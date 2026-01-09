@@ -1,55 +1,96 @@
 <template>
-    <section class="relative bg-secondary min-h-screen flex items-center overflow-hidden">
-        <!-- Background Pattern -->
-        <div class="absolute inset-0 opacity-10">
-            <div class="absolute top-20 left-10 w-72 h-72 bg-primary rounded-full blur-3xl"></div>
-            <div class="absolute bottom-20 right-10 w-96 h-96 bg-accent rounded-full blur-3xl"></div>
-        </div>
-
-        <div class="container relative z-10 pt-24">
-            <div class="grid lg:grid-cols-2 gap-12 items-center">
-                <!-- Content -->
-                <div class="space-y-6">
-                    <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
-                        <Icon name="mdi:star" class="w-4 h-4 text-accent" />
-                        <span class="text-white text-sm font-medium">IT SOLUTION AGENCY IN USA</span>
-                    </div>
-
-                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-                        BUSINESS INNOVATION
-                        <span class="text-primary">WITH IT EXPERT</span>
-                    </h1>
-
-                    <p class="text-gray-300 text-lg max-w-xl">
-                        Professionally optimize interdependent intellectual interoperable connect best practices.
-                        Progressively fabricate done
-                    </p>
-
-                    <div class="flex flex-wrap gap-4 pt-4">
-                        <NuxtLink to="/contact" class="btn-primary">
-                            Let's Talk
-                            <Icon name="mdi:arrow-right" class="w-5 h-5" />
-                        </NuxtLink>
-                        <NuxtLink to="/about" class="btn-outline">
-                            Read More
-                        </NuxtLink>
-                    </div>
+    <section class="relative min-h-screen overflow-hidden" aria-label="Banner giới thiệu công ty SHT">
+        <!-- Slides -->
+        <div class="relative h-screen">
+            <div v-for="(slide, index) in slides" :key="index" class="absolute inset-0 transition-opacity duration-700" :class="currentSlide === index ? 'opacity-100 z-10' : 'opacity-0 z-0'">
+                <!-- Background Image -->
+                <div class="absolute inset-0 bg-cover bg-center" :style="{ backgroundImage: `url(${slide.image})` }">
+                    <div class="absolute inset-0 bg-secondary/70"></div>
                 </div>
-
-                <!-- Hero Image -->
-                <div class="relative">
-                    <div class="relative z-10">
-                        <img src="https://toptechh.netlify.app/images/hero-thumb.png" alt="IT Expert" class="w-full max-w-lg mx-auto" />
+                <!-- Content -->
+                <div class="relative z-10 h-full flex items-center">
+                    <div class="container">
+                        <div class="max-w-3xl space-y-6">
+                            <span class="inline-block bg-primary/20 text-primary px-4 py-2 rounded-full text-sm font-semibold">
+                                {{ slide.badge }}
+                            </span>
+                            <component :is="index === 0 ? 'h1' : 'h2'" class="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+                                {{ slide.title }}
+                                <span class="text-primary">{{ slide.highlight }}</span>
+                            </component>
+                            <p class="text-gray-300 text-lg max-w-xl">{{ slide.description }}</p>
+                            <div class="flex flex-wrap gap-4 pt-4">
+                                <button class="btn-primary" aria-label="Liên hệ tư vấn">
+                                    Liên Hệ Ngay
+                                    <Icon name="mdi:arrow-right" class="w-5 h-5" />
+                                </button>
+                                <button class="btn-outline" aria-label="Xem thêm về công ty">
+                                    Tìm Hiểu Thêm
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <!-- Decorative Shape -->
-                    <div class="absolute -bottom-10 -right-10 w-64 h-64 bg-primary/20 rounded-full blur-2xl"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Scroll Indicator -->
-        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-            <Icon name="mdi:chevron-down" class="w-8 h-8 text-white/50" />
+        <!-- Navigation Arrows -->
+        <button @click="prevSlide" class="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white/10 hover:bg-primary rounded-full flex items-center justify-center text-white transition-colors" aria-label="Slide trước">
+            <Icon name="mdi:chevron-left" class="w-6 h-6" />
+        </button>
+        <button @click="nextSlide" class="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white/10 hover:bg-primary rounded-full flex items-center justify-center text-white transition-colors" aria-label="Slide tiếp theo">
+            <Icon name="mdi:chevron-right" class="w-6 h-6" />
+        </button>
+
+        <!-- Dots Indicator -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-3">
+            <button v-for="(_, index) in slides" :key="index" @click="currentSlide = index" class="w-3 h-3 rounded-full transition-all" :class="currentSlide === index ? 'bg-primary w-8' : 'bg-white/50 hover:bg-white'" :aria-label="`Đi đến slide ${index + 1}`"></button>
         </div>
     </section>
 </template>
+
+<script setup>
+const currentSlide = ref(0)
+
+const slides = [
+    {
+        badge: 'Giải Pháp An Ninh Toàn Diện',
+        title: 'SHT - Chuyên Gia',
+        highlight: 'Camera & Hạ Tầng Mạng',
+        description: 'Cung cấp giải pháp an ninh thông minh, hạ tầng mạng chuyên nghiệp cho gia đình và doanh nghiệp. Đồng hành cùng bạn bảo vệ tài sản.',
+        image: '/images/banner.jpg',
+    },
+    {
+        badge: '8 Lĩnh Vực Cốt Lõi',
+        title: 'Hệ Thống Camera AI',
+        highlight: 'Giám Sát Thông Minh',
+        description: 'Camera nhận diện khuôn mặt, phát hiện xâm nhập, giám sát từ xa 24/7 qua điện thoại. Công nghệ AI tiên tiến nhất.',
+        image: '/images/banner.jpg',
+    },
+    {
+        badge: 'Uy Tín - Chất Lượng',
+        title: 'Hạ Tầng Mạng',
+        highlight: 'Ổn Định 24/7',
+        description: 'Thi công mạng LAN, WiFi doanh nghiệp, Firewall bảo mật, VPN kết nối đa chi nhánh. Đảm bảo vận hành liên tục.',
+        image: '/images/banner.jpg',
+    }
+]
+
+const nextSlide = () => {
+    currentSlide.value = (currentSlide.value + 1) % slides.length
+}
+
+const prevSlide = () => {
+    currentSlide.value = (currentSlide.value - 1 + slides.length) % slides.length
+}
+
+// Auto-play
+let autoPlayInterval
+onMounted(() => {
+    autoPlayInterval = setInterval(nextSlide, 5000)
+})
+
+onUnmounted(() => {
+    clearInterval(autoPlayInterval)
+})
+</script>

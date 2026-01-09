@@ -1,76 +1,105 @@
 <template>
-    <footer class="bg-secondary pt-20 pb-8">
+    <footer class="bg-secondary pt-16 pb-6" itemscope itemtype="https://schema.org/Organization">
         <div class="container">
             <!-- Main Footer Content -->
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12 border-b border-white/10">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-10 pb-10 border-b border-white/10">
                 <!-- Logo & Description -->
-                <div class="lg:col-span-1">
-                    <NuxtLink to="/" class="inline-block mb-6">
-                        <div class="text-3xl font-bold text-white">
-                            <span class="text-primary">Top</span>tech
+                <div>
+                    <div class="inline-block mb-4 cursor-pointer" itemprop="url">
+                        <div class="text-3xl font-bold text-white" itemprop="name">
+                            <span class="text-primary">SHT</span> Security
                         </div>
-                    </NuxtLink>
-                    <p class="text-gray-400 leading-relaxed mb-6">
-                        Monotonectally synergize granular top visualize strategic infomediaries afters task state of the art infrastructures digital agency in north
+                    </div>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-4" itemprop="description">
+                        Chuyên cung cấp giải pháp an ninh và hạ tầng mạng cho gia đình, doanh nghiệp.
+                        Camera AI, mạng LAN, WiFi, Access Control, Báo cháy, Tổng đài IP.
                     </p>
-                    <NuxtLink to="/about" class="btn-primary">
-                        Discover More
-                    </NuxtLink>
+                    <button class="btn-primary text-sm">
+                        Về Chúng Tôi
+                    </button>
                 </div>
 
-                <!-- Company Links -->
+                <!-- Quick Links -->
                 <div>
-                    <h4 class="text-white font-bold text-xl mb-6">Company</h4>
+                    <h3 class="text-white font-bold text-lg mb-4">Liên Kết</h3>
+                    <nav aria-label="Footer navigation">
+                        <ul class="space-y-2">
+                            <li v-for="link in quickLinks" :key="link.name">
+                                <span class="text-gray-400 hover:text-primary transition-colors text-sm flex items-center gap-2 cursor-pointer">
+                                    <Icon name="mdi:chevron-right" class="w-4 h-4" />
+                                    {{ link.name }}
+                                </span>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h3 class="text-white font-bold text-lg mb-4">Liên Hệ</h3>
                     <ul class="space-y-3">
-                        <li v-for="link in companyLinks" :key="link.name">
-                            <NuxtLink :to="link.path" class="text-gray-400 hover:text-primary transition-colors flex items-center gap-2">
-                                <Icon name="mdi:chevron-right" class="w-4 h-4" />
-                                {{ link.name }}
-                            </NuxtLink>
+                        <li>
+                            <div class="text-gray-400 hover:text-primary transition-colors text-sm flex items-center gap-2 cursor-pointer" itemprop="telephone">
+                                <Icon name="mdi:phone" class="w-4 h-4 text-primary" />
+                                0901 234 567
+                            </div>
+                        </li>
+                        <li>
+                            <div class="text-gray-400 hover:text-primary transition-colors text-sm flex items-center gap-2 cursor-pointer">
+                                <Icon name="mdi:phone-classic" class="w-4 h-4 text-primary" />
+                                028 7654 321
+                            </div>
+                        </li>
+                        <li>
+                            <div class="text-gray-400 hover:text-primary transition-colors text-sm flex items-center gap-2 cursor-pointer" itemprop="email">
+                                <Icon name="mdi:email" class="w-4 h-4 text-primary" />
+                                info@sht.vn
+                            </div>
+                        </li>
+                        <li>
+                            <div class="text-gray-400 hover:text-primary transition-colors text-sm flex items-center gap-2 cursor-pointer">
+                                <Icon name="mdi:facebook" class="w-4 h-4 text-primary" />
+                                facebook.com/SHT.security
+                            </div>
+                        </li>
+                        <li>
+                            <div class="text-gray-400 hover:text-primary transition-colors text-sm flex items-center gap-2 cursor-pointer">
+                                <Icon name="mdi:chat" class="w-4 h-4 text-primary" />
+                                Zalo: 0901 234 567
+                            </div>
+                        </li>
+                        <li class="text-gray-400 text-sm flex items-start gap-2" itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+                            <Icon name="mdi:map-marker" class="w-4 h-4 text-primary mt-0.5" />
+                            <span itemprop="streetAddress">123 Đường ABC, Phường XYZ, Quận 1, TP. Hồ Chí Minh</span>
                         </li>
                     </ul>
                 </div>
 
-                <!-- Services Links -->
+                <!-- Google Map -->
                 <div>
-                    <h4 class="text-white font-bold text-xl mb-6">Our Services</h4>
-                    <ul class="space-y-3">
-                        <li v-for="link in serviceLinks" :key="link.name">
-                            <NuxtLink :to="link.path" class="text-gray-400 hover:text-primary transition-colors flex items-center gap-2">
-                                <Icon name="mdi:chevron-right" class="w-4 h-4" />
-                                {{ link.name }}
-                            </NuxtLink>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Newsletter -->
-                <div>
-                    <h4 class="text-white font-bold text-xl mb-6">Newsletter</h4>
-                    <p class="text-gray-400 mb-4">Subscribe Our Latest Newsletter</p>
-                    <form @submit.prevent="subscribe" class="space-y-3">
-                        <div class="relative">
-                            <input v-model="email" type="email" placeholder="Enter your email" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-primary" />
-                        </div>
-                        <button type="submit" class="btn-primary w-full justify-center">
-                            Subscribe
-                            <Icon name="mdi:send" class="w-4 h-4" />
-                        </button>
-                    </form>
+                    <h3 class="text-white font-bold text-lg mb-4">Bản Đồ</h3>
+                    <div class="rounded-lg overflow-hidden aspect-video">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.4241674197956!2d106.69765841533417!3d10.778789792319392!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f38f9ed887b%3A0x14aded5703768989!2zUXXhuq1uIDEsIFRow6BuaCBwaOG7kSBI4buTIENow60gTWluaCwgVmnhu4d0IE5hbQ!5e0!3m2!1svi!2s!4v1704796800000" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Bản đồ địa chỉ SHT Security"></iframe>
+                    </div>
                 </div>
             </div>
 
             <!-- Bottom Footer -->
-            <div class="pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-                <p class="text-gray-400 text-sm">
-                    © 2024 Toptech. Designed By Dream IT Solution
-                </p>
+            <div class="pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <p class="text-gray-400 text-sm">
+                        © 2024 SHT Security. All rights reserved.
+                    </p>
+                    <div class="cursor-pointer" title="Đã đăng ký Bộ Công Thương">
+                        <img src="/images/bocongthuong.png" alt="Đã đăng ký Bộ Công Thương" class="h-10" loading="lazy" />
+                    </div>
+                </div>
 
                 <!-- Social Icons -->
                 <div class="flex items-center gap-3">
-                    <a v-for="social in socials" :key="social.name" :href="social.url" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-primary transition-colors">
-                        <Icon :name="social.icon" class="w-5 h-5" />
-                    </a>
+                    <div v-for="social in socials" :key="social.name" :aria-label="social.name" class="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-primary transition-colors cursor-pointer">
+                        <Icon :name="social.icon" class="w-4 h-4" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -78,34 +107,22 @@
 </template>
 
 <script setup>
-const email = ref('')
-
-const companyLinks = [
-    { name: 'About Us', path: '/about' },
-    { name: 'Our Team', path: '/team' },
-    { name: 'Pricing Plan', path: '/pricing' },
-    { name: 'Latest Blog', path: '/blog' },
-    { name: 'Careers', path: '/careers' }
-]
-
-const serviceLinks = [
-    { name: 'IT Solutions', path: '/services' },
-    { name: 'Cyber Security', path: '/services' },
-    { name: 'Digital Marketing', path: '/services' },
-    { name: 'Brand Identity', path: '/services' },
-    { name: 'SEO Marketing', path: '/services' }
+const quickLinks = [
+    { name: 'Giới Thiệu', path: '/gioi-thieu' },
+    { name: 'Camera An Ninh', path: '/san-pham/camera-an-ninh' },
+    { name: 'Hạ Tầng Mạng', path: '/san-pham/ha-tang-mang' },
+    { name: 'WiFi & Firewall', path: '/san-pham/wifi-firewall' },
+    { name: 'Access Control', path: '/san-pham/access-control' },
+    { name: 'Báo Động & Báo Cháy', path: '/san-pham/bao-dong-bao-chay' },
+    { name: 'Dự Án', path: '/du-an' },
+    { name: 'Bài Đăng', path: '/bai-dang' },
+    { name: 'Liên Hệ', path: '/lien-he' }
 ]
 
 const socials = [
-    { name: 'Facebook', icon: 'mdi:facebook', url: '#' },
-    { name: 'Twitter', icon: 'mdi:twitter', url: '#' },
-    { name: 'LinkedIn', icon: 'mdi:linkedin', url: '#' },
-    { name: 'Instagram', icon: 'mdi:instagram', url: '#' }
+    { name: 'Facebook', icon: 'mdi:facebook', url: 'https://facebook.com/SHT.security' },
+    { name: 'TikTok', icon: 'mdi:music-note', url: 'https://tiktok.com/@sht.security' },
+    { name: 'YouTube', icon: 'mdi:youtube', url: 'https://youtube.com/@SHTsecurity' },
+    { name: 'Zalo', icon: 'mdi:chat', url: 'https://zalo.me/0901234567' }
 ]
-
-const subscribe = () => {
-    // Handle subscription
-    console.log('Subscribe:', email.value)
-    email.value = ''
-}
 </script>
