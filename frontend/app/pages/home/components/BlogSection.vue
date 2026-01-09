@@ -1,9 +1,7 @@
 <template>
-    <section class="relative w-full bg-slate-50 overflow-hidden">
-        <div class="absolute inset-0 opacity-20 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
-
-        <div class="container relative z-10 mb-8 flex flex-col md:flex-row items-end justify-between gap-6">
-            <div>
+    <section class="relative w-full overflow-hidden">
+        <div class="container relative z-10 mb-8">
+            <div class="bg-white/90 backdrop-blur-sm rounded-2xl p-6 inline-block">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100/50 border border-blue-200 text-blue-700 text-xs font-bold uppercase tracking-wider mb-2">
                     <span class="relative flex h-2 w-2">
                         <span class="absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75 animate-ping" />
@@ -15,52 +13,37 @@
                     CÁC KÊNH <span class="text-primary">TRUYỀN THÔNG</span>
                 </h2>
             </div>
-
-            <div class="flex gap-3">
-                <button @click="scrollSlider(-400)" class="w-12 h-12 rounded-full border border-slate-300 flex items-center justify-center hover:bg-white hover:border-primary transition-all text-slate-600 hover:text-primary shadow-sm">
-                    <Icon name="mdi:chevron-left" class="w-6 h-6" />
-                </button>
-                <button @click="scrollSlider(400)" class="w-12 h-12 rounded-full border border-slate-300 flex items-center justify-center hover:bg-white hover:border-primary transition-all text-slate-600 hover:text-primary shadow-sm">
-                    <Icon name="mdi:chevron-right" class="w-6 h-6" />
-                </button>
-            </div>
         </div>
 
-        <div class="container relative z-10 mb-8 flex flex-wrap justify-center gap-4">
-            <a href="https://tiktok.com/@huyphan_sht_co.ltd" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-3 px-6 py-3 bg-white border border-slate-200 hover:border-primary rounded-full transition-all hover:bg-blue-50 shadow-sm">
-                <Icon name="mdi:music-note" class="w-5 h-5 text-slate-700" />
-                <span class="text-sm font-semibold text-slate-900 group-hover:text-primary transition-colors">Theo dõi TikTok</span>
+        <div class="container relative z-10 mb-0 flex flex-wrap justify-center gap-3 md:gap-4">
+            <a href="https://tiktok.com/@huyphan_sht_co.ltd" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-3 px-2 md:px-6 py-2 md:py-3 md:bg-white md:border border-slate-200 hover:border-primary md:rounded-full transition-all md:hover:bg-blue-50 md:shadow-sm">
+                <Icon name="mdi:music-note" class="w-8 h-8 md:w-7 md:h-7 text-slate-700" />
+                <span class="hidden md:inline text-sm font-semibold text-slate-900 group-hover:text-primary transition-colors">Theo dõi TikTok</span>
             </a>
-            <a href="https://facebook.com/SHT.security" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-3 px-6 py-3 bg-white border border-slate-200 hover:border-blue-500 rounded-full transition-all hover:bg-blue-50 shadow-sm">
-                <Icon name="mdi:facebook" class="w-5 h-5 text-blue-600" />
-                <span class="text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">Theo dõi Facebook</span>
+            <a href="https://facebook.com/SHT.security" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-3 px-2 md:px-6 py-2 md:py-3 md:bg-white md:border border-slate-200 hover:border-blue-500 md:rounded-full transition-all md:hover:bg-blue-50 md:shadow-sm">
+                <Icon name="mdi:facebook" class="w-8 h-8 md:w-7 md:h-7 text-blue-600" />
+                <span class="hidden md:inline text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">Theo dõi Facebook</span>
             </a>
-            <a href="https://youtube.com/@SHTsecurity" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-3 px-6 py-3 bg-white border border-slate-200 hover:border-red-500 rounded-full transition-all hover:bg-red-50 shadow-sm">
-                <Icon name="mdi:youtube" class="w-5 h-5 text-red-600" />
-                <span class="text-sm font-semibold text-slate-900 group-hover:text-red-600 transition-colors">Đăng ký YouTube</span>
+            <a href="https://youtube.com/@SHTsecurity" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-3 px-2 md:px-6 py-2 md:py-3 md:bg-white md:border border-slate-200 hover:border-red-500 md:rounded-full transition-all md:hover:bg-red-50 md:shadow-sm">
+                <Icon name="mdi:youtube" class="w-8 h-8 md:w-7 md:h-7 text-red-600" />
+                <span class="hidden md:inline text-sm font-semibold text-slate-900 group-hover:text-red-600 transition-colors">Đăng ký YouTube</span>
             </a>
         </div>
 
-        <div class="container relative z-10">
-            <div ref="sliderRef" class="overflow-x-auto hide-scroll" @mousedown="startDrag" @mousemove="onDrag" @mouseup="endDrag" @mouseleave="endDrag">
-                <div class="flex gap-6 md:gap-8 w-max pb-10 pt-4 select-none">
-                    <div v-for="(video, index) in videos" :key="index" class="relative group pointer-events-auto">
-                        <div class="phone-frame w-[325px] h-[575px] bg-white rounded-[32px] overflow-hidden relative border border-slate-200 shadow-lg">
-                            <div v-html="video.embedHtml" class="w-full h-full [&_iframe]:w-full [&_iframe]:h-full [&_iframe]:border-0 [&_iframe]:pointer-events-auto [&_blockquote]:m-0 [&_blockquote]:p-0" />
+        <div class="scroll-container relative z-10 w-full overflow-x-auto px-4">
+            <div class="flex gap-6 py-10 min-w-max justify-center">
+                <div v-for="(video, index) in videos" :key="index" class="relative group flex-shrink-0">
+                    <div class="phone-frame w-[280px] h-[500px] bg-white rounded-[32px] overflow-hidden relative border border-slate-200 shadow-lg">
+                        <div v-html="video.embedHtml" class="absolute inset-0 w-full h-full flex items-center justify-center [&_iframe]:w-full [&_iframe]:h-full [&_iframe]:border-0 [&_iframe]:absolute [&_iframe]:inset-0 [&_blockquote]:m-0 [&_blockquote]:p-0 [&_blockquote]:w-full [&_blockquote]:h-full [&_blockquote]:scale-[1.4] [&_blockquote]:origin-center" />
+                    </div>
+                </div>
+
+                <div class="relative group flex-shrink-0">
+                    <div class="phone-frame w-[280px] h-[500px] bg-white rounded-[32px] overflow-hidden relative border border-slate-200 shadow-lg flex items-center justify-center p-4">
+                        <div id="fb-root"></div>
+                        <div class="fb-page w-full h-full" data-href="https://www.facebook.com/SmartHomeTechnologySHT/" data-tabs="timeline" data-width="260" data-height="460" data-small-header="true" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true">
                         </div>
                     </div>
-
-                    <NuxtLink to="https://tiktok.com/@huyphan_sht_co.ltd" target="_blank" class="relative group">
-                        <div class="phone-frame w-[325px] h-[575px] bg-white rounded-[32px] overflow-hidden relative border border-slate-200 shadow-lg flex items-center justify-center">
-                            <div class="text-center p-6">
-                                <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-200">
-                                    <Icon name="mdi:plus" class="w-8 h-8 text-primary" />
-                                </div>
-                                <h3 class="text-xl font-bold text-slate-900 mb-2">Xem thêm trên TikTok</h3>
-                                <span class="text-primary text-sm hover:underline">@huyphan_sht_co.ltd</span>
-                            </div>
-                        </div>
-                    </NuxtLink>
                 </div>
             </div>
         </div>
@@ -68,11 +51,6 @@
 </template>
 
 <script setup lang="ts">
-const sliderRef = ref<HTMLElement | null>(null)
-const isDragging = ref(false)
-const startX = ref(0)
-const scrollLeft = ref(0)
-
 const videos = [
     {
         embedHtml: `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@huyphan_sht_co.ltd/video/7479305993915026705" data-video-id="7479305993915026705" style="max-width:100%;min-width:100%;height:100%;margin:0;"><section><a target="_blank" title="@huyphan_sht_co.ltd" href="https://www.tiktok.com/@huyphan_sht_co.ltd?refer=embed">@huyphan_sht_co.ltd</a></section></blockquote>`
@@ -85,59 +63,29 @@ const videos = [
     }
 ]
 
-function scrollSlider(amount: number) {
-    sliderRef.value?.scrollBy({ left: amount, behavior: 'smooth' })
-}
-
-function startDrag(e: MouseEvent) {
-    if (!sliderRef.value) return
-    const target = e.target as HTMLElement
-    if (target.closest('.phone-frame')) return
-    isDragging.value = true
-    sliderRef.value.style.cursor = 'grabbing'
-    startX.value = e.pageX - sliderRef.value.offsetLeft
-    scrollLeft.value = sliderRef.value.scrollLeft
-}
-
-function onDrag(e: MouseEvent) {
-    if (!isDragging.value || !sliderRef.value) return
-    e.preventDefault()
-    const x = e.pageX - sliderRef.value.offsetLeft
-    const walk = (x - startX.value) * 2
-    sliderRef.value.scrollLeft = scrollLeft.value - walk
-}
-
-function endDrag() {
-    isDragging.value = false
-    if (sliderRef.value) sliderRef.value.style.cursor = 'grab'
-}
-
 onMounted(() => {
-    const script = document.createElement('script')
-    script.src = 'https://www.tiktok.com/embed.js'
-    script.async = true
-    document.body.appendChild(script)
+    const tiktokScript = document.createElement('script')
+    tiktokScript.src = 'https://www.tiktok.com/embed.js'
+    tiktokScript.async = true
+    document.body.appendChild(tiktokScript)
+
+    const fbScript = document.createElement('script')
+    fbScript.text = `(function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = 'https://connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v18.0';
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));`
+    document.body.appendChild(fbScript)
 })
 </script>
 
 <style scoped>
-.bg-dot-pattern {
-    background-image: radial-gradient(#334155 1px, transparent 1px);
-    background-size: 30px 30px;
-}
-
-.hide-scroll::-webkit-scrollbar {
-    display: none;
-}
-
-.hide-scroll {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-    cursor: grab;
-}
-
-.hide-scroll:active {
-    cursor: grabbing;
+.scroll-container {
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    overscroll-behavior-x: contain;
 }
 
 .phone-frame {

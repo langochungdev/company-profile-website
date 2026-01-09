@@ -34,13 +34,8 @@
             </div>
         </div>
 
-        <!-- Navigation Arrows -->
-        <button @click="prevSlide" class="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white/10 hover:bg-primary rounded-full flex items-center justify-center text-white transition-colors" aria-label="Slide trước">
-            <Icon name="mdi:chevron-left" class="w-6 h-6" />
-        </button>
-        <button @click="nextSlide" class="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-white/10 hover:bg-primary rounded-full flex items-center justify-center text-white transition-colors" aria-label="Slide tiếp theo">
-            <Icon name="mdi:chevron-right" class="w-6 h-6" />
-        </button>
+        <div @click="prevSlide" class="absolute left-0 top-0 w-1/4 h-full z-20 cursor-pointer" aria-label="Slide trước"></div>
+        <div @click="nextSlide" class="absolute right-0 top-0 w-1/4 h-full z-20 cursor-pointer" aria-label="Slide tiếp theo"></div>
 
         <!-- Dots Indicator -->
         <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-3">

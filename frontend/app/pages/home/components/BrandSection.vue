@@ -1,7 +1,7 @@
 <template>
-    <section class="bg-gradient-to-b from-gray-50 to-secondary overflow-hidden py-6" aria-label="Chứng nhận và đối tác">
+    <section class="overflow-hidden py-6" aria-label="Chứng nhận và đối tác">
         <div class="container h-full flex flex-col gap-6">
-            <div class="bg-gray-50 rounded-2xl p-6 flex-1 flex flex-col">
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-6 flex-1 flex flex-col">
                 <div class="flex flex-col lg:flex-row items-center gap-6 mb-4">
                     <div class="lg:w-1/4 text-center lg:text-left flex-shrink-0">
                         <h2 class="text-2xl font-bold text-secondary">
@@ -12,11 +12,13 @@
                     <div class="lg:w-3/4 overflow-hidden flex-1">
                         <div class="certificates-scroll" @mouseenter="pauseAnimation = true" @mouseleave="pauseAnimation = false">
                             <div class="certificates-track" :class="{ paused: pauseAnimation }">
-                                <div v-for="i in 10" :key="'cert-' + i" class="flex-shrink-0 mx-3">
-                                    <div class="bg-white rounded-xl shadow-lg p-3 hover:shadow-2xl transition-all duration-300">
-                                        <img src="/images/chungnhan.jpg" :alt="'Giấy chứng nhận SHT ' + i" loading="lazy" class="h-32 w-auto object-contain rounded-lg" />
+                                <template v-for="set in 2" :key="'cert-set-' + set">
+                                    <div v-for="i in 10" :key="'cert-' + set + '-' + i" class="flex-shrink-0 mx-4">
+                                        <div class="hover:scale-105 transition-all duration-300 cursor-pointer" @click="openPopup('/images/chungnhan.jpg')">
+                                            <img src="/images/chungnhan.jpg" :alt="'Giấy chứng nhận SHT ' + i" loading="lazy" class="h-48 w-auto object-contain" />
+                                        </div>
                                     </div>
-                                </div>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -34,19 +36,48 @@
                     <div class="lg:w-3/4 overflow-hidden flex-1">
                         <div class="partners-scroll" @mouseenter="pausePartners = true" @mouseleave="pausePartners = false">
                             <div class="partners-track" :class="{ paused: pausePartners }">
-                                <img v-for="i in 10" :key="'partner-' + i" :src="`/images/doitac.jpg`" :alt="'Đối tác SHT ' + i" loading="lazy" class="h-16 w-auto object-contain mx-10 grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition-all duration-300" />
+                                <template v-for="set in 2" :key="'partner-set-' + set">
+                                    <img v-for="i in 10" :key="'partner-' + set + '-' + i" :src="`/images/doitac.jpg`" :alt="'Đối tác SHT ' + i" loading="lazy" class="h-16 w-auto object-contain mx-10 grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition-all duration-300" />
+                                </template>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <Teleport to="body">
+            <Transition name="fade">
+                <div v-if="showPopup" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90" @click="closePopup">
+                    <div class="w-full h-full flex items-center justify-center">
+                        <img :src="selectedImage" alt="Giấy chứng nhận" class="w-[75vw] md:w-auto md:h-[67vh] max-w-[95vw] max-h-[95vh] object-contain" />
+                    </div>
+                </div>
+            </Transition>
+        </Teleport>
     </section>
 </template>
 
 <script setup>
 const pauseAnimation = ref(false)
 const pausePartners = ref(false)
+const showPopup = ref(false)
+const selectedImage = ref('')
+
+const openPopup = (imageSrc) => {
+    selectedImage.value = imageSrc
+    showPopup.value = true
+    document.body.style.overflow = 'hidden'
+}
+
+const closePopup = () => {
+    showPopup.value = false
+    document.body.style.overflow = ''
+}
+
+onUnmounted(() => {
+    document.body.style.overflow = ''
+})
 </script>
 
 <style scoped>
@@ -61,6 +92,17 @@ const pausePartners = ref(false)
     display: flex;
     width: max-content;
     animation: scroll-left 40s linear infinite;
+}
+
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 
 .partners-track {

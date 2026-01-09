@@ -1,38 +1,44 @@
-<!-- Section topbar chứa thông tin liên hệ và mạng xã hội -->
+<!-- Component hiển thị thông tin liên hệ nhanh ở đầu trang -->
 <template>
-    <div class="bg-secondary text-sm py-2 border-b border-white/10">
+    <div class="bg-secondary text-sm py-1 lg:py-2 border-b border-white/10">
         <div class="container">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-6">
-                    <a href="tel:0901234567" class="flex items-center gap-2 text-white/80 hover:text-primary transition-colors">
-                        <Icon name="mdi:phone" class="w-4 h-4" />
-                        <span class="hidden sm:inline">0901 234 567</span>
-                    </a>
-                    <a href="mailto:info@sht.vn" class="flex items-center gap-2 text-white/80 hover:text-primary transition-colors">
-                        <Icon name="mdi:email" class="w-4 h-4" />
-                        <span class="hidden md:inline">info@sht.vn</span>
-                    </a>
-                    <div class="flex items-center gap-2 text-white/80">
-                        <Icon name="mdi:map-marker" class="w-4 h-4" />
-                        <span class="hidden lg:inline">123 Đường ABC, Quận 1, TP.HCM</span>
-                    </div>
+            <div class="flex items-center justify-between lg:justify-end gap-3 lg:gap-6">
+                <div class="flex items-center gap-1 lg:gap-2 text-white/80 text-xs lg:text-sm">
+                    <Icon name="mdi:map-marker" class="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
+                    <span class="truncate">123 Đường ABC, Quận 1, TP.HCM</span>
                 </div>
-
-                <!-- <div class="flex items-center gap-3">
-                    <a v-for="social in socialLinks" :key="social.name" :href="social.url" target="_blank" rel="noopener noreferrer" :aria-label="social.name" class="text-white/80 hover:text-primary transition-colors">
-                        <Icon :name="social.icon" class="w-4 h-4" />
-                    </a>
-                </div> -->
+                <a href="mailto:info@sht.vn" class="hidden lg:flex items-center gap-2 text-white/80 hover:text-primary transition-colors">
+                    <Icon name="mdi:email" class="w-4 h-4" />
+                    <span>info@sht.vn</span>
+                </a>
+                <a href="tel:0901234567" class="phone-blink flex items-center gap-1 lg:gap-2 text-xs lg:text-sm">
+                    <Icon name="mdi:phone" class="w-3 h-3 lg:w-4 lg:h-4 flex-shrink-0" />
+                    <span>0901 234 567</span>
+                </a>
             </div>
         </div>
     </div>
 </template>
 
-<script setup>
-const socialLinks = [
-    { name: 'Facebook', icon: 'mdi:facebook', url: 'https://facebook.com/SHT.security' },
-    { name: 'TikTok', icon: 'mdi:music-note', url: 'https://tiktok.com/@sht.security' },
-    { name: 'YouTube', icon: 'mdi:youtube', url: 'https://youtube.com/@SHTsecurity' },
-    { name: 'Zalo', icon: 'mdi:chat', url: 'https://zalo.me/0901234567' }
-]
-</script>
+<style scoped>
+@keyframes blink-red {
+
+    0%,
+    100% {
+        color: #ef4444;
+    }
+
+    50% {
+        color: #fca5a5;
+        filter: brightness(1.5);
+    }
+}
+
+.phone-blink {
+    animation: blink-red 1.5s ease-in-out infinite;
+}
+
+.phone-blink:hover {
+    animation-play-state: paused;
+}
+</style>

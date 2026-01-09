@@ -1,12 +1,12 @@
 <template>
     <div>
         <TheTopBar class="fixed top-0 left-0 right-0 z-50" />
-        <header :class="['fixed left-0 right-0 z-40 transition-all duration-300', scrolled ? 'bg-secondary shadow-lg' : 'bg-secondary/20 backdrop-blur-sm', navVisible ? 'top-[36px]' : '-top-[80px]']">
+        <header :class="['fixed left-0 right-0 z-40 transition-all duration-300', scrolled ? 'bg-secondary shadow-lg' : 'bg-secondary/20 backdrop-blur-sm', navVisible ? 'top-[25px] lg:top-[36px]' : '-top-[80px]']">
             <div class="container">
                 <div class="flex items-center justify-between py-2.5">
                     <!-- Logo -->
                     <div class="flex items-center cursor-pointer" aria-label="Trang chủ SHT Security">
-                        <img src="/images/logo.png" alt="SHT Security Logo" class="h-16 w-auto" />
+                        <img src="./img/logo.png" alt="SHT Security Logo" class="h-16 w-auto" />
                     </div>
 
                     <!-- Desktop Navigation -->

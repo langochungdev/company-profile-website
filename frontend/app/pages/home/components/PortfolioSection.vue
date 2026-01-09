@@ -1,9 +1,7 @@
 <template>
-    <section class="relative w-full bg-slate-50 flex flex-col justify-center py-12 overflow-hidden">
-        <div class="absolute inset-0 opacity-20 pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
-
+    <section class="relative w-full flex flex-col justify-center py-6 overflow-hidden">
         <div class="container relative z-10 mb-8">
-            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-slate-200 pb-6">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white/90 backdrop-blur-sm rounded-2xl p-6 border-b border-slate-200">
                 <div class="max-w-3xl">
                     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100/50 border border-blue-200 text-blue-700 text-xs font-bold uppercase tracking-wider mb-2">
                         <span class="relative flex h-2 w-2">
@@ -31,13 +29,13 @@
 
         <div class="container relative z-10">
             <div class="project-container flex flex-col lg:flex-row h-auto lg:h-[500px] w-full gap-2 lg:gap-1">
-                <div v-for="(project, index) in projects" :key="index" :style="{ '--aspect-ratio': aspectRatios[index] || 1.5 }" class="project-card group relative h-[350px] lg:h-full bg-slate-900 border border-slate-200 shadow-md cursor-pointer" @mouseenter="hoveredIndex = index" @mouseleave="hoveredIndex = null">
+                <div v-for="(project, index) in projects" :key="index" :style="{ '--aspect-ratio': aspectRatios[index] || 1.5 }" class="project-card group relative h-[350px] lg:h-full bg-slate-900 border border-slate-200 shadow-md cursor-pointer" :class="index >= 3 ? 'hidden lg:block' : ''" @mouseenter="hoveredIndex = index" @mouseleave="hoveredIndex = null">
                     <div class="absolute inset-0 w-full h-full overflow-hidden">
-                        <img :src="project.image" :alt="project.title" loading="lazy" class="absolute inset-0 w-full h-full object-cover object-center" />
+                        <img :src="project.image" :alt="project.title" loading="lazy" class="absolute inset-0 w-full h-full object-cover object-center transition-all duration-500" :class="hoveredIndex === index ? 'grayscale-0' : 'grayscale'" />
                     </div>
 
                     <div class="absolute bottom-0 left-0 w-full p-6 lg:p-8 z-20 flex flex-col justify-end h-full">
-                        <div class="absolute bottom-4 left-6 lg:left-8 transition-all duration-500 ease-out max-w-[calc(100%-3rem)]" :class="hoveredIndex === index ? 'relative bottom-auto left-auto mb-2 max-w-full' : hoveredIndex !== null ? 'scale-90 opacity-80' : ''">
+                        <div class="absolute top-4 left-4 lg:bottom-4 lg:top-auto lg:left-8 transition-all duration-500 ease-out max-w-[calc(100%-3rem)]" :class="hoveredIndex === index ? 'lg:relative lg:bottom-auto lg:left-auto mb-2 max-w-full' : hoveredIndex !== null ? 'lg:scale-90 lg:opacity-80' : ''">
                             <span :class="project.badgeColor" class="inline-block px-3 py-1 text-xs font-bold text-slate-900 rounded-md shadow-lg whitespace-nowrap overflow-hidden text-ellipsis">
                                 {{ project.category }}
                             </span>
