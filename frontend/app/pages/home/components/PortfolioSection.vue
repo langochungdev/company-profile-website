@@ -29,9 +29,9 @@
 
         <div class="container relative z-10">
             <div class="project-container flex flex-col lg:flex-row h-auto lg:h-[500px] w-full gap-2 lg:gap-1">
-                <div v-for="(project, index) in projects" :key="index" :style="{ '--aspect-ratio': aspectRatios[index] || 1.5 }" class="project-card group relative h-[350px] lg:h-full bg-slate-900 border border-slate-200 shadow-md cursor-pointer" :class="index >= 3 ? 'hidden lg:block' : ''" @mouseenter="hoveredIndex = index" @mouseleave="hoveredIndex = null">
+                <div v-for="(project, index) in projects" :key="index" :style="{ '--aspect-ratio': aspectRatios[index] || 1.5 }" class="project-card group relative h-[350px] lg:h-full bg-slate-900 border border-slate-200 shadow-md cursor-pointer" :class="index >= 3 ? 'hidden lg:block' : ''" @mouseenter="onMouseEnter(index)" @mouseleave="onMouseLeave">
                     <div class="absolute inset-0 w-full h-full overflow-hidden">
-                        <img :src="project.image" :alt="project.title" loading="lazy" class="absolute inset-0 w-full h-full object-cover object-center transition-all duration-500" :class="hoveredIndex === index ? 'grayscale-0' : 'grayscale'" />
+                        <img :src="project.image" :alt="project.title" loading="lazy" class="absolute inset-0 w-full h-full object-cover object-center transition-all duration-500 lg:grayscale" :class="hoveredIndex === index ? 'lg:grayscale-0' : ''" />
                     </div>
 
                     <div class="absolute bottom-0 left-0 w-full p-6 lg:p-8 z-20 flex flex-col justify-end h-full">
@@ -40,7 +40,7 @@
                                 {{ project.category }}
                             </span>
                         </div>
-                        <div class="project-info bg-black/30 backdrop-blur-sm rounded-xl p-4 transition-opacity duration-300" :class="hoveredIndex === index ? 'opacity-100' : 'opacity-0 pointer-events-none'">
+                        <div class="project-info bg-black/30 backdrop-blur-sm rounded-xl p-4" :class="hoveredIndex === index ? 'lg:opacity-100' : 'lg:opacity-0 lg:pointer-events-none'">
                             <h3 class="text-xl lg:text-2xl font-bold text-white mb-2 leading-tight drop-shadow-lg" v-html="project.titleHtml" />
                             <p class="text-gray-200 text-sm max-w-lg line-clamp-2 drop-shadow-md">
                                 {{ project.description }}
@@ -56,6 +56,19 @@
 <script setup lang="ts">
 const hoveredIndex = ref<number | null>(null)
 const aspectRatios = ref<Record<number, number>>({})
+const isMobile = ref(false)
+
+const onMouseEnter = (index: number) => {
+    if (!isMobile.value) {
+        hoveredIndex.value = index
+    }
+}
+
+const onMouseLeave = () => {
+    if (!isMobile.value) {
+        hoveredIndex.value = null
+    }
+}
 
 const projects = [
     {
@@ -136,12 +149,27 @@ const projects = [
 ]
 
 onMounted(() => {
+    isMobile.value = window.innerWidth < 1024
+
+    const handleResize = () => {
+        isMobile.value = window.innerWidth < 1024
+        if (isMobile.value) {
+            hoveredIndex.value = null
+        }
+    }
+
+    window.addEventListener('resize', handleResize)
+
     projects.forEach((project, index) => {
         const img = new Image()
         img.onload = () => {
             aspectRatios.value[index] = img.width / img.height
         }
         img.src = project.image
+    })
+
+    onUnmounted(() => {
+        window.removeEventListener('resize', handleResize)
     })
 })
 </script>
@@ -173,18 +201,22 @@ onMounted(() => {
     opacity: 1;
     transform: translateY(0);
     transition: none;
+    pointer-events: auto;
 }
 
 @media (min-width: 1024px) {
     .project-info {
         opacity: 0;
         transform: translateY(20px);
+        transition: all 0.4s ease-out;
+        pointer-events: none;
     }
 
     .project-card:hover .project-info {
         opacity: 1;
         transform: translateY(0);
         transition: all 0.4s ease-out 0.2s;
+        pointer-events: auto;
     }
 }
 
