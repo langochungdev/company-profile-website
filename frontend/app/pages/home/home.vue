@@ -26,16 +26,14 @@ import PortfolioSection from './components/PortfolioSection.vue'
 import BlogSection from './components/BlogSection.vue'
 import BrandSection from './components/BrandSection.vue'
 
-// SEO Meta Tags
 useSeoMeta({
     title: 'SHT Security - Giải Pháp An Ninh & Hạ Tầng Mạng Chuyên Nghiệp',
     description: 'SHT chuyên cung cấp giải pháp camera an ninh AI, hạ tầng mạng, WiFi doanh nghiệp, Access Control, báo cháy, tổng đài IP cho gia đình và doanh nghiệp tại TP.HCM.',
     keywords: 'camera an ninh, lắp đặt camera, hạ tầng mạng, wifi doanh nghiệp, access control, báo cháy, tổng đài ip, SHT security',
     ogTitle: 'SHT Security - Giải Pháp An Ninh & Hạ Tầng Mạng',
     ogDescription: 'Chuyên gia về camera AI, mạng LAN, WiFi, Access Control, báo cháy cho gia đình và doanh nghiệp.',
-    ogImage: '/images/og-image.jpg',
     ogType: 'website',
-    twitterCard: 'summary_large_image'
+    ogUrl: 'https://sht.langochung.me'
 })
 
 // JSON-LD Structured Data
@@ -47,8 +45,8 @@ useHead({
                 '@context': 'https://schema.org',
                 '@type': 'Organization',
                 name: 'SHT Security',
-                url: 'https://sht.vn',
-                logo: 'https://sht.vn/images/logo.png',
+                url: 'https://sht.langochung.me',
+                logo: 'https://sht.langochung.me/images/logo.png',
                 description: 'Chuyên cung cấp giải pháp an ninh và hạ tầng mạng cho gia đình và doanh nghiệp',
                 address: {
                     '@type': 'PostalAddress',
@@ -80,7 +78,7 @@ useHead({
                         '@type': 'ListItem',
                         position: 1,
                         name: 'Trang Chủ',
-                        item: 'https://sht.vn'
+                        item: 'https://sht.langochung.me'
                     }
                 ]
             })
