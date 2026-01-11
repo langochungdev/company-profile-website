@@ -29,18 +29,18 @@
 
         <div class="container relative z-10">
             <div class="project-container flex flex-col lg:flex-row h-auto lg:h-[500px] w-full gap-2 lg:gap-1">
-                <div v-for="(project, index) in projects" :key="index" :style="{ '--aspect-ratio': aspectRatios[index] || 1.5 }" class="project-card group relative h-[350px] lg:h-full bg-slate-900 border border-slate-200 shadow-md cursor-pointer" :class="index >= 3 ? 'hidden lg:block' : ''" @mouseenter="onMouseEnter(index)" @mouseleave="onMouseLeave">
+                <div v-for="(project, index) in projects" :key="index" :style="{ '--aspect-ratio': aspectRatios[index] || 1.5 }" class="project-card group relative h-[350px] lg:h-full bg-slate-900 border border-slate-200 shadow-md lg:cursor-pointer" :class="index >= 3 ? 'hidden lg:block' : ''" @mouseenter="onMouseEnter(index)" @mouseleave="onMouseLeave">
                     <div class="absolute inset-0 w-full h-full overflow-hidden">
-                        <img :src="project.image" :alt="project.title" loading="lazy" class="absolute inset-0 w-full h-full object-cover object-center transition-all duration-500 lg:grayscale" :class="hoveredIndex === index ? 'lg:grayscale-0' : ''" />
+                        <img :src="project.image" :alt="project.title" loading="lazy" class="absolute inset-0 w-full h-full object-cover object-center lg:transition-all lg:duration-500 lg:grayscale" :class="hoveredIndex === index ? 'lg:grayscale-0' : ''" />
                     </div>
 
                     <div class="absolute bottom-0 left-0 w-full p-6 lg:p-8 z-20 flex flex-col justify-end h-full">
-                        <div class="absolute top-4 left-4 lg:bottom-4 lg:top-auto lg:left-8 transition-all duration-500 ease-out max-w-[calc(100%-3rem)]" :class="hoveredIndex === index ? 'lg:relative lg:bottom-auto lg:left-auto mb-2 max-w-full' : hoveredIndex !== null ? 'lg:scale-90 lg:opacity-80' : ''">
+                        <div class="absolute top-4 left-4 lg:bottom-4 lg:top-auto lg:left-8 lg:transition-all lg:duration-500 lg:ease-out max-w-[calc(100%-3rem)]" :class="hoveredIndex === index ? 'lg:relative lg:bottom-auto lg:left-auto mb-2 max-w-full' : hoveredIndex !== null ? 'lg:scale-90 lg:opacity-80' : ''">
                             <span :class="project.badgeColor" class="inline-block px-3 py-1 text-xs font-bold text-slate-900 rounded-md shadow-lg whitespace-nowrap overflow-hidden text-ellipsis">
                                 {{ project.category }}
                             </span>
                         </div>
-                        <div class="project-info bg-black/30 backdrop-blur-sm rounded-xl p-4" :class="hoveredIndex === index ? 'lg:opacity-100' : 'lg:opacity-0 lg:pointer-events-none'">
+                        <div class="project-info bg-black/30 backdrop-blur-sm rounded-xl p-4 opacity-100" :class="hoveredIndex === index ? 'lg:opacity-100' : 'lg:opacity-0 lg:pointer-events-none'">
                             <h3 class="text-xl lg:text-2xl font-bold text-white mb-2 leading-tight drop-shadow-lg" v-html="project.titleHtml" />
                             <p class="text-gray-200 text-sm max-w-lg line-clamp-2 drop-shadow-md">
                                 {{ project.description }}
@@ -182,19 +182,8 @@ onMounted(() => {
 
 .project-card {
     flex: 1;
-    transition: flex 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1);
     position: relative;
     overflow: hidden;
-}
-
-.project-container:hover .project-card {
-    flex: 1;
-    opacity: 0.7;
-}
-
-.project-container .project-card:hover {
-    flex: calc(var(--aspect-ratio) * 3);
-    opacity: 1 !important;
 }
 
 .project-info {
@@ -205,6 +194,20 @@ onMounted(() => {
 }
 
 @media (min-width: 1024px) {
+    .project-card {
+        transition: flex 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .project-container:hover .project-card {
+        flex: 1;
+        opacity: 0.7;
+    }
+
+    .project-container .project-card:hover {
+        flex: calc(var(--aspect-ratio) * 3);
+        opacity: 1 !important;
+    }
+
     .project-info {
         opacity: 0;
         transform: translateY(20px);
@@ -224,11 +227,6 @@ onMounted(() => {
     .project-card {
         flex: none;
         width: 100%;
-    }
-
-    .project-container:hover .project-card {
-        opacity: 1;
-        filter: none;
     }
 
     .project-container {
