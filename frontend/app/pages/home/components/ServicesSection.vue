@@ -1,51 +1,55 @@
 <template>
-    <section class="relative overflow-hidden h-[calc(100vh-120px)] py-6">
-        <div class="container relative z-10 h-full flex flex-col">
-            <div class="flex flex-col md:flex-row md:items-end justify-between mb-4 gap-2 flex-shrink-0 bg-white/90 backdrop-blur-sm rounded-2xl p-4 -mx-4 px-4">
+    <section class="services-section">
+        <div class="container services-container">
+            <div class="services-header">
                 <div>
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100/50 border border-blue-200 text-blue-700 text-xs font-bold uppercase tracking-wider mb-2">
-                        <span class="relative flex h-2 w-2">
-                            <span class="absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75 animate-ping" />
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
+                    <div class="services-badge">
+                        <span class="badge-dot">
+                            <span class="dot-ping" />
+                            <span class="dot-core" />
                         </span>
                         Lĩnh Vực Hoạt Động
                     </div>
-                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
-                        Hệ Sinh Thái <span class="text-primary">Công Nghệ</span>
+                    <h2 class="services-title whitespace-nowrap">
+                        Các Hạng Mục<span class="text-primary"> Thi Công</span>
                     </h2>
                 </div>
-                <div class="hidden md:block">
-                    <button class="group flex items-center gap-2 px-6 py-3 border border-slate-300 hover:border-primary rounded-full transition-all bg-white hover:bg-blue-50 shadow-sm cursor-pointer">
-                        <span class="text-sm font-semibold tracking-wider text-slate-900 group-hover:text-primary transition-colors">XEM TẤT CẢ GIẢI PHÁP</span>
-                        <Icon name="mdi:arrow-right" class="w-4 h-4 text-slate-600 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                <div class="services-cta">
+                    <button class="cta-button">
+                        <span class="cta-text">XEM TẤT CẢ GIẢI PHÁP</span>
+                        <Icon name="mdi:arrow-right" class="cta-icon" />
                     </button>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 grid-rows-3 gap-3 flex-1 min-h-0">
-                <div v-for="(service, index) in services" :key="index" :class="[getGridClass(index)]" class="group relative block overflow-hidden rounded-2xl bg-slate-900 shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer">
-                    <img :src="service.image" :alt="service.title" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" :class="index === 7 ? 'md:filter-none blur-sm' : ''" />
+            <div class="mobile-scroll">
+                <div v-for="(service, index) in services" :key="'m-' + index" class="mobile-card" :class="{ 'active': activeIndex === index }" @click="activeIndex = index">
+                    <img :src="service.image" :alt="service.title" class="mobile-card-bg" />
+                    <div class="mobile-card-overlay"></div>
+                    <div class="mobile-card-content">
+                        <Icon :name="service.icon" class="mobile-card-icon" />
+                        <span class="mobile-card-title">{{ service.title }}</span>
+                    </div>
+                    <div class="mobile-card-expanded">
+                        <p class="mobile-card-desc">{{ service.description }}</p>
+                        <button class="mobile-card-btn">
+                            <span>Xem chi tiết</span>
+                            <Icon name="mdi:arrow-right" class="mobile-btn-icon" />
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-                    <div class="absolute bottom-0 left-0 w-full h-[50%] bg-gradient-to-t from-slate-950/70 via-slate-900/40 to-transparent" :class="index === 7 ? 'md:h-[50%] h-full from-slate-950/90' : ''"></div>
-
-                    <div class="absolute inset-0 p-4 flex flex-col justify-between" :class="index === 7 ? 'md:justify-between justify-center items-center' : ''">
-                        <div v-if="index !== 7 || index === 7" class="flex justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-500" :class="index === 7 ? 'md:flex hidden' : ''">
-                            <div :class="[getIconBgColor(index)]" class="w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-slate-900 border border-white/20 transform scale-0 group-hover:scale-100 transition-transform duration-500">
-                                <Icon :name="service.icon" class="w-5 h-5" />
-                            </div>
-                        </div>
-
-                        <div v-if="index === 7" class="md:hidden text-center">
-                            <Icon name="mdi:dots-horizontal-circle" class="w-12 h-12 text-white mx-auto mb-3" />
-                            <h3 class="text-2xl font-bold text-white mb-2">Xem Thêm</h3>
-                            <p class="text-white/80 text-sm">Khám phá các giải pháp khác</p>
-                        </div>
-
-                        <div class="space-y-2" :class="index === 7 ? 'md:block hidden' : ''">
-                            <h3 :class="index === 0 ? 'text-xl md:text-2xl' : 'text-sm md:text-base'" class="font-bold text-white leading-tight drop-shadow-lg">
+            <div class="services-grid">
+                <div v-for="(service, index) in services" :key="index" :class="['service-card', getGridClass(index)]">
+                    <img :src="service.image" :alt="service.title" loading="lazy" class="service-image" />
+                    <div class="service-gradient"></div>
+                    <div class="service-content">
+                        <div class="service-info">
+                            <h3 class="service-name" :class="{ 'name-large': index === 0 }">
                                 {{ service.title }}
                             </h3>
-                            <p class="text-gray-200 text-xs leading-relaxed drop-shadow-md" :class="getGridClass(index).includes('col-span-2') ? 'line-clamp-3' : 'line-clamp-2'">
+                            <p class="service-desc">
                                 {{ service.description }}
                             </p>
                         </div>
@@ -57,6 +61,7 @@
 </template>
 
 <script setup lang="ts">
+const activeIndex = ref(0)
 const services = [
     {
         title: 'Camera An Ninh AI',
@@ -117,27 +122,495 @@ const services = [
 ]
 
 function getGridClass(index: number) {
-    if (index === 0) return 'col-span-2 md:col-span-2 md:row-span-2'
-    if (index === 3) return 'md:col-span-2 md:row-span-1'
-    if (index >= 4 && index <= 6) return 'hidden md:block md:col-span-1 md:row-span-1'
-    if (index === 7) return 'md:col-span-1 md:row-span-1'
-    return 'md:col-span-1 md:row-span-1'
+    const classes = ['card-0', 'card-1', 'card-2', 'card-3', 'card-4', 'card-5', 'card-6', 'card-7']
+    return classes[index] || ''
 }
-
-function getIconBgColor(index: number) {
-    const colors = [
-        'bg-cyan-400',
-        'bg-emerald-400',
-        'bg-purple-400',
-        'bg-orange-400',
-        'bg-pink-400',
-        'bg-blue-400',
-        'bg-yellow-400',
-        'bg-red-400'
-    ]
-    return colors[index] || 'bg-gray-400'
-}
-
 </script>
 
-<style scoped></style>
+<style scoped>
+.services-section {
+    position: relative;
+    overflow: hidden;
+    height: auto;
+    min-height: calc(100vh - 120px);
+    padding: 1.5rem 0;
+}
+
+.services-container {
+    position: relative;
+    z-index: 10;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.services-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    padding: 1rem;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.services-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    background: rgba(219, 234, 254, 0.5);
+    border: 1px solid rgb(191, 219, 254);
+    color: rgb(29, 78, 216);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.badge-dot {
+    position: relative;
+    display: flex;
+    width: 0.5rem;
+    height: 0.5rem;
+}
+
+.dot-ping {
+    position: absolute;
+    display: inline-flex;
+    width: 100%;
+    height: 100%;
+    border-radius: 9999px;
+    background: rgb(96, 165, 250);
+    opacity: 0.75;
+    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.dot-core {
+    position: relative;
+    display: inline-flex;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: rgb(59, 130, 246);
+}
+
+.services-title {
+    font-size: clamp(1.25rem, 4.5vw, 1.875rem);
+    font-weight: 700;
+    color: rgb(15, 23, 42);
+    line-height: 1.25;
+}
+
+.services-cta {
+    display: none;
+}
+
+.cta-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid rgb(203, 213, 225);
+    border-radius: 9999px;
+    background: white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+    border-color: var(--color-primary);
+    background: rgb(239, 246, 255);
+}
+
+.cta-text {
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: rgb(15, 23, 42);
+    transition: color 0.3s ease;
+}
+
+.cta-button:hover .cta-text {
+    color: var(--color-primary);
+}
+
+.cta-icon {
+    width: 1rem;
+    height: 1rem;
+    color: rgb(71, 85, 105);
+    transition: all 0.3s ease;
+}
+
+.cta-button:hover .cta-icon {
+    color: var(--color-primary);
+    transform: translateX(0.25rem);
+}
+
+.mobile-scroll {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.mobile-card {
+    position: relative;
+    flex-shrink: 0;
+    height: 60px;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-card.active {
+    height: 180px;
+}
+
+.mobile-card-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.mobile-card.active .mobile-card-bg {
+    transform: scale(1.05);
+}
+
+.mobile-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.7) 0%, rgba(15, 23, 42, 0.4) 100%);
+    transition: background 0.3s ease;
+}
+
+.mobile-card.active .mobile-card-overlay {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.6) 100%);
+}
+
+.mobile-card-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    height: 60px;
+}
+
+.mobile-card-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.mobile-card-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mobile-card-expanded {
+    position: relative;
+    z-index: 2;
+    padding: 0 1rem 1rem;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.mobile-card.active .mobile-card-expanded {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.mobile-card-desc {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.mobile-card-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--color-primary);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mobile-card-btn:hover {
+    background: var(--color-primary-dark, #1d4ed8);
+}
+
+.mobile-btn-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+}
+
+.services-grid {
+    display: none;
+}
+
+.service-card {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: 1rem;
+    background: rgb(15, 23, 42);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.5s ease;
+}
+
+.service-card:hover {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.service-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s ease;
+}
+
+.service-card:hover .service-image {
+    transform: scale(1.1);
+}
+
+.service-gradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background: linear-gradient(to top, rgba(2, 6, 23, 0.7), rgba(15, 23, 42, 0.4), transparent);
+}
+
+.service-content {
+    position: absolute;
+    inset: 0;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.service-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.service-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    line-height: 1.25;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.name-large {
+    font-size: 1.5rem;
+}
+
+.service-desc {
+    color: rgb(229, 231, 235);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+@keyframes ping {
+
+    75%,
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+@media (min-width: 768px) {
+    .services-section {
+        height: calc(100vh - 120px);
+        min-height: auto;
+    }
+
+    .services-header {
+        flex-direction: row;
+        align-items: flex-end;
+    }
+
+    .services-title {
+        font-size: 2.25rem;
+    }
+
+    .services-cta {
+        display: block;
+    }
+
+    .mobile-scroll {
+        display: none;
+    }
+
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        grid-template-rows: repeat(6, 1fr);
+        gap: 0.75rem;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .service-card {
+        border-radius: 1.25rem;
+        transform-origin: center;
+    }
+
+    .service-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 1.25rem;
+        padding: 2px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+
+    .service-card:hover::before {
+        opacity: 1;
+    }
+
+    .service-card:hover {
+        transform: translateY(-4px);
+        z-index: 10;
+    }
+
+    .card-0 {
+        grid-column: 1 / 5;
+        grid-row: 1 / 5;
+    }
+
+    .card-1 {
+        grid-column: 5 / 8;
+        grid-row: 1 / 3;
+    }
+
+    .card-2 {
+        grid-column: 8 / 10;
+        grid-row: 1 / 3;
+    }
+
+    .card-3 {
+        grid-column: 10 / 13;
+        grid-row: 1 / 3;
+    }
+
+    .card-4 {
+        grid-column: 5 / 8;
+        grid-row: 3 / 5;
+    }
+
+    .card-5 {
+        grid-column: 8 / 13;
+        grid-row: 3 / 5;
+    }
+
+    .card-6 {
+        grid-column: 1 / 4;
+        grid-row: 5 / 7;
+    }
+
+    .card-7 {
+        grid-column: 4 / 13;
+        grid-row: 5 / 7;
+    }
+
+    .card-0 .service-name {
+        font-size: 1.75rem;
+    }
+
+    .card-0 .service-desc,
+    .card-5 .service-desc,
+    .card-7 .service-desc {
+        -webkit-line-clamp: 3;
+    }
+
+    .service-gradient {
+        height: 60%;
+        background: linear-gradient(to top, rgba(2, 6, 23, 0.85), rgba(15, 23, 42, 0.5), transparent);
+    }
+
+    .service-content {
+        padding: 1.5rem;
+    }
+
+    .service-name {
+        font-size: 1.125rem;
+    }
+
+    .service-desc {
+        font-size: 0.8125rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .services-grid {
+        gap: 1rem;
+    }
+
+    .card-0 .service-name {
+        font-size: 2rem;
+    }
+
+    .service-name {
+        font-size: 1.25rem;
+    }
+
+    .service-content {
+        padding: 1.75rem;
+    }
+}
+</style>

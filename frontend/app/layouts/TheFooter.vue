@@ -2,7 +2,7 @@
     <footer class="bg-secondary pt-8 pb-6" itemscope itemtype="https://schema.org/Organization">
         <div class="container">
             <!-- Main Footer Content -->
-            <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-10 border-b border-white/10">
+            <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-3 border-b border-white/10">
                 <!-- Logo & Description -->
                 <div class="col-span-2 md:col-span-1">
                     <div class="inline-block mb-4 cursor-pointer" itemprop="url">

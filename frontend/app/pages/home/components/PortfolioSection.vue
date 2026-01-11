@@ -10,8 +10,8 @@
                         </span>
                         Hồ sơ năng lực
                     </div>
-                    <h2 class="text-3xl md:text-5xl font-bold text-slate-900 leading-tight mb-3">
-                        Dự Án <span class="text-primary">Hạ Tầng</span> Công Nghệ
+                    <h2 class="font-bold text-slate-900 leading-tight mb-3 whitespace-nowrap" style="font-size: clamp(1.5rem, 5vw, 3rem);">
+                        Dự Án <span class="text-primary">Hạ Tầng</span> Đã làm
                     </h2>
                     <p class="text-slate-600 text-sm max-w-2xl">
                         Chúng tôi triển khai các giải pháp an ninh tích hợp, hạ tầng mạng lõi và hệ thống quản lý tòa nhà thông minh cho các doanh nghiệp hàng đầu.

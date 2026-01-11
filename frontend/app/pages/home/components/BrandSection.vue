@@ -4,7 +4,7 @@
             <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-6 flex-1 flex flex-col">
                 <div class="flex flex-col lg:flex-row items-center gap-6 mb-4">
                     <div class="lg:w-1/4 text-center lg:text-left flex-shrink-0">
-                        <h2 class="text-2xl font-bold text-secondary">
+                        <h2 class="font-bold text-secondary leading-tight whitespace-nowrap" style="font-size: clamp(1.125rem, 3.5vw, 1.5rem);">
                             Giấy Chứng Nhận & <span class="text-primary">Chứng Chỉ</span>
                         </h2>
                         <p class="text-gray-600 text-sm mt-2">Uy tín & Chất lượng được công nhận</p>
@@ -28,7 +28,7 @@
             <div class="bg-gradient-to-r from-secondary via-secondary-light to-secondary rounded-2xl p-6 flex-shrink-0">
                 <div class="flex flex-col lg:flex-row items-center gap-6">
                     <div class="lg:w-1/4 text-center lg:text-left flex-shrink-0">
-                        <h2 class="text-2xl font-bold text-white">
+                        <h2 class="font-bold text-white leading-tight whitespace-nowrap" style="font-size: clamp(1.125rem, 3.5vw, 1.5rem);">
                             Đối Tác <span class="text-primary">Tin Cậy</span>
                         </h2>
                         <p class="text-gray-400 text-sm mt-2">Hợp tác cùng các thương hiệu hàng đầu</p>
@@ -46,15 +46,17 @@
             </div>
         </div>
 
-        <Teleport to="body">
-            <Transition name="fade">
-                <div v-if="showPopup" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90" @click="closePopup">
-                    <div class="w-full h-full flex items-center justify-center">
-                        <img :src="selectedImage" alt="Giấy chứng nhận" class="w-[75vw] md:w-auto md:h-[67vh] max-w-[95vw] max-h-[95vh] object-contain" />
+        <ClientOnly>
+            <Teleport to="body">
+                <Transition name="fade">
+                    <div v-if="showPopup" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90" @click="closePopup">
+                        <div class="w-full h-full flex items-center justify-center">
+                            <img :src="selectedImage" alt="Giấy chứng nhận" class="w-[75vw] md:w-auto md:h-[67vh] max-w-[95vw] max-h-[95vh] object-contain" />
+                        </div>
                     </div>
-                </div>
-            </Transition>
-        </Teleport>
+                </Transition>
+            </Teleport>
+        </ClientOnly>
     </section>
 </template>
 
