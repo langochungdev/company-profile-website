@@ -11,7 +11,7 @@
             <PortfolioSection />
 
             <!-- Section 3: Tin Tức - Social Media -->
-            <BlogSection />
+            <!-- <BlogSection /> -->
 
             <!-- Section 4 & 5: Chứng Nhận & Đối Tác -->
             <BrandSection />

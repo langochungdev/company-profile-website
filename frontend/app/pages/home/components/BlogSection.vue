@@ -1,48 +1,48 @@
 <template>
-    <section class="relative w-full overflow-hidden">
-        <div class="container relative z-10 mb-8">
-            <div class="bg-white/90 backdrop-blur-sm rounded-2xl p-6 inline-block">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100/50 border border-blue-200 text-blue-700 text-xs font-bold uppercase tracking-wider mb-2">
-                    <span class="relative flex h-2 w-2">
-                        <span class="absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75 animate-ping" />
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
-                    </span>
-                    Các KÊNH TRUYỀN THÔNG
-                </div>
-                <h2 class="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
-                    CÁC KÊNH <span class="text-primary">TRUYỀN THÔNG</span>
-                </h2>
-            </div>
-        </div>
-
-        <div class="container relative z-10 mb-0 flex flex-wrap justify-center gap-3 md:gap-4">
-            <a href="https://tiktok.com/@huyphan_sht_co.ltd" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-3 px-2 md:px-6 py-2 md:py-3 md:bg-white md:border border-slate-200 hover:border-primary md:rounded-full transition-all md:hover:bg-blue-50 md:shadow-sm">
-                <Icon name="mdi:music-note" class="w-8 h-8 md:w-7 md:h-7 text-slate-700" />
-                <span class="hidden md:inline text-sm font-semibold text-slate-900 group-hover:text-primary transition-colors">Theo dõi TikTok</span>
-            </a>
-            <a href="https://facebook.com/SHT.security" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-3 px-2 md:px-6 py-2 md:py-3 md:bg-white md:border border-slate-200 hover:border-blue-500 md:rounded-full transition-all md:hover:bg-blue-50 md:shadow-sm">
-                <Icon name="mdi:facebook" class="w-8 h-8 md:w-7 md:h-7 text-blue-600" />
-                <span class="hidden md:inline text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">Theo dõi Facebook</span>
-            </a>
-            <a href="https://youtube.com/@SHTsecurity" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-3 px-2 md:px-6 py-2 md:py-3 md:bg-white md:border border-slate-200 hover:border-red-500 md:rounded-full transition-all md:hover:bg-red-50 md:shadow-sm">
-                <Icon name="mdi:youtube" class="w-8 h-8 md:w-7 md:h-7 text-red-600" />
-                <span class="hidden md:inline text-sm font-semibold text-slate-900 group-hover:text-red-600 transition-colors">Đăng ký YouTube</span>
-            </a>
-        </div>
-
-        <div class="scroll-container relative z-10 w-full overflow-x-auto px-4">
-            <div class="flex gap-6 py-10 min-w-max justify-center">
-                <div v-for="(video, index) in videos" :key="index" class="relative group flex-shrink-0">
-                    <div class="phone-frame w-[280px] h-[500px] bg-white rounded-[32px] overflow-hidden relative border border-slate-200 shadow-lg">
-                        <div v-html="video.embedHtml" class="absolute inset-0 w-full h-full flex items-center justify-center [&_iframe]:w-full [&_iframe]:h-full [&_iframe]:border-0 [&_iframe]:absolute [&_iframe]:inset-0 [&_blockquote]:m-0 [&_blockquote]:p-0 [&_blockquote]:w-full [&_blockquote]:h-full [&_blockquote]:scale-[1.4] [&_blockquote]:origin-center" />
+    <section class="blog-section">
+        <div class="blog-container">
+            <div class="blog-header">
+                <div class="blog-header-card">
+                    <div class="blog-badge">
+                        <span class="badge-pulse">
+                            <span class="pulse-ring" />
+                            <span class="pulse-dot" />
+                        </span>
+                        Các KÊNH TRUYỀN THÔNG
                     </div>
+                    <h2 class="blog-title">
+                        CÁC KÊNH <span class="blog-title-highlight">TRUYỀN THÔNG</span>
+                    </h2>
+                </div>
+            </div>
+
+            <div class="social-links">
+                <a href="https://tiktok.com/@huyphan_sht_co.ltd" target="_blank" rel="noopener noreferrer" class="social-link social-link-tiktok">
+                    <Icon name="mdi:music-note" class="social-icon" />
+                    <span class="social-text">Theo dõi TikTok</span>
+                </a>
+                <a href="https://facebook.com/SHT.security" target="_blank" rel="noopener noreferrer" class="social-link social-link-facebook">
+                    <Icon name="mdi:facebook" class="social-icon" />
+                    <span class="social-text">Theo dõi Facebook</span>
+                </a>
+                <a href="https://youtube.com/@SHTsecurity" target="_blank" rel="noopener noreferrer" class="social-link social-link-youtube">
+                    <Icon name="mdi:youtube" class="social-icon" />
+                    <span class="social-text">Đăng ký YouTube</span>
+                </a>
+            </div>
+
+            <div class="video-grid">
+                <div v-for="(video, index) in videos" :key="index" class="video-card">
+                    <blockquote class="tiktok-embed" :cite="video.cite" :data-video-id="video.videoId">
+                        <section>
+                            <a target="_blank" :href="video.profileUrl">{{ video.username }}</a>
+                        </section>
+                    </blockquote>
                 </div>
 
-                <div class="relative group flex-shrink-0">
-                    <div class="phone-frame w-[280px] h-[500px] bg-white rounded-[32px] overflow-hidden relative border border-slate-200 shadow-lg flex items-center justify-center p-4">
-                        <div id="fb-root"></div>
-                        <div class="fb-page w-full h-full" data-href="https://www.facebook.com/SmartHomeTechnologySHT/" data-tabs="timeline" data-width="260" data-height="460" data-small-header="true" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true">
-                        </div>
+                <div class="video-card facebook-card">
+                    <div id="fb-root"></div>
+                    <div class="fb-page" data-href="https://www.facebook.com/SmartHomeTechnologySHT/" data-tabs="timeline" data-width="325" data-height="700" data-small-header="false" data-adapt-container-width="false" data-hide-cover="false" data-show-facepile="true">
                     </div>
                 </div>
             </div>
@@ -53,13 +53,22 @@
 <script setup lang="ts">
 const videos = [
     {
-        embedHtml: `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@huyphan_sht_co.ltd/video/7479305993915026705" data-video-id="7479305993915026705" style="max-width:100%;min-width:100%;height:100%;margin:0;"><section><a target="_blank" title="@huyphan_sht_co.ltd" href="https://www.tiktok.com/@huyphan_sht_co.ltd?refer=embed">@huyphan_sht_co.ltd</a></section></blockquote>`
+        cite: 'https://www.tiktok.com/@huyphan_sht_co.ltd/video/7479305993915026705',
+        videoId: '7479305993915026705',
+        username: '@huyphan_sht_co.ltd',
+        profileUrl: 'https://www.tiktok.com/@huyphan_sht_co.ltd?refer=embed'
     },
     {
-        embedHtml: `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@huyphan_sht_co.ltd/video/7479305993915026705" data-video-id="7479305993915026705" style="max-width:100%;min-width:100%;height:100%;margin:0;"><section><a target="_blank" title="@huyphan_sht_co.ltd" href="https://www.tiktok.com/@huyphan_sht_co.ltd?refer=embed">@huyphan_sht_co.ltd</a></section></blockquote>`
+        cite: 'https://www.tiktok.com/@huyphan_sht_co.ltd/video/7479305993915026705',
+        videoId: '7479305993915026705',
+        username: '@huyphan_sht_co.ltd',
+        profileUrl: 'https://www.tiktok.com/@huyphan_sht_co.ltd?refer=embed'
     },
     {
-        embedHtml: `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@huyphan_sht_co.ltd/video/7479305993915026705" data-video-id="7479305993915026705" style="max-width:100%;min-width:100%;height:100%;margin:0;"><section><a target="_blank" title="@huyphan_sht_co.ltd" href="https://www.tiktok.com/@huyphan_sht_co.ltd?refer=embed">@huyphan_sht_co.ltd</a></section></blockquote>`
+        cite: 'https://www.tiktok.com/@huyphan_sht_co.ltd/video/7479305993915026705',
+        videoId: '7479305993915026705',
+        username: '@huyphan_sht_co.ltd',
+        profileUrl: 'https://www.tiktok.com/@huyphan_sht_co.ltd?refer=embed'
     }
 ]
 
@@ -82,19 +91,273 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.scroll-container {
+.blog-section {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: 40px 16px;
+}
+
+.blog-container {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.blog-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.blog-header-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    padding: 24px;
+    display: inline-block;
+}
+
+.blog-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    background: rgba(219, 234, 254, 0.5);
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+}
+
+.badge-pulse {
+    position: relative;
+    display: flex;
+    height: 8px;
+    width: 8px;
+}
+
+.pulse-ring {
+    position: absolute;
+    display: inline-flex;
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    background: #60a5fa;
+    opacity: 0.75;
+    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.pulse-dot {
+    position: relative;
+    display: inline-flex;
+    border-radius: 50%;
+    height: 8px;
+    width: 8px;
+    background: #3b82f6;
+}
+
+@keyframes ping {
+
+    75%,
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+.blog-title {
+    font-size: 30px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.25;
+    margin: 0;
+}
+
+.blog-title-highlight {
+    color: var(--primary-color, #3b82f6);
+}
+
+.social-links {
+    margin-bottom: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    border-radius: 9999px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.social-icon {
+    width: 32px;
+    height: 32px;
+}
+
+.social-text {
+    display: none;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+    transition: color 0.3s ease;
+}
+
+.social-link-tiktok .social-icon {
+    color: #334155;
+}
+
+.social-link-tiktok:hover .social-text {
+    color: var(--primary-color, #3b82f6);
+}
+
+.social-link-facebook .social-icon {
+    color: #1877f2;
+}
+
+.social-link-facebook:hover .social-text {
+    color: #1877f2;
+}
+
+.social-link-youtube .social-icon {
+    color: #ff0000;
+}
+
+.social-link-youtube:hover .social-text {
+    color: #ff0000;
+}
+
+.video-grid {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 16px 0;
+    scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-x;
-    overscroll-behavior-x: contain;
 }
 
-.phone-frame {
-    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+.video-grid::-webkit-scrollbar {
+    display: none;
 }
 
-.phone-frame:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
-    border-color: rgb(59 130 246);
+.video-card {
+    flex: 0 0 auto;
+    width: 280px;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    scroll-snap-align: center;
+}
+
+.facebook-card {
+    display: flex;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+}
+
+.fb-page {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    line-height: 0;
+}
+
+.facebook-card :deep(.fb_iframe_widget),
+.facebook-card :deep(.fb_iframe_widget span),
+.facebook-card :deep(.fb_iframe_widget iframe) {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+}
+
+.facebook-card :deep(iframe) {
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
+    display: block !important;
+}
+
+.video-card :deep(.tiktok-embed) {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+@media (min-width: 768px) {
+    .blog-title {
+        font-size: 36px;
+    }
+
+    .social-link {
+        padding: 12px 24px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .social-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .social-text {
+        display: inline;
+    }
+
+    .social-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .social-link-tiktok:hover {
+        background: #eff6ff;
+        border-color: var(--primary-color, #3b82f6);
+    }
+
+    .social-link-facebook:hover {
+        background: #eff6ff;
+        border-color: #1877f2;
+    }
+
+    .social-link-youtube:hover {
+        background: #fef2f2;
+        border-color: #ff0000;
+    }
+
+    .video-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        overflow: visible;
+        justify-items: center;
+    }
+
+    .video-card {
+        width: 100%;
+        max-width: 325px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .video-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
 </style>

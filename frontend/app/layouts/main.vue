@@ -16,28 +16,6 @@
 <script setup>
 import TheHeader from './TheHeader.vue'
 import TheFooter from './TheFooter.vue'
-import Lenis from '@studio-freight/lenis'
-
-onMounted(() => {
-    const lenis = new Lenis({
-        duration: 0.8,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        orientation: 'vertical',
-        gestureOrientation: 'vertical',
-        smoothWheel: true,
-        wheelMultiplier: 0.8,
-        smoothTouch: false,
-        touchMultiplier: 2,
-        infinite: false,
-    })
-
-    function raf(time) {
-        lenis.raf(time)
-        requestAnimationFrame(raf)
-    }
-
-    requestAnimationFrame(raf)
-})
 </script>
 
 <style scoped>

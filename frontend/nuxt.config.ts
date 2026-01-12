@@ -11,7 +11,7 @@ export default defineNuxtConfig({
                 { name: "description", content: "IT Solution Agency providing innovative business solutions" },
                 { name: "theme-color", content: "#000000" },
                 { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-                { name: "apple-mobile-web-app-capable", content: "yes" },
+                { name: "mobile-web-app-capable", content: "yes" },
                 { property: "og:image", content: "https://sht.langochung.me/seo/banner.png" },
                 { property: "og:image:width", content: "1920" },
                 { property: "og:image:height", content: "661" },

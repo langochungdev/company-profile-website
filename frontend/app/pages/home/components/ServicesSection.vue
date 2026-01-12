@@ -415,8 +415,14 @@ function getGridClass(index: number) {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 50%;
-    background: linear-gradient(to top, rgba(2, 6, 23, 0.7), rgba(15, 23, 42, 0.4), transparent);
+    height: 30%;
+    background: linear-gradient(to top, rgba(2, 6, 23, 0.85), transparent);
+    transition: height 0.4s ease, background 0.4s ease;
+}
+
+.service-card:hover .service-gradient {
+    height: 60%;
+    background: linear-gradient(to top, rgba(2, 6, 23, 0.9), rgba(15, 23, 42, 0.6), transparent);
 }
 
 .service-content {
@@ -440,6 +446,11 @@ function getGridClass(index: number) {
     color: white;
     line-height: 1.25;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease;
+}
+
+.service-card:hover .service-name {
+    transform: translateY(-4px);
 }
 
 .name-large {
@@ -455,6 +466,16 @@ function getGridClass(index: number) {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    max-height: 0;
+}
+
+.service-card:hover .service-desc {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 100px;
 }
 
 @keyframes ping {
@@ -579,8 +600,11 @@ function getGridClass(index: number) {
     }
 
     .service-gradient {
-        height: 60%;
-        background: linear-gradient(to top, rgba(2, 6, 23, 0.85), rgba(15, 23, 42, 0.5), transparent);
+        height: 35%;
+    }
+
+    .service-card:hover .service-gradient {
+        height: 70%;
     }
 
     .service-content {
