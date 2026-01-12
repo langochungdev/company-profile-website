@@ -150,11 +150,13 @@ onUnmounted(() => {
     align-items: center;
     justify-content: space-between;
     gap: 2rem;
-    padding: 1rem 0;
+    padding: 1rem 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .content-wrapper {
-    margin: 0 18px;
+    margin: 0;
     width: 100%;
     opacity: 0;
     transform: translateY(40px);
@@ -311,11 +313,11 @@ onUnmounted(() => {
 }
 
 .hero-nav.prev {
-    left: 2rem;
+    left: 1rem;
 }
 
 .hero-nav.next {
-    right: 2rem;
+    right: 1rem;
 }
 
 .nav-icon {
@@ -399,7 +401,7 @@ onUnmounted(() => {
     }
 
     .slide-content {
-        padding: 0.5rem 0;
+        padding: 0.5rem 1rem;
     }
 
     .content-wrapper {

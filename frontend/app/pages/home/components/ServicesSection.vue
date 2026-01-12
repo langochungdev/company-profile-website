@@ -142,6 +142,9 @@ function getGridClass(index: number) {
     height: 100%;
     display: flex;
     flex-direction: column;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
 }
 
 .services-header {
@@ -155,10 +158,11 @@ function getGridClass(index: number) {
     backdrop-filter: blur(12px);
     border-radius: 1rem;
     padding: 1rem;
-    margin-left: -1rem;
-    margin-right: -1rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
 }
 
 .services-badge {
