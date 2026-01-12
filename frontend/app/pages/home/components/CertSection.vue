@@ -1,15 +1,15 @@
 <template>
-    <section class="brand-section" aria-label="Chứng nhận và đối tác">
-        <div class="brand-container">
+    <section class="certificates-section" aria-label="Chứng nhận">
+        <div class="certificates-container">
             <div class="certificates-box">
-                <div class="brand-content">
-                    <div class="brand-header">
-                        <h2 class="brand-title">
+                <div class="certificates-content">
+                    <div class="certificates-header">
+                        <h2 class="certificates-title">
                             Giấy Chứng Nhận & <span class="text-primary">Chứng Chỉ</span>
                         </h2>
-                        <p class="brand-subtitle">Uy tín & Chất lượng được công nhận</p>
+                        <p class="certificates-subtitle">Uy tín & Chất lượng được công nhận</p>
                     </div>
-                    <div class="brand-scroll-wrapper">
+                    <div class="certificates-scroll-wrapper">
                         <div class="certificates-scroll" @mouseenter="pauseAnimation = true" @mouseleave="pauseAnimation = false">
                             <div class="certificates-track" :class="{ paused: pauseAnimation }">
                                 <template v-for="set in 2" :key="'cert-set-' + set">
@@ -18,26 +18,6 @@
                                             <img src="/images/chungnhan.jpg" :alt="'Giấy chứng nhận SHT ' + i" loading="lazy" class="certificate-img" />
                                         </div>
                                     </div>
-                                </template>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="partners-box">
-                <div class="brand-content">
-                    <div class="brand-header">
-                        <h2 class="brand-title brand-title--white">
-                            Đối Tác <span class="text-primary">Tin Cậy</span>
-                        </h2>
-                        <p class="brand-subtitle brand-subtitle--light">Hợp tác cùng các thương hiệu hàng đầu</p>
-                    </div>
-                    <div class="brand-scroll-wrapper">
-                        <div class="partners-scroll" @mouseenter="pausePartners = true" @mouseleave="pausePartners = false">
-                            <div class="partners-track" :class="{ paused: pausePartners }">
-                                <template v-for="set in 2" :key="'partner-set-' + set">
-                                    <img v-for="i in 10" :key="'partner-' + set + '-' + i" :src="`/images/doitac.jpg`" :alt="'Đối tác SHT ' + i" loading="lazy" class="partner-logo" />
                                 </template>
                             </div>
                         </div>
@@ -62,7 +42,6 @@
 
 <script setup>
 const pauseAnimation = ref(false)
-const pausePartners = ref(false)
 const showPopup = ref(false)
 const selectedImage = ref('')
 
@@ -83,38 +62,24 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.brand-section {
+.certificates-section {
     overflow: hidden;
     padding: 1.5rem 0;
 }
 
-.brand-container {
+.certificates-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1rem;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
 }
 
 .certificates-box {
     background: linear-gradient(to bottom right, #eff6ff, #e0e7ff);
     border-radius: 1rem;
     padding: 1.5rem;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
 }
 
-.partners-box {
-    background: linear-gradient(to right, #111111, #1F1F1F, #111111);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    flex-shrink: 0;
-}
-
-.brand-content {
+.certificates-content {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -122,78 +87,67 @@ onUnmounted(() => {
 }
 
 @media (min-width: 1024px) {
-    .brand-content {
+    .certificates-content {
         flex-direction: row;
         align-items: flex-start;
     }
 }
 
-.brand-header {
+.certificates-header {
     width: 100%;
     text-align: center;
     flex-shrink: 0;
+    margin-bottom: 1rem;
 }
 
 @media (min-width: 1024px) {
-    .brand-header {
+    .certificates-header {
         width: 25%;
         text-align: left;
+        margin-bottom: 0;
     }
 }
 
-.brand-title {
+.certificates-title {
     font-weight: 700;
     color: #111111;
-    line-height: 1.25;
-    white-space: nowrap;
+    line-height: 1.4;
     font-size: clamp(1.125rem, 3.5vw, 1.5rem);
-}
-
-.brand-title--white {
-    color: #ffffff;
 }
 
 .text-primary {
     color: #DC2626;
 }
 
-.brand-subtitle {
+.certificates-subtitle {
     color: #4b5563;
     font-size: 0.875rem;
     margin-top: 0.5rem;
 }
 
-.brand-subtitle--light {
-    color: #9ca3af;
-}
-
-.brand-scroll-wrapper {
+.certificates-scroll-wrapper {
     width: 100%;
     overflow: hidden;
     flex: 1;
+    position: relative;
 }
 
 @media (min-width: 1024px) {
-    .brand-scroll-wrapper {
+    .certificates-scroll-wrapper {
         width: 75%;
     }
 }
 
-.certificates-scroll,
-.partners-scroll {
+.certificates-scroll {
     overflow: hidden;
     width: 100%;
+    position: relative;
 }
 
-.certificates-track,
-.partners-track {
+.certificates-track {
     display: flex;
     width: max-content;
     animation: scroll-left 40s linear infinite;
-}
-
-.partners-track {
-    animation-duration: 25s;
 }
 
 .paused {
@@ -218,21 +172,6 @@ onUnmounted(() => {
     height: 6rem;
     width: auto;
     object-fit: contain;
-}
-
-.partner-logo {
-    height: 4rem;
-    width: auto;
-    object-fit: contain;
-    margin: 0 2.5rem;
-    filter: grayscale(100%);
-    opacity: 0.7;
-    transition: all 0.3s ease;
-}
-
-.partner-logo:hover {
-    filter: grayscale(0%);
-    opacity: 1;
 }
 
 .popup-overlay {

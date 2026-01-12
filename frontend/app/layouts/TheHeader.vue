@@ -1,100 +1,70 @@
+<!-- Chức năng: Header chính với navigation và dropdown menu sản phẩm -->
 <template>
     <div>
-        <TheTopBar class="fixed top-0 left-0 right-0 z-50" />
-        <header :class="['fixed left-0 right-0 z-40 transition-all duration-300', scrolled ? 'bg-secondary shadow-lg' : 'bg-secondary/20 backdrop-blur-sm', navVisible ? 'top-[25px] lg:top-[36px]' : '-top-[80px]']">
-            <div class="container">
-                <div class="flex items-center justify-between py-2.5">
-                    <!-- Logo -->
-                    <div class="flex items-center cursor-pointer" aria-label="Trang chủ SHT Security">
-                        <img src="./img/logo.png" alt="SHT Security Logo" class="h-16 w-auto" />
+        <TheTopBar class="top-bar" />
+        <header :class="['header', scrolled ? 'header-scrolled' : 'header-transparent', navVisible ? 'header-visible' : 'header-hidden']">
+            <div class="header-container">
+                <div class="header-content">
+                    <div class="logo" aria-label="Trang chủ SHT Security">
+                        <img src="/images/logo.png" alt="SHT Security Logo" class="logo-img" />
                     </div>
 
-                    <!-- Desktop Navigation -->
-                    <nav class="hidden lg:flex items-center gap-6" aria-label="Main navigation">
-                        <span class="text-white hover:text-primary transition-colors font-medium cursor-pointer">
-                            Trang Chủ
-                        </span>
-                        <span class="text-white hover:text-primary transition-colors font-medium cursor-pointer">
-                            Giới Thiệu
-                        </span>
+                    <nav class="nav-desktop" aria-label="Main navigation">
+                        <span class="nav-link">Trang Chủ</span>
+                        <span class="nav-link">Giới Thiệu</span>
 
-                        <!-- Products Dropdown -->
-                        <div class="relative" ref="dropdownRef">
-                            <button @click="toggleDropdown" class="text-white hover:text-primary transition-colors font-medium flex items-center gap-1" :aria-expanded="isDropdownOpen">
+                        <div class="dropdown" ref="dropdownRef">
+                            <button @click="toggleDropdown" class="dropdown-trigger" :aria-expanded="isDropdownOpen">
                                 Sản Phẩm
-                                <Icon name="mdi:chevron-down" class="w-4 h-4 transition-transform" :class="{ 'rotate-180': isDropdownOpen }" />
+                                <Icon name="mdi:chevron-down" class="dropdown-icon" :class="{ 'dropdown-icon-open': isDropdownOpen }" />
                             </button>
-                            <Transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0" leave-active-class="transition duration-150 ease-in" leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 -translate-y-2">
-                                <div v-if="isDropdownOpen" class="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-2xl py-2 z-50">
-                                    <div v-for="product in products" :key="product.path" class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-gray-50 hover:text-primary transition-colors cursor-pointer" @click="isDropdownOpen = false">
-                                        <Icon :name="product.icon" class="w-5 h-5 text-primary" />
-                                        <span class="text-sm font-medium">{{ product.name }}</span>
+                            <Transition enter-active-class="dropdown-enter-active" enter-from-class="dropdown-enter-from" enter-to-class="dropdown-enter-to" leave-active-class="dropdown-leave-active" leave-from-class="dropdown-leave-from" leave-to-class="dropdown-leave-to">
+                                <div v-if="isDropdownOpen" class="dropdown-menu">
+                                    <div v-for="product in products" :key="product.path" class="dropdown-item" @click="isDropdownOpen = false">
+                                        <Icon :name="product.icon" class="dropdown-item-icon" />
+                                        <span class="dropdown-item-text">{{ product.name }}</span>
                                     </div>
                                 </div>
                             </Transition>
                         </div>
 
-                        <span class="text-white hover:text-primary transition-colors font-medium cursor-pointer">
-                            Dịch Vụ
-                        </span>
-                        <span class="text-white hover:text-primary transition-colors font-medium cursor-pointer">
-                            Bài Đăng
-                        </span>
-                        <span class="text-white hover:text-primary transition-colors font-medium cursor-pointer">
-                            Liên Hệ
-                        </span>
+                        <span class="nav-link">Dịch Vụ</span>
+                        <span class="nav-link">Bài Đăng</span>
+                        <span class="nav-link">Liên Hệ</span>
                     </nav>
 
-                    <!-- CTA Button -->
-                    <div class="hidden lg:flex items-center gap-4">
-                        <button class="btn-primary">
-                            Báo Giá
-                        </button>
+                    <div class="cta-desktop">
+                        <button class="cta-btn">Báo Giá</button>
                     </div>
 
-                    <!-- Mobile Menu Button -->
-                    <button @click="isMenuOpen = !isMenuOpen" class="lg:hidden text-white p-2" aria-label="Menu">
-                        <Icon :name="isMenuOpen ? 'mdi:close' : 'mdi:menu'" class="w-6 h-6" />
+                    <button @click="isMenuOpen = !isMenuOpen" class="menu-toggle" aria-label="Menu">
+                        <Icon :name="isMenuOpen ? 'mdi:close' : 'mdi:menu'" class="menu-icon" />
                     </button>
                 </div>
 
-                <!-- Mobile Menu -->
-                <Transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0" leave-active-class="transition duration-150 ease-in" leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 -translate-y-2">
-                    <div v-if="isMenuOpen" class="lg:hidden bg-secondary-light rounded-lg p-4 mb-4">
-                        <nav class="flex flex-col gap-2">
-                            <span class="text-white hover:text-primary transition-colors font-medium py-2 cursor-pointer" @click="isMenuOpen = false">
-                                Trang Chủ
-                            </span>
-                            <span class="text-white hover:text-primary transition-colors font-medium py-2 cursor-pointer" @click="isMenuOpen = false">
-                                Giới Thiệu
-                            </span>
+                <Transition enter-active-class="mobile-menu-enter-active" enter-from-class="mobile-menu-enter-from" enter-to-class="mobile-menu-enter-to" leave-active-class="mobile-menu-leave-active" leave-from-class="mobile-menu-leave-from" leave-to-class="mobile-menu-leave-to">
+                    <div v-if="isMenuOpen" class="mobile-menu">
+                        <nav class="mobile-nav">
+                            <span class="mobile-nav-link" @click="isMenuOpen = false">Trang Chủ</span>
+                            <span class="mobile-nav-link" @click="isMenuOpen = false">Giới Thiệu</span>
 
-                            <!-- Mobile Products Accordion -->
                             <div>
-                                <button @click="isMobileProductsOpen = !isMobileProductsOpen" class="w-full text-white hover:text-primary transition-colors font-medium py-2 flex items-center justify-between">
+                                <button @click="isMobileProductsOpen = !isMobileProductsOpen" class="mobile-accordion-trigger">
                                     Sản Phẩm
-                                    <Icon name="mdi:chevron-down" class="w-4 h-4 transition-transform" :class="{ 'rotate-180': isMobileProductsOpen }" />
+                                    <Icon name="mdi:chevron-down" class="mobile-accordion-icon" :class="{ 'mobile-accordion-icon-open': isMobileProductsOpen }" />
                                 </button>
-                                <div v-if="isMobileProductsOpen" class="pl-4 space-y-1">
-                                    <div v-for="product in products" :key="product.path" class="flex items-center gap-2 text-gray-300 hover:text-primary transition-colors py-2 text-sm cursor-pointer" @click="isMenuOpen = false">
-                                        <Icon :name="product.icon" class="w-4 h-4" />
+                                <div v-if="isMobileProductsOpen" class="mobile-accordion-content">
+                                    <div v-for="product in products" :key="product.path" class="mobile-product-item" @click="isMenuOpen = false">
+                                        <Icon :name="product.icon" class="mobile-product-icon" />
                                         {{ product.name }}
                                     </div>
                                 </div>
                             </div>
 
-                            <span class="text-white hover:text-primary transition-colors font-medium py-2 cursor-pointer" @click="isMenuOpen = false">
-                                Dịch Vụ
-                            </span>
-                            <span class="text-white hover:text-primary transition-colors font-medium py-2 cursor-pointer" @click="isMenuOpen = false">
-                                Bài Đăng
-                            </span>
-                            <span class="text-white hover:text-primary transition-colors font-medium py-2 cursor-pointer" @click="isMenuOpen = false">
-                                Liên Hệ
-                            </span>
-                            <button class="btn-primary w-full justify-center mt-2" @click="isMenuOpen = false">
-                                Báo Giá
-                            </button>
+                            <span class="mobile-nav-link" @click="isMenuOpen = false">Dịch Vụ</span>
+                            <span class="mobile-nav-link" @click="isMenuOpen = false">Bài Đăng</span>
+                            <span class="mobile-nav-link" @click="isMenuOpen = false">Liên Hệ</span>
+                            <button class="cta-btn cta-mobile" @click="isMenuOpen = false">Báo Giá</button>
                         </nav>
                     </div>
                 </Transition>
@@ -157,3 +127,714 @@ onUnmounted(() => {
     document.removeEventListener('click', handleClickOutside)
 })
 </script>
+
+<style scoped>
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+}
+
+.header {
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    transition: all 0.3s;
+}
+
+.header-scrolled {
+    background: #1a1a1a;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.header-transparent {
+    background: rgba(26, 26, 26, 0.2);
+    backdrop-filter: blur(8px);
+}
+
+.header-visible {
+    top: 25px;
+}
+
+@media (min-width: 1024px) {
+    .header-visible {
+        top: 36px;
+    }
+}
+
+.header-hidden {
+    top: -80px;
+}
+
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.625rem 0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.logo-img {
+    height: 4rem;
+    width: auto;
+}
+
+.nav-desktop {
+    display: none;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+    .nav-desktop {
+        display: flex;
+    }
+}
+
+.nav-link {
+    color: #ffffff;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.nav-link:hover {
+    color: #DC2626;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-trigger {
+    color: #ffffff;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.3s;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.dropdown-trigger:hover {
+    color: #DC2626;
+}
+
+.dropdown-icon {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 0.3s;
+}
+
+.dropdown-icon-open {
+    transform: rotate(180deg);
+}
+
+.dropdown-enter-active {
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+
+.dropdown-enter-from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+}
+
+.dropdown-enter-to {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.dropdown-leave-active {
+    transition: opacity 0.15s ease-in, transform 0.15s ease-in;
+}
+
+.dropdown-leave-from {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.dropdown-leave-to {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.5rem;
+    width: 16rem;
+    background: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    padding: 0.5rem 0;
+    z-index: 50;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #1a1a1a;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background: #f9fafb;
+    color: #DC2626;
+}
+
+.dropdown-item-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: #DC2626;
+}
+
+.dropdown-item-text {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.cta-desktop {
+    display: none;
+    align-items: center;
+    gap: 1rem;
+}
+
+@media (min-width: 1024px) {
+    .cta-desktop {
+        display: flex;
+    }
+}
+
+.cta-btn {
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+    color: #ffffff;
+    padding: 0.625rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+}
+
+.cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(220, 38, 38, 0.3);
+}
+
+.cta-mobile {
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+    display: flex;
+}
+
+.menu-toggle {
+    display: block;
+    color: #ffffff;
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+@media (min-width: 1024px) {
+    .menu-toggle {
+        display: none;
+    }
+}
+
+.menu-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.mobile-menu-enter-active {
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+
+.mobile-menu-enter-from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+}
+
+.mobile-menu-enter-to {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.mobile-menu-leave-active {
+    transition: opacity 0.15s ease-in, transform 0.15s ease-in;
+}
+
+.mobile-menu-leave-from {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.mobile-menu-leave-to {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+}
+
+.mobile-menu {
+    display: block;
+    background: rgba(38, 38, 38, 0.95);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+@media (min-width: 1024px) {
+    .mobile-menu {
+        display: none;
+    }
+}
+
+.mobile-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.mobile-nav-link {
+    color: #ffffff;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.mobile-nav-link:hover {
+    color: #DC2626;
+}
+
+.mobile-accordion-trigger {
+    width: 100%;
+    color: #ffffff;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: color 0.3s;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.mobile-accordion-trigger:hover {
+    color: #DC2626;
+}
+
+.mobile-accordion-icon {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 0.3s;
+}
+
+.mobile-accordion-icon-open {
+    transform: rotate(180deg);
+}
+
+.mobile-accordion-content {
+    padding-left: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.mobile-product-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #d1d5db;
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.mobile-product-item:hover {
+    color: #DC2626;
+}
+
+.mobile-product-icon {
+    width: 1rem;
+    height: 1rem;
+}
+</style>
+
+<style scoped>
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+}
+
+.header {
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    transition: all 0.3s;
+}
+
+.header-scrolled {
+    background: #1a1a1a;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.header-transparent {
+    background: rgba(26, 26, 26, 0.2);
+    backdrop-filter: blur(8px);
+}
+
+.header-visible {
+    top: 25px;
+}
+
+@media (min-width: 1024px) {
+    .header-visible {
+        top: 36px;
+    }
+}
+
+.header-hidden {
+    top: -80px;
+}
+
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.625rem 0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.logo-img {
+    height: 4rem;
+    width: auto;
+}
+
+.nav-desktop {
+    display: none;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+    .nav-desktop {
+        display: flex;
+    }
+}
+
+.nav-link {
+    color: #ffffff;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.nav-link:hover {
+    color: #DC2626;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-trigger {
+    color: #ffffff;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: color 0.3s;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.dropdown-trigger:hover {
+    color: #DC2626;
+}
+
+.dropdown-icon {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 0.3s;
+}
+
+.dropdown-icon-open {
+    transform: rotate(180deg);
+}
+
+.dropdown-enter-active {
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+
+.dropdown-enter-from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+}
+
+.dropdown-enter-to {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.dropdown-leave-active {
+    transition: opacity 0.15s ease-in, transform 0.15s ease-in;
+}
+
+.dropdown-leave-from {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.dropdown-leave-to {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.5rem;
+    width: 16rem;
+    background: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    padding: 0.5rem 0;
+    z-index: 50;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #1a1a1a;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background: #f9fafb;
+    color: #DC2626;
+}
+
+.dropdown-item-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: #DC2626;
+}
+
+.dropdown-item-text {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.cta-desktop {
+    display: none;
+    align-items: center;
+    gap: 1rem;
+}
+
+@media (min-width: 1024px) {
+    .cta-desktop {
+        display: flex;
+    }
+}
+
+.cta-btn {
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+    color: #ffffff;
+    padding: 0.625rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+}
+
+.cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(220, 38, 38, 0.3);
+}
+
+.cta-mobile {
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+}
+
+.menu-toggle {
+    display: block;
+    color: #ffffff;
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+@media (min-width: 1024px) {
+    .menu-toggle {
+        display: none;
+    }
+}
+
+.menu-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.mobile-menu-enter-active {
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+
+.mobile-menu-enter-from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+}
+
+.mobile-menu-enter-to {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.mobile-menu-leave-active {
+    transition: opacity 0.15s ease-in, transform 0.15s ease-in;
+}
+
+.mobile-menu-leave-from {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.mobile-menu-leave-to {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+}
+
+.mobile-menu {
+    display: block;
+    background: rgba(38, 38, 38, 0.95);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+@media (min-width: 1024px) {
+    .mobile-menu {
+        display: none;
+    }
+}
+
+.mobile-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.mobile-nav-link {
+    color: #ffffff;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.mobile-nav-link:hover {
+    color: #DC2626;
+}
+
+.mobile-accordion-trigger {
+    width: 100%;
+    color: #ffffff;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: color 0.3s;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.mobile-accordion-trigger:hover {
+    color: #DC2626;
+}
+
+.mobile-accordion-icon {
+    width: 1rem;
+    height: 1rem;
+    transition: transform 0.3s;
+}
+
+.mobile-accordion-icon-open {
+    transform: rotate(180deg);
+}
+
+.mobile-accordion-content {
+    padding-left: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.mobile-product-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #d1d5db;
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.mobile-product-item:hover {
+    color: #DC2626;
+}
+
+.mobile-product-icon {
+    width: 1rem;
+    height: 1rem;
+}
+</style>

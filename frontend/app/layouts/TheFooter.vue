@@ -1,35 +1,33 @@
+<!-- Chức năng: Footer chính với thông tin liên hệ, liên kết nhanh và bản đồ -->
 <template>
-    <footer class="bg-secondary pt-8 pb-6" itemscope itemtype="https://schema.org/Organization">
-        <div class="container">
-            <!-- Main Footer Content -->
-            <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-3 border-b border-white/10">
-                <!-- Logo & Description -->
-                <div class="col-span-2 md:col-span-1">
-                    <div class="inline-block mb-4 cursor-pointer" itemprop="url">
-                        <div class="text-3xl font-bold text-white" itemprop="name">
+    <footer class="footer" itemscope itemtype="https://schema.org/Organization">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="brand-logo" itemprop="url">
+                        <div class="brand-name" itemprop="name">
                             <span class="text-primary">SHT</span> Security
                         </div>
                     </div>
-                    <p class="text-gray-400 text-sm leading-relaxed mb-4" itemprop="description">
+                    <p class="brand-desc" itemprop="description">
                         Chuyên cung cấp giải pháp an ninh và hạ tầng mạng cho gia đình, doanh nghiệp.
                         Camera AI, mạng LAN, WiFi, Access Control, Báo cháy, Tổng đài IP.
                     </p>
-                    <button class="btn-primary text-sm">
+                    <button class="brand-btn">
                         Về Chúng Tôi
                     </button>
-                    <div class="hidden md:block cursor-pointer mt-4" title="Đã đăng ký Bộ Công Thương">
-                        <img src="./img/bocongthuong.png" alt="Đã đăng ký Bộ Công Thương" class="h-20" loading="lazy" />
+                    <div class="bct-badge bct-desktop" title="Đã đăng ký Bộ Công Thương">
+                        <img src="./img/bocongthuong.png" alt="Đã đăng ký Bộ Công Thương" class="bct-img" loading="lazy" />
                     </div>
                 </div>
 
-                <!-- Quick Links -->
-                <div>
-                    <h3 class="text-white font-bold text-lg mb-4">Liên Kết</h3>
+                <div class="footer-links">
+                    <h3 class="footer-title">Liên Kết</h3>
                     <nav aria-label="Footer navigation">
-                        <ul class="space-y-2">
+                        <ul class="links-list">
                             <li v-for="link in quickLinks" :key="link.name">
-                                <span class="text-gray-400 hover:text-primary transition-colors text-sm flex items-center gap-2 cursor-pointer">
-                                    <Icon name="mdi:chevron-right" class="w-4 h-4" />
+                                <span class="link-item">
+                                    <Icon name="mdi:chevron-right" class="link-icon" />
                                     {{ link.name }}
                                 </span>
                             </li>
@@ -37,78 +35,73 @@
                     </nav>
                 </div>
 
-                <!-- Contact Info -->
-                <div>
-                    <h3 class="text-white font-bold text-lg mb-4">Liên Hệ</h3>
-                    <ul class="space-y-3">
+                <div class="footer-contact">
+                    <h3 class="footer-title">Liên Hệ</h3>
+                    <ul class="contact-list">
                         <li>
-                            <div class="text-gray-400 hover:text-primary transition-colors text-sm flex items-center gap-2 cursor-pointer" itemprop="telephone">
-                                <Icon name="mdi:phone" class="w-4 h-4 text-primary" />
+                            <div class="contact-item" itemprop="telephone">
+                                <Icon name="mdi:phone" class="contact-icon" />
                                 0901 234 567
                             </div>
                         </li>
                         <li>
-                            <div class="text-gray-400 hover:text-primary transition-colors text-sm flex items-center gap-2 cursor-pointer">
-                                <Icon name="mdi:phone-classic" class="w-4 h-4 text-primary" />
+                            <div class="contact-item">
+                                <Icon name="mdi:phone-classic" class="contact-icon" />
                                 028 7654 321
                             </div>
                         </li>
                         <li>
-                            <div class="text-gray-400 hover:text-primary transition-colors text-sm flex items-center gap-2 cursor-pointer" itemprop="email">
-                                <Icon name="mdi:email" class="w-4 h-4 text-primary" />
+                            <div class="contact-item" itemprop="email">
+                                <Icon name="mdi:email" class="contact-icon" />
                                 info@sht.vn
                             </div>
                         </li>
                         <li>
-                            <div class="text-gray-400 hover:text-primary transition-colors text-sm flex items-center gap-2 cursor-pointer">
-                                <Icon name="mdi:facebook" class="w-4 h-4 text-primary" />
+                            <div class="contact-item">
+                                <Icon name="mdi:facebook" class="contact-icon" />
                                 facebook.com/SHT.security
                             </div>
                         </li>
                         <li>
-                            <div class="text-gray-400 hover:text-primary transition-colors text-sm flex items-center gap-2 cursor-pointer">
-                                <Icon name="mdi:chat" class="w-4 h-4 text-primary" />
+                            <div class="contact-item">
+                                <Icon name="mdi:chat" class="contact-icon" />
                                 Zalo: 0901 234 567
                             </div>
                         </li>
-                        <li class="md:hidden">
-                            <div class="cursor-pointer" title="Đã đăng ký Bộ Công Thương">
-                                <img src="./img/bocongthuong.png" alt="Đã đăng ký Bộ Công Thương" class="h-12" loading="lazy" />
+                        <li class="bct-mobile-item">
+                            <div class="bct-badge" title="Đã đăng ký Bộ Công Thương">
+                                <img src="./img/bocongthuong.png" alt="Đã đăng ký Bộ Công Thương" class="bct-img-mobile" loading="lazy" />
                             </div>
                         </li>
                     </ul>
-                    <div class="hidden md:flex items-center gap-3 mt-4">
-                        <div v-for="social in socials" :key="social.name" :aria-label="social.name" class="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-primary transition-colors cursor-pointer">
-                            <Icon :name="social.icon" class="w-4 h-4" />
+                    <div class="social-icons social-desktop">
+                        <div v-for="social in socials" :key="social.name" :aria-label="social.name" class="social-icon">
+                            <Icon :name="social.icon" class="social-icon-svg" />
                         </div>
                     </div>
                 </div>
 
-                <!-- Google Map -->
-                <div class="col-span-2 md:col-span-1 md:flex md:flex-col">
-                    <h3 class="text-white font-bold text-lg mb-4">Bản Đồ</h3>
-                    <div class="text-gray-400 text-sm flex items-start gap-2 mb-3" itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
-                        <Icon name="mdi:map-marker" class="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                <div class="footer-map">
+                    <h3 class="footer-title">Bản Đồ</h3>
+                    <div class="map-address" itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+                        <Icon name="mdi:map-marker" class="map-icon" />
                         <span itemprop="streetAddress">123 Đường ABC, Phường XYZ, Quận 1, TP. Hồ Chí Minh</span>
                     </div>
-                    <div class="rounded-lg overflow-hidden aspect-video md:aspect-auto md:flex-1">
+                    <div class="map-wrapper">
                         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.4241674197956!2d106.69765841533417!3d10.778789792319392!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f38f9ed887b%3A0x14aded5703768989!2zUXXhuq1uIDEsIFRow6BuaCBwaOG7kSBI4buTIENow60gTWluaCwgVmnhu4d0IE5hbQ!5e0!3m2!1svi!2s!4v1704796800000" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Bản đồ địa chỉ SHT Security"></iframe>
                     </div>
-                    <div class="flex md:hidden items-center justify-center gap-3 mt-4">
-                        <div v-for="social in socials" :key="social.name" :aria-label="social.name" class="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-primary transition-colors cursor-pointer">
-                            <Icon :name="social.icon" class="w-4 h-4" />
+                    <div class="social-icons social-mobile">
+                        <div v-for="social in socials" :key="social.name" :aria-label="social.name" class="social-icon">
+                            <Icon :name="social.icon" class="social-icon-svg" />
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Bottom Footer -->
-            <div class="pt-6 flex flex-col items-center justify-center gap-4">
-                <p class="text-gray-400 text-sm text-center">
+            <div class="footer-bottom">
+                <p class="copyright">
                     © 2024 SHT Security. All rights reserved.
                 </p>
-
-                <!-- Social Icons -->
             </div>
         </div>
     </footer>
@@ -134,3 +127,296 @@ const socials = [
     { name: 'Zalo', icon: 'mdi:chat', url: 'https://zalo.me/0901234567' }
 ]
 </script>
+
+<style scoped>
+.footer {
+    background: #1a1a1a;
+    padding-top: 2rem;
+    padding-bottom: 1.5rem;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (min-width: 768px) {
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .footer-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.footer-brand {
+    grid-column: span 2;
+}
+
+@media (min-width: 768px) {
+    .footer-brand {
+        grid-column: span 1;
+    }
+}
+
+.brand-logo {
+    display: inline-block;
+    margin-bottom: 1rem;
+    cursor: pointer;
+}
+
+.brand-name {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.text-primary {
+    color: #DC2626;
+}
+
+.brand-desc {
+    color: #9ca3af;
+    font-size: 0.875rem;
+    line-height: 1.625;
+    margin-bottom: 1rem;
+}
+
+.brand-btn {
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+    color: #ffffff;
+    padding: 0.625rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+
+.brand-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(220, 38, 38, 0.3);
+}
+
+.bct-badge {
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+.bct-desktop {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .bct-desktop {
+        display: block;
+    }
+}
+
+.bct-img {
+    height: 5rem;
+}
+
+.bct-img-mobile {
+    height: 3rem;
+}
+
+.bct-mobile-item {
+    display: block;
+}
+
+@media (min-width: 768px) {
+    .bct-mobile-item {
+        display: none;
+    }
+}
+
+.footer-links,
+.footer-contact {
+    grid-column: span 1;
+}
+
+.footer-map {
+    grid-column: span 2;
+}
+
+@media (min-width: 768px) {
+    .footer-map {
+        grid-column: span 1;
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.footer-title {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+}
+
+.links-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.link-item {
+    color: #9ca3af;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.link-item:hover {
+    color: #DC2626;
+}
+
+.link-icon {
+    width: 1rem;
+    height: 1rem;
+}
+
+.contact-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.contact-item {
+    color: #9ca3af;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.contact-item:hover {
+    color: #DC2626;
+}
+
+.contact-icon {
+    width: 1rem;
+    height: 1rem;
+    color: #DC2626;
+}
+
+.social-icons {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.social-desktop {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .social-desktop {
+        display: flex;
+    }
+}
+
+.social-mobile {
+    display: flex;
+    justify-content: center;
+}
+
+@media (min-width: 768px) {
+    .social-mobile {
+        display: none;
+    }
+}
+
+.social-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    transition: background 0.3s;
+    cursor: pointer;
+}
+
+.social-icon:hover {
+    background: #DC2626;
+}
+
+.social-icon-svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+.map-address {
+    color: #9ca3af;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.map-icon {
+    width: 1rem;
+    height: 1rem;
+    color: #DC2626;
+    margin-top: 0.125rem;
+    flex-shrink: 0;
+}
+
+.map-wrapper {
+    border-radius: 0.5rem;
+    overflow: hidden;
+    aspect-ratio: 16/9;
+}
+
+@media (min-width: 768px) {
+    .map-wrapper {
+        aspect-ratio: auto;
+        flex: 1;
+    }
+}
+
+.footer-bottom {
+    padding-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.copyright {
+    color: #9ca3af;
+    font-size: 0.875rem;
+    text-align: center;
+}
+</style>

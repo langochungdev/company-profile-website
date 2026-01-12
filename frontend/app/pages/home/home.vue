@@ -8,13 +8,16 @@
             <ServicesSection />
 
             <!-- Section 2: Dự Án Tiêu Biểu -->
-            <PortfolioSection />
+            <ProjectSection />
 
             <!-- Section 3: Tin Tức - Social Media -->
             <!-- <BlogSection /> -->
 
-            <!-- Section 4 & 5: Chứng Nhận & Đối Tác -->
-            <BrandSection />
+            <!-- Section 4: Chứng Nhận -->
+            <CertSection />
+
+            <!-- Section 5: Đối Tác -->
+            <PartnerSection />
         </main>
     </NuxtLayout>
 </template>
@@ -22,9 +25,10 @@
 <script setup>
 import HeroSection from './components/HeroSection.vue'
 import ServicesSection from './components/ServicesSection.vue'
-import PortfolioSection from './components/PortfolioSection.vue'
+import ProjectSection from './components/ProjectSection.vue'
 import BlogSection from './components/BlogSection.vue'
-import BrandSection from './components/BrandSection.vue'
+import CertSection from './components/CertSection.vue'
+import PartnerSection from './components/PartnerSection.vue'
 
 useSeoMeta({
     title: 'SHT Security - Giải Pháp An Ninh & Hạ Tầng Mạng Chuyên Nghiệp',
@@ -36,7 +40,6 @@ useSeoMeta({
     ogUrl: 'https://sht.langochung.me'
 })
 
-// JSON-LD Structured Data
 useHead({
     script: [
         {

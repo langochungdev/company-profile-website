@@ -359,7 +359,7 @@ function getGridClass(index: number) {
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background: var(--color-primary);
+    background: #DC2626;
     color: white;
     font-size: 0.75rem;
     font-weight: 600;
@@ -370,7 +370,7 @@ function getGridClass(index: number) {
 }
 
 .mobile-card-btn:hover {
-    background: var(--color-primary-dark, #1d4ed8);
+    background: #B91C1C;
 }
 
 .mobile-btn-icon {
