@@ -170,6 +170,7 @@
 
 /* Animations */
 @keyframes blink-red {
+
     0%,
     100% {
         color: #ef4444;
@@ -333,7 +334,7 @@
 
 @media (min-width: 1536px) {
     .container {
-        max-width: 1536px;
+        max-width: 1200px;
     }
 }
 </style>
