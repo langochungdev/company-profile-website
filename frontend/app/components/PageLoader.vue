@@ -1,12 +1,12 @@
 <!-- Component preloader hiển thị khi trang web đang load -->
 <template>
-    <Transition enter-active-class="transition duration-300" enter-from-class="opacity-100" enter-to-class="opacity-100" leave-active-class="transition duration-500" leave-from-class="opacity-100" leave-to-class="opacity-0">
-        <div v-if="isLoading" class="fixed inset-0 z-[9999] bg-black flex items-center justify-center">
-            <div class="relative w-40 h-40">
-                <div class="absolute inset-0 border-4 border-white/10 rounded-full"></div>
-                <div class="absolute inset-0 border-4 border-transparent border-t-primary rounded-full animate-spin"></div>
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <img src="/images/logo.png" alt="SHT Logo" class="w-24 h-24 object-contain" />
+    <Transition name="page-loader">
+        <div v-if="isLoading" class="page-loader">
+            <div class="loader-container">
+                <div class="loader-circle-bg"></div>
+                <div class="loader-circle-spin"></div>
+                <div class="logo-wrapper">
+                    <img src="/images/logo.png" alt="SHT Logo" class="logo-img" />
                 </div>
             </div>
         </div>
@@ -34,4 +34,74 @@ onMounted(() => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.page-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background-color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loader-container {
+    position: relative;
+    width: 10rem;
+    height: 10rem;
+}
+
+.loader-circle-bg {
+    position: absolute;
+    inset: 0;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-radius: 9999px;
+}
+
+.loader-circle-spin {
+    position: absolute;
+    inset: 0;
+    border: 4px solid transparent;
+    border-top-color: #DC2626;
+    border-radius: 9999px;
+    animation: spin 1s linear infinite;
+}
+
+.logo-wrapper {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-img {
+    width: 6rem;
+    height: 6rem;
+    object-fit: contain;
+}
+
+/* Transitions */
+.page-loader-enter-active {
+    transition: opacity 0.3s ease;
+}
+
+.page-loader-leave-active {
+    transition: opacity 0.5s ease;
+}
+
+.page-loader-enter-from,
+.page-loader-leave-to {
+    opacity: 0;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+</style>
