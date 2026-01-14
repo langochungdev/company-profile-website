@@ -70,7 +70,7 @@
                         </li>
                         <li class="bct-mobile-item">
                             <div class="bct-badge" title="Đã đăng ký Bộ Công Thương">
-                                <img src="./images/bocongthuong.png" alt="Đã đăng ký Bộ Công Thương" class="bct-img-mobile" loading="lazy" />
+                                <img src="../images/bocongthuong.png" alt="Đã đăng ký Bộ Công Thương" class="bct-img-mobile" loading="lazy" />
                             </div>
                         </li>
                     </ul>
