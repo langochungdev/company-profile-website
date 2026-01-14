@@ -1,32 +1,28 @@
 <template>
     <NuxtLayout name="main">
+        <PageLoader />
         <main>
-            <!-- Hero Section - Slideshow Banner -->
             <HeroSection />
 
-            <!-- Section 1: Lĩnh Vực Hoạt Động (8 mảng cốt lõi) -->
             <ServicesSection />
 
-            <!-- Section 2: Dự Án Tiêu Biểu -->
             <ProjectSection />
 
-            <!-- Section 3: Tin Tức - Social Media -->
-            <!-- <BlogSection /> -->
+            <NewsSection />
 
-            <!-- Section 4: Chứng Nhận -->
             <CertSection />
 
-            <!-- Section 5: Đối Tác -->
             <PartnerSection />
         </main>
     </NuxtLayout>
 </template>
 
 <script setup>
+import PageLoader from '@/components/PageLoader.vue'
 import HeroSection from './components/HeroSection.vue'
 import ServicesSection from './components/ServicesSection.vue'
 import ProjectSection from './components/ProjectSection.vue'
-import BlogSection from './components/BlogSection.vue'
+import NewsSection from './components/NewsSection.vue'
 import CertSection from './components/CertSection.vue'
 import PartnerSection from './components/PartnerSection.vue'
 

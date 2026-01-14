@@ -17,13 +17,13 @@
                         </component>
                         <p class="slide-desc">{{ slide.description }}</p>
                         <div class="slide-actions">
-                            <button class="btn-primary" aria-label="Liên hệ tư vấn">
+                            <NuxtLink to="/contact" class="btn-primary" aria-label="Liên hệ tư vấn">
                                 <span>Liên Hệ Ngay</span>
                                 <Icon name="mdi:arrow-right" class="btn-icon" />
-                            </button>
-                            <button class="btn-outline" aria-label="Xem thêm về công ty">
-                                <span>Tìm Hiểu Thêm</span>
-                            </button>
+                            </NuxtLink>
+                            <NuxtLink to="/product" class="btn-outline" aria-label="Xem thêm sản phẩm">
+                                <span>Xem Sản Phẩm</span>
+                            </NuxtLink>
                         </div>
                     </div>
                     <div class="slide-visual">

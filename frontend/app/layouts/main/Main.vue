@@ -1,4 +1,3 @@
-<!-- Chức năng: Layout chính cho toàn bộ ứng dụng với header, footer và nút Zalo -->
 <template>
     <div class="main-layout">
         <Header />

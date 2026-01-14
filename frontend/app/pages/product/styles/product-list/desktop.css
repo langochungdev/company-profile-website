@@ -1,0 +1,88 @@
+/* Desktop Styles for Product List */
+
+.product-list-section {
+    padding: 60px 0 100px;
+    background-color: #f8fafc;
+    min-height: 800px;
+}
+
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* Filter Wrapper */
+.filter-wrapper {
+    margin-bottom: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.filter-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.filter-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.filter-chip {
+    padding: 8px 20px;
+    border-radius: 8px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-chip:hover {
+    border-color: #34d399;
+    color: #059669;
+}
+
+.filter-chip.active {
+    background: #10b981;
+    /* Emerald 500 */
+    color: white;
+    border-color: #10b981;
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+}
+
+/* Product Grid */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 100px 0;
+    color: #94a3b8;
+}
+
+.empty-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    color: #cbd5e1;
+}
+
+.empty-state h3 {
+    font-size: 20px;
+    color: #1e293b;
+    margin-bottom: 8px;
+}

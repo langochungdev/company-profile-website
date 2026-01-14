@@ -1,0 +1,52 @@
+@media (max-width: 1024px) {
+    .post-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .post-sidebar {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .sidebar-cta,
+    .sidebar-related {
+        flex: 1;
+        min-width: 280px;
+    }
+}
+
+@media (max-width: 768px) {
+    .post-detail-header {
+        padding: 120px 0 30px;
+    }
+
+    .post-detail-content {
+        padding: 40px 0 60px;
+    }
+
+    .post-title {
+        font-size: 28px;
+    }
+
+    .post-body {
+        font-size: 16px;
+    }
+
+    .post-body .lead {
+        font-size: 17px;
+    }
+
+    .post-body h2 {
+        font-size: 22px;
+    }
+
+    .post-sidebar {
+        flex-direction: column;
+    }
+
+    .sidebar-cta,
+    .sidebar-related {
+        min-width: 100%;
+    }
+}

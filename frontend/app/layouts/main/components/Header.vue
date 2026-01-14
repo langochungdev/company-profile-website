@@ -10,27 +10,27 @@
                     </div>
 
                     <nav class="nav-desktop" aria-label="Main navigation">
-                        <span class="nav-link">Trang Chủ</span>
-                        <span class="nav-link">Giới Thiệu</span>
+                        <NuxtLink to="/" class="nav-link">Trang Chủ</NuxtLink>
+                        <NuxtLink to="/about-us" class="nav-link">Giới Thiệu</NuxtLink>
 
                         <div class="dropdown" ref="dropdownRef">
                             <button @click="toggleDropdown" class="dropdown-trigger" :aria-expanded="isDropdownOpen">
-                                Sản Phẩm
+                                <NuxtLink to="/product" class="trigger-link">Sản Phẩm</NuxtLink>
                                 <Icon name="mdi:chevron-down" class="dropdown-icon" :class="{ 'dropdown-icon-open': isDropdownOpen }" />
                             </button>
                             <Transition enter-active-class="dropdown-enter-active" enter-from-class="dropdown-enter-from" enter-to-class="dropdown-enter-to" leave-active-class="dropdown-leave-active" leave-from-class="dropdown-leave-from" leave-to-class="dropdown-leave-to">
                                 <div v-if="isDropdownOpen" class="dropdown-menu">
-                                    <div v-for="product in products" :key="product.path" class="dropdown-item" @click="isDropdownOpen = false">
+                                    <NuxtLink v-for="product in products" :key="product.path" :to="product.path" class="dropdown-item" @click="isDropdownOpen = false">
                                         <Icon :name="product.icon" class="dropdown-item-icon" />
                                         <span class="dropdown-item-text">{{ product.name }}</span>
-                                    </div>
+                                    </NuxtLink>
                                 </div>
                             </Transition>
                         </div>
 
-                        <span class="nav-link">Dịch Vụ</span>
-                        <span class="nav-link">Bài Đăng</span>
-                        <span class="nav-link">Liên Hệ</span>
+                        <NuxtLink to="/dich-vu" class="nav-link">Dịch Vụ</NuxtLink>
+                        <NuxtLink to="/post" class="nav-link">Tin Tức</NuxtLink>
+                        <NuxtLink to="/contact" class="nav-link">Liên Hệ</NuxtLink>
                     </nav>
 
                     <div class="cta-desktop">
@@ -45,25 +45,25 @@
                 <Transition enter-active-class="mobile-menu-enter-active" enter-from-class="mobile-menu-enter-from" enter-to-class="mobile-menu-enter-to" leave-active-class="mobile-menu-leave-active" leave-from-class="mobile-menu-leave-from" leave-to-class="mobile-menu-leave-to">
                     <div v-if="isMenuOpen" class="mobile-menu">
                         <nav class="mobile-nav">
-                            <span class="mobile-nav-link" @click="isMenuOpen = false">Trang Chủ</span>
-                            <span class="mobile-nav-link" @click="isMenuOpen = false">Giới Thiệu</span>
+                            <NuxtLink to="/" class="mobile-nav-link" @click="isMenuOpen = false">Trang Chủ</NuxtLink>
+                            <NuxtLink to="/about-us" class="mobile-nav-link" @click="isMenuOpen = false">Giới Thiệu</NuxtLink>
 
                             <div>
                                 <button @click="isMobileProductsOpen = !isMobileProductsOpen" class="mobile-accordion-trigger">
-                                    Sản Phẩm
+                                    <NuxtLink to="/product" @click.stop="isMenuOpen = false" class="accordion-link">Sản Phẩm</NuxtLink>
                                     <Icon name="mdi:chevron-down" class="mobile-accordion-icon" :class="{ 'mobile-accordion-icon-open': isMobileProductsOpen }" />
                                 </button>
                                 <div v-if="isMobileProductsOpen" class="mobile-accordion-content">
-                                    <div v-for="product in products" :key="product.path" class="mobile-product-item" @click="isMenuOpen = false">
+                                    <NuxtLink v-for="product in products" :key="product.path" :to="product.path" class="mobile-product-item" @click="isMenuOpen = false">
                                         <Icon :name="product.icon" class="mobile-product-icon" />
                                         {{ product.name }}
-                                    </div>
+                                    </NuxtLink>
                                 </div>
                             </div>
 
-                            <span class="mobile-nav-link" @click="isMenuOpen = false">Dịch Vụ</span>
-                            <span class="mobile-nav-link" @click="isMenuOpen = false">Bài Đăng</span>
-                            <span class="mobile-nav-link" @click="isMenuOpen = false">Liên Hệ</span>
+                            <NuxtLink to="/dich-vu" class="mobile-nav-link" @click="isMenuOpen = false">Dịch Vụ</NuxtLink>
+                            <NuxtLink to="/post" class="mobile-nav-link" @click="isMenuOpen = false">Tin Tức</NuxtLink>
+                            <NuxtLink to="/contact" class="mobile-nav-link" @click="isMenuOpen = false">Liên Hệ</NuxtLink>
                             <button class="cta-btn cta-mobile" @click="isMenuOpen = false">Báo Giá</button>
                         </nav>
                     </div>
@@ -85,14 +85,14 @@ const lastScrollY = ref(0)
 const dropdownRef = ref(null)
 
 const products = [
-    { name: 'Camera An Ninh - AI', path: '/san-pham/camera-an-ninh', icon: 'mdi:cctv' },
-    { name: 'Hạ Tầng Mạng', path: '/san-pham/ha-tang-mang', icon: 'mdi:lan' },
-    { name: 'WiFi & Firewall', path: '/san-pham/wifi-firewall', icon: 'mdi:wifi' },
-    { name: 'Tủ Rack & Hạ Tầng', path: '/san-pham/tu-rack', icon: 'mdi:server' },
-    { name: 'Access Control', path: '/san-pham/access-control', icon: 'mdi:fingerprint' },
-    { name: 'Báo Động - Báo Cháy', path: '/san-pham/bao-dong-bao-chay', icon: 'mdi:alarm-light' },
-    { name: 'Tổng Đài IP PBX', path: '/san-pham/tong-dai-ip', icon: 'mdi:phone-voip' },
-    { name: 'Âm Thanh - Loa PA', path: '/san-pham/am-thanh-loa', icon: 'mdi:speaker' }
+    { name: 'Camera An Ninh - AI', path: '/product/camera-ai-sht-pro', icon: 'mdi:cctv' },
+    { name: 'Hạ Tầng Mạng', path: '/product/switch-poe-24-port', icon: 'mdi:lan' },
+    { name: 'WiFi & Firewall', path: '/product/wifi-6-enterprise', icon: 'mdi:wifi' },
+    { name: 'Tủ Rack & Hạ Tầng', path: '/product/router-load-balance', icon: 'mdi:server' },
+    { name: 'Access Control', path: '/product/may-cham-cong-faceid', icon: 'mdi:fingerprint' },
+    { name: 'Báo Động - Báo Cháy', path: '/product/bao-chay-dia-chi-4-loop', icon: 'mdi:alarm-light' },
+    { name: 'Tổng Đài IP PBX', path: '/product', icon: 'mdi:phone-voip' },
+    { name: 'Âm Thanh - Loa PA', path: '/product', icon: 'mdi:speaker' }
 ]
 
 const toggleDropdown = () => {

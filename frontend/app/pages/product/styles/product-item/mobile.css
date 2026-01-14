@@ -1,0 +1,10 @@
+/* Mobile Styles for Product Item */
+@media (max-width: 768px) {
+    .card-image-wrapper {
+        padding-top: 70%;
+    }
+
+    .card-content {
+        padding: 16px;
+    }
+}

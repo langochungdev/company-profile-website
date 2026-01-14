@@ -1,0 +1,10 @@
+/* Mobile Styles for Post Item */
+@media (max-width: 768px) {
+    .card-content {
+        padding: 20px;
+    }
+
+    .card-title {
+        font-size: 18px;
+    }
+}

@@ -13,11 +13,11 @@
                         Chuyên cung cấp giải pháp an ninh và hạ tầng mạng cho gia đình, doanh nghiệp.
                         Camera AI, mạng LAN, WiFi, Access Control, Báo cháy, Tổng đài IP.
                     </p>
-                    <button class="brand-btn">
+                    <NuxtLink to="/gioi-thieu" class="brand-btn">
                         Về Chúng Tôi
-                    </button>
+                    </NuxtLink>
                     <div class="bct-badge bct-desktop" title="Đã đăng ký Bộ Công Thương">
-                        <img src="./images/bocongthuong.png" alt="Đã đăng ký Bộ Công Thương" class="bct-img" loading="lazy" />
+                        <img src="../images/bocongthuong.png" alt="Đã đăng ký Bộ Công Thương" class="bct-img" loading="lazy" />
                     </div>
                 </div>
 
@@ -26,10 +26,10 @@
                     <nav aria-label="Footer navigation">
                         <ul class="links-list">
                             <li v-for="link in quickLinks" :key="link.name">
-                                <span class="link-item">
+                                <NuxtLink :to="link.path" class="link-item">
                                     <Icon name="mdi:chevron-right" class="link-icon" />
                                     {{ link.name }}
-                                </span>
+                                </NuxtLink>
                             </li>
                         </ul>
                     </nav>
@@ -109,15 +109,10 @@
 
 <script setup>
 const quickLinks = [
-    { name: 'Giới Thiệu', path: '/gioi-thieu' },
-    { name: 'Camera An Ninh', path: '/san-pham/camera-an-ninh' },
-    { name: 'Hạ Tầng Mạng', path: '/san-pham/ha-tang-mang' },
-    { name: 'WiFi & Firewall', path: '/san-pham/wifi-firewall' },
-    { name: 'Access Control', path: '/san-pham/access-control' },
-    { name: 'Báo Động & Báo Cháy', path: '/san-pham/bao-dong-bao-chay' },
-    { name: 'Dự Án', path: '/du-an' },
-    { name: 'Bài Đăng', path: '/bai-dang' },
-    { name: 'Liên Hệ', path: '/lien-he' }
+    { name: 'Giới Thiệu', path: '/about-us' },
+    { name: 'Sản Phẩm', path: '/product' },
+    { name: 'Tin Tức', path: '/post' },
+    { name: 'Liên Hệ', path: '/contact' }
 ]
 
 const socials = [
