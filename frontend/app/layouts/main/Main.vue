@@ -1,11 +1,11 @@
 <!-- Chức năng: Layout chính cho toàn bộ ứng dụng với header, footer và nút Zalo -->
 <template>
     <div class="main-layout">
-        <TheHeader />
+        <Header />
 
         <slot />
 
-        <TheFooter />
+        <Footer />
 
         <a href="https://zalo.me/0373763354" target="_blank" rel="noopener noreferrer" class="zalo-button" aria-label="Chat qua Zalo">
             <span class="zalo-ping"></span>
@@ -15,8 +15,8 @@
 </template>
 
 <script setup>
-import TheHeader from './TheHeader.vue'
-import TheFooter from './TheFooter.vue'
+import Header from './components/Header.vue'
+import Footer from './components/Footer.vue'
 </script>
 
 <style scoped>
