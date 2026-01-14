@@ -1,14 +1,12 @@
 <template>
     <NuxtLayout name="main">
         <main>
-            <ProductHeader />
             <ProductList />
         </main>
     </NuxtLayout>
 </template>
 
 <script setup>
-import ProductHeader from './components/ProductHeader.vue'
 import ProductList from './components/ProductList.vue'
 
 useSeoMeta({

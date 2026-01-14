@@ -1,18 +1,6 @@
 <template>
     <NuxtLayout name="main">
         <main v-if="post">
-            <section class="post-detail-header">
-                <div class="container">
-                    <div class="header-breadcrumb">
-                        <NuxtLink to="/" class="breadcrumb-link">Trang chủ</NuxtLink>
-                        <Icon name="mdi:chevron-right" class="separator" />
-                        <NuxtLink to="/post" class="breadcrumb-link">Tin tức</NuxtLink>
-                        <Icon name="mdi:chevron-right" class="separator" />
-                        <span class="breadcrumb-current">{{ post.category }}</span>
-                    </div>
-                </div>
-            </section>
-
             <article class="post-detail-content">
                 <div class="container">
                     <div class="post-grid">

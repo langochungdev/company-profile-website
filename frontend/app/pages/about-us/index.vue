@@ -1,14 +1,12 @@
 <template>
     <NuxtLayout name="main">
         <main>
-            <AboutHeader />
             <AboutContent />
         </main>
     </NuxtLayout>
 </template>
 
 <script setup>
-import AboutHeader from './components/AboutHeader.vue'
 import AboutContent from './components/AboutContent.vue'
 
 useSeoMeta({

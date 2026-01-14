@@ -14,7 +14,7 @@
                         <div class="partners-scroll" @mouseenter="pausePartners = true" @mouseleave="pausePartners = false">
                             <div class="partners-track" :class="{ paused: pausePartners }">
                                 <template v-for="set in 2" :key="'partner-set-' + set">
-                                    <img v-for="i in 10" :key="'partner-' + set + '-' + i" :src="`/images/doitac.jpg`" :alt="'Đối tác SHT ' + i" loading="lazy" class="partner-logo" />
+                                    <img v-for="i in 10" :key="'partner-' + set + '-' + i" src="https://placehold.co/200x100/png?text=200x100" :alt="'Đối tác SHT ' + i" loading="lazy" class="partner-logo" />
                                 </template>
                             </div>
                         </div>

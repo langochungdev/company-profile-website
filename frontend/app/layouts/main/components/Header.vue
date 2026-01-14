@@ -1,13 +1,13 @@
-<!-- Chức năng: Header chính với navigation và dropdown menu sản phẩm -->
+<!-- Chức năng: Header chính với navigation, dropdown menu và breadcrumb -->
 <template>
     <div>
         <TopBar class="top-bar" />
         <header :class="['header', scrolled ? 'header-scrolled' : 'header-transparent', navVisible ? 'header-visible' : 'header-hidden']">
             <div class="header-container">
                 <div class="header-content">
-                    <div class="logo" aria-label="Trang chủ SHT Security">
+                    <NuxtLink to="/" class="logo" aria-label="Trang chủ SHT Security">
                         <img src="/images/logo.png" alt="SHT Security Logo" class="logo-img" />
-                    </div>
+                    </NuxtLink>
 
                     <nav class="nav-desktop" aria-label="Main navigation">
                         <NuxtLink to="/" class="nav-link">Trang Chủ</NuxtLink>
@@ -68,6 +68,28 @@
                         </nav>
                     </div>
                 </Transition>
+
+                <nav v-if="showBreadcrumb" class="header-breadcrumb" aria-label="Breadcrumb">
+                    <ol class="breadcrumb-list">
+                        <li class="breadcrumb-item">
+                            <NuxtLink to="/" class="breadcrumb-link">
+                                <Icon name="mdi:home" class="breadcrumb-icon" />
+                                <span>Trang chủ</span>
+                            </NuxtLink>
+                        </li>
+                        <template v-for="(item, index) in breadcrumbItems" :key="index">
+                            <li class="breadcrumb-separator">
+                                <Icon name="mdi:chevron-right" />
+                            </li>
+                            <li class="breadcrumb-item">
+                                <NuxtLink v-if="item.to" :to="item.to" class="breadcrumb-link">
+                                    {{ item.label }}
+                                </NuxtLink>
+                                <span v-else class="breadcrumb-current">{{ item.label }}</span>
+                            </li>
+                        </template>
+                    </ol>
+                </nav>
             </div>
         </header>
     </div>
@@ -76,6 +98,7 @@
 <script setup>
 import TopBar from './TopBar.vue'
 
+const route = useRoute()
 const isMenuOpen = ref(false)
 const isDropdownOpen = ref(false)
 const isMobileProductsOpen = ref(false)
@@ -94,6 +117,44 @@ const products = [
     { name: 'Tổng Đài IP PBX', path: '/product', icon: 'mdi:phone-voip' },
     { name: 'Âm Thanh - Loa PA', path: '/product', icon: 'mdi:speaker' }
 ]
+
+const showBreadcrumb = computed(() => {
+    return route.path !== '/' && route.path !== '/home'
+})
+
+const breadcrumbItems = computed(() => {
+    const path = route.path
+    const items = []
+
+    if (path.startsWith('/product')) {
+        if (path === '/product') {
+            items.push({ label: 'Sản phẩm' })
+        } else {
+            items.push({ label: 'Sản phẩm', to: '/product' })
+            const slug = path.replace('/product/', '')
+            const product = products.find(p => p.path.includes(slug))
+            items.push({ label: product?.name || 'Chi tiết sản phẩm' })
+        }
+    } else if (path.startsWith('/post')) {
+        if (path === '/post') {
+            items.push({ label: 'Tin tức' })
+        } else {
+            items.push({ label: 'Tin tức', to: '/post' })
+            items.push({ label: 'Bài viết' })
+        }
+    } else if (path === '/about-us') {
+        items.push({ label: 'Giới thiệu' })
+    } else if (path === '/contact') {
+        items.push({ label: 'Liên hệ' })
+    } else if (path === '/dich-vu') {
+        items.push({ label: 'Dịch vụ' })
+    } else {
+        const pageName = path.replace('/', '').replace(/-/g, ' ')
+        items.push({ label: pageName.charAt(0).toUpperCase() + pageName.slice(1) })
+    }
+
+    return items
+})
 
 const toggleDropdown = () => {
     isDropdownOpen.value = !isDropdownOpen.value

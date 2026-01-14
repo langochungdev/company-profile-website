@@ -27,7 +27,7 @@
                         </div>
                     </div>
                     <div class="slide-visual">
-                        <img src="/images/cam.webp" alt="Ảnh minh họa" class="visual-img" />
+                        <img src="https://placehold.co/600x600/png?text=600x600" alt="Ảnh minh họa" class="visual-img" />
                     </div>
                 </div>
             </div>
@@ -57,21 +57,21 @@ const slides = [
         title: 'SHT - Chuyên Gia',
         highlight: 'Camera & Hạ Tầng Mạng',
         description: 'Cung cấp giải pháp an ninh thông minh, hạ tầng mạng chuyên nghiệp cho gia đình và doanh nghiệp. Đồng hành cùng bạn bảo vệ tài sản.',
-        image: '/images/banner.jpg',
+        image: 'https://placehold.co/1920x1080/jpg?text=1920x1080',
     },
     {
         badge: '8 Lĩnh Vực Cốt Lõi',
         title: 'Hệ Thống Camera AI',
         highlight: 'Giám Sát Thông Minh',
         description: 'Camera nhận diện khuôn mặt, phát hiện xâm nhập, giám sát từ xa 24/7 qua điện thoại. Công nghệ AI tiên tiến nhất.',
-        image: '/images/banner1.jpg',
+        image: 'https://placehold.co/1920x1080/jpg?text=1920x1080',
     },
     {
         badge: 'Uy Tín - Chất Lượng',
         title: 'Hạ Tầng Mạng',
         highlight: 'Ổn Định 24/7',
         description: 'Thi công mạng LAN, WiFi doanh nghiệp, Firewall bảo mật, VPN kết nối đa chi nhánh. Đảm bảo vận hành liên tục.',
-        image: '/images/banner.jpg',
+        image: 'https://placehold.co/1920x1080/jpg?text=1920x1080',
     }
 ]
 

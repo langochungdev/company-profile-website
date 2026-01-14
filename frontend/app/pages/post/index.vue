@@ -1,14 +1,12 @@
 <template>
     <NuxtLayout name="main">
         <main>
-            <PostHeader />
             <PostList />
         </main>
     </NuxtLayout>
 </template>
 
 <script setup>
-import PostHeader from './components/PostHeader.vue'
 import PostList from './components/PostList.vue'
 
 useSeoMeta({

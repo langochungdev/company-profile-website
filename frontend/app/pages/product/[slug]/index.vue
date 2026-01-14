@@ -1,18 +1,6 @@
 <template>
     <NuxtLayout name="main">
         <main v-if="product">
-            <section class="product-detail-header">
-                <div class="container">
-                    <div class="header-breadcrumb">
-                        <NuxtLink to="/" class="breadcrumb-link">Trang chủ</NuxtLink>
-                        <Icon name="mdi:chevron-right" class="separator" />
-                        <NuxtLink to="/product" class="breadcrumb-link">Sản phẩm</NuxtLink>
-                        <Icon name="mdi:chevron-right" class="separator" />
-                        <span class="breadcrumb-current">{{ product.name }}</span>
-                    </div>
-                </div>
-            </section>
-
             <section class="product-detail-content">
                 <div class="container">
                     <div class="detail-grid">

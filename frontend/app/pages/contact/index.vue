@@ -1,14 +1,12 @@
 <template>
     <NuxtLayout name="main">
         <main>
-            <ContactHeader />
             <ContactForm />
         </main>
     </NuxtLayout>
 </template>
 
 <script setup>
-import ContactHeader from './components/ContactHeader.vue'
 import ContactForm from './components/ContactForm.vue'
 
 useSeoMeta({

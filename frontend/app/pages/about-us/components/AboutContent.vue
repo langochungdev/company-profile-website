@@ -3,7 +3,7 @@
         <div class="container">
             <div class="intro-section">
                 <div class="intro-image">
-                    <img src="/images/pj.jpg" alt="Đội ngũ SHT Security" />
+                    <img src="https://placehold.co/800x600/jpg?text=800x600" alt="Đội ngũ SHT Security" />
                     <div class="experience-badge">
                         <span class="exp-number">10+</span>
                         <span class="exp-text">Năm Kinh Nghiệm</span>
