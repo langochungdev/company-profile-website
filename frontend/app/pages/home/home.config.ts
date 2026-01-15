@@ -6,6 +6,7 @@ export const homeConfig = {
     path: "pages/home",
     icon: "mdi:home",
     order: 1,
+    group: "Trang",
 
     sections: {
         hero: {
@@ -37,6 +38,16 @@ export const homeConfig = {
                     },
                 },
                 visualImage: { type: "image", label: "Ảnh minh họa", note: "Ảnh sản phẩm bên phải slide" },
+            },
+        },
+
+        about: {
+            label: "Giới Thiệu Công Ty",
+            collapsed: true,
+            fields: {
+                sectionTitle: { type: "text", label: "Tiêu đề section", default: "Về Chúng Tôi", max: 50 },
+                content: { type: "richtext", label: "Nội dung giới thiệu", placeholder: "Nhập nội dung giới thiệu công ty..." },
+                image: { type: "image", label: "Ảnh minh họa", note: "800x600" },
             },
         },
 

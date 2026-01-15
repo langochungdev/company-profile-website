@@ -1,0 +1,10 @@
+/* RichTextEditor - Mobile styles */
+@media (max-width: 640px) {
+    .toolbar-divider {
+        display: none;
+    }
+
+    .editor-toolbar {
+        gap: 2px;
+    }
+}

@@ -1,3 +1,7 @@
+// Cấu hình trang sản phẩm cho admin panel
+
+import { productDetailConfig } from "./productDetail.config";
+
 export interface Product {
     id: string;
     name: string;
@@ -74,3 +78,61 @@ export const PRODUCTS: Product[] = [
 ];
 
 export const PRODUCT_CATEGORIES = ["Tất cả", "Camera AI", "WiFi Doanh Nghiệp", "Switch & Router", "Báo Cháy", "Access Control"];
+
+export const productPageConfig = {
+    page: "product",
+    pageName: "Sản phẩm",
+    path: "pages/product",
+    icon: "mdi:package-variant",
+    order: 3,
+    group: "Trang",
+
+    type: "collection" as const,
+    itemConfig: {
+        name: "sản phẩm",
+        namePlural: "Sản phẩm",
+        icon: "mdi:package-variant",
+        config: productDetailConfig,
+        data: PRODUCTS,
+    },
+
+    sections: {
+        settings: {
+            label: "Cài đặt trang",
+            collapsed: false,
+            fields: {
+                pageTitle: {
+                    type: "text",
+                    label: "Tiêu đề trang",
+                    max: 60,
+                    default: "Sản Phẩm",
+                },
+                pageDescription: {
+                    type: "textarea",
+                    label: "Mô tả trang",
+                    max: 200,
+                    rows: 3,
+                },
+                productsPerPage: {
+                    type: "number",
+                    label: "Số sản phẩm/trang",
+                    min: 6,
+                    max: 24,
+                    default: 12,
+                },
+            },
+        },
+
+        seo: {
+            label: "SEO & Meta Tags",
+            collapsed: true,
+            fields: {
+                title: { type: "text", label: "Meta Title", max: 60 },
+                description: { type: "textarea", label: "Meta Description", max: 160, rows: 3 },
+                ogImage: { type: "image", label: "OG Image", note: "1200x630px" },
+            },
+        },
+    },
+};
+
+export type ProductPageConfig = typeof productPageConfig;

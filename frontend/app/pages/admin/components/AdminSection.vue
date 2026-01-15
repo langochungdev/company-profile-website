@@ -26,53 +26,5 @@ defineEmits<{
 </script>
 
 <style scoped>
-.admin-section {
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    margin-bottom: 16px;
-    overflow: hidden;
-}
-
-.section-header {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    background: #f9fafb;
-    border: none;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.section-header:hover {
-    background: #f3f4f6;
-}
-
-.section-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #111827;
-}
-
-.section-icon {
-    width: 18px;
-    height: 18px;
-    color: #3b82f6;
-}
-
-.chevron-icon {
-    width: 20px;
-    height: 20px;
-    color: #6b7280;
-    transition: transform 0.2s;
-}
-
-.section-content {
-    padding: 16px;
-    background: #ffffff;
-}
+@import "../styles/admin-section/desktop.css";
 </style>

@@ -1,5 +1,153 @@
+# 📋 PAGE CONFIG DESIGN - HỆ THỐNG CẤU HÌNH ADMIN ĐỘNG
+
+> **⚠️ QUAN TRỌNG - PHÂN BIỆT 2 LOẠI CONFIG**
+
+## 🔹 Cấu trúc thư mục
+
+```
+frontend/app/pages/
+├── admin/
+│   ├── config/                    ⭐ CORE ADMIN CONFIG (CỐ ĐỊNH - TÁI SỬ DỤNG)
+│   │   ├── openGraph.config.ts    → Config chung cho Open Graph Meta
+│   │   ├── seo.config.ts          → Config chung cho SEO Settings
+│   │   └── general.config.ts      → Config chung cho General Settings
+│   │
+│   └── docs/
+│       └── PAGE-CONFIG-DESIGN.md  → File này (hướng dẫn)
+│
+├── home/
+│   ├── HomePage.vue
+│   └── home.config.ts             🔧 PAGE CONFIG (LINH HOẠT - THAY ĐỔI THEO PROJECT)
+│
+├── about/
+│   ├── AboutPage.vue
+│   └── about.config.ts            🔧 PAGE CONFIG (LINH HOẠT - THAY ĐỔI THEO PROJECT)
+│
+└── product/
+    ├── ProductPage.vue
+    └── product.config.ts          🔧 PAGE CONFIG (LINH HOẠT - THAY ĐỔI THEO PROJECT)
+```
+
+---
+
+## 🎯 Mục đích phân biệt
+
+### 1️⃣ **`admin/config/*.config.ts`** - CORE ADMIN CONFIG (CỐ ĐỊNH)
+
+**Đặc điểm:**
+
+-   ✅ **Dùng chung cho TẤT CẢ các project**
+-   ✅ **KHÔNG thay đổi** khi copy admin sang project khác
+-   ✅ Định nghĩa cấu trúc config của toàn bộ hệ thống admin
+-   ✅ Bao gồm: SEO, Open Graph, General Settings, Menu Config, v.v.
+
+**VÍ DỤ:**
+
 ```typescript
-// page.config.ts - VÍ DỤ HOÀN CHỈNH
+// admin/config/openGraph.config.ts
+export const openGraphConfig = {
+    page: 'open-graph',
+    sections: {
+        basic: { ... },
+        images: { ... },
+        twitter: { ... }
+    }
+}
+```
+
+**💡 Khi tái sử dụng admin:**
+→ Copy toàn bộ thư mục `admin/` sang project mới
+→ **KHÔNG CẦN** sửa các file trong `admin/config/`
+
+---
+
+### 2️⃣ **`pages/<page-name>/<page-name>.config.ts`** - PAGE CONFIG (LINH HOẠT)
+
+**Đặc điểm:**
+
+-   🔧 **Riêng cho TỪNG PAGE** của từng project
+-   🔧 **THAY ĐỔI** tùy theo nội dung trang
+-   🔧 Mỗi trang có thể có cấu trúc sections khác nhau
+-   🔧 Admin sẽ load config này để generate form động
+
+**VÍ DỤ:**
+
+```typescript
+// pages/home/home.config.ts (Project A - Company Website)
+export const homeConfig = {
+    page: 'home',
+    sections: {
+        hero: { ... },
+        services: { ... },
+        testimonials: { ... }
+    }
+}
+
+// pages/home/home.config.ts (Project B - E-commerce)
+export const homeConfig = {
+    page: 'home',
+    sections: {
+        slider: { ... },
+        products: { ... },
+        deals: { ... }
+    }
+}
+```
+
+**💡 Khi chuyển project:**
+→ Copy thư mục `admin/` (giữ nguyên)
+→ **SỬA/TẠO MỚI** các file `pages/<page>/<page>.config.ts` theo nhu cầu
+
+---
+
+## 📦 Workflow tái sử dụng admin
+
+### Bước 1: Copy Admin Core
+
+```bash
+# Copy toàn bộ admin sang project mới
+cp -r project-old/frontend/app/pages/admin project-new/frontend/app/pages/admin
+```
+
+### Bước 2: Tạo Page Configs cho project mới
+
+```typescript
+// project-new/frontend/app/pages/home/home.config.ts
+export const homeConfig = {
+    // Tùy chỉnh theo nhu cầu project mới
+};
+```
+
+### Bước 3: Import vào Admin Registry
+
+```typescript
+// admin/page.config.ts (file tổng)
+import { homeConfig } from "@/pages/home/home.config";
+import { aboutConfig } from "@/pages/about/about.config";
+// ... import các page config khác
+
+export const PAGE_CONFIGS = {
+    home: homeConfig,
+    about: aboutConfig,
+    // ...
+};
+```
+
+---
+
+## ✅ CHECKLIST khi tái sử dụng admin
+
+-   [ ] Copy thư mục `admin/` → **KHÔNG SỬA** các file trong `admin/config/`
+-   [ ] Tạo/Sửa các file `pages/<page>/<page>.config.ts` theo project mới
+-   [ ] Cập nhật `admin/page.config.ts` để import các page config mới
+-   [ ] Test admin panel xem có load đúng config không
+
+---
+
+## 🎨 VÍ DỤ HOÀN CHỈNH PAGE CONFIG
+
+```typescript
+// pages/product/product.config.ts - VÍ DỤ HOÀN CHỈNH
 
 export const productPageConfig = {
     page: "product",
@@ -262,6 +410,64 @@ export const productPageConfig = {
 | `select`   | Dropdown         | `options`, `default`               |
 | `array`    | Danh sách items  | `min`, `max`, `schema`, `sortable` |
 | `group`    | Nhóm fields      | `fields`                           |
+
+---
+
+## 📐 NGUYÊN TẮC CHỌN FIELD TYPE
+
+### **Khi nào dùng `text` vs `textarea` vs `richtext`?**
+
+| Field Type | Sử dụng khi                                 | Ví dụ                                 |
+| ---------- | ------------------------------------------- | ------------------------------------- |
+| `text`     | Nội dung ngắn, 1 dòng, < 100 ký tự          | Tiêu đề, tên, label, URL, icon name   |
+| `textarea` | Nội dung thuần text nhiều dòng, < 500 ký tự | Mô tả ngắn, meta description, ghi chú |
+| `richtext` | Nội dung dài, cần định dạng HTML            | Bài viết, giới thiệu, mô tả chi tiết  |
+
+### **🎯 QUY TẮC BẮT BUỘC DÙNG `richtext`:**
+
+> **Rule: Nếu nội dung cần FORMATTING (in đậm, danh sách, heading, link) → PHẢI dùng `richtext`**
+
+✅ **DÙNG `richtext` cho:**
+
+-   Nội dung giới thiệu công ty/dịch vụ/sản phẩm
+-   Mô tả chi tiết (> 500 ký tự)
+-   Bài viết blog/tin tức
+-   Nội dung có cấu trúc (heading, bullet points)
+-   Bất cứ field nào user có thể muốn định dạng
+
+❌ **KHÔNG dùng `richtext` cho:**
+
+-   Tiêu đề, tên (dùng `text`)
+-   Mô tả ngắn SEO (dùng `textarea` với `max: 160`)
+-   Giá trị đơn như số điện thoại, email, URL
+
+### **Ví dụ áp dụng:**
+
+```typescript
+// ✅ ĐÚNG - Dùng richtext cho nội dung cần định dạng
+content: {
+    label: "Nội dung giới thiệu",
+    fields: {
+        title: { type: "text", label: "Tiêu đề", max: 80 },
+        body: { type: "richtext", label: "Nội dung chi tiết", placeholder: "Nhập nội dung..." },
+    }
+}
+
+// ❌ SAI - Dùng textarea cho nội dung dài cần định dạng
+content: {
+    label: "Nội dung giới thiệu",
+    fields: {
+        body: { type: "textarea", label: "Nội dung chi tiết", rows: 10 }, // SAI!
+    }
+}
+```
+
+### **Checklist khi tạo config mới:**
+
+-   [ ] Trang có section giới thiệu dài? → Thêm field `richtext`
+-   [ ] Trang có mô tả sản phẩm/dịch vụ chi tiết? → Thêm field `richtext`
+-   [ ] Nội dung có thể cần bullet points, heading? → Thêm field `richtext`
+-   [ ] User có thể muốn chèn link, in đậm? → Thêm field `richtext`
 
 ### **3. Props chung cho tất cả fields**
 
@@ -1480,3 +1686,272 @@ await load();
 ✅ Auto Firestore sync  
 ✅ Dễ maintain & scale  
 ✅ Reusable components
+
+---
+
+## 🔥 NGUYÊN TẮC METADATA-DRIVEN UI
+
+> **Core Principle: "Change Metadata, Not Code"**
+>
+> Khi sửa bất kỳ config nào, Admin UI TỰ ĐỘNG thay đổi theo mà KHÔNG cần sửa code admin.
+
+### 📌 Nguyên Tắc 1: Single Source of Truth
+
+```typescript
+// Config metadata là nguồn DUY NHẤT định nghĩa UI
+// Admin KHÔNG hard-code bất kỳ field nào
+
+// ❌ SAI - Hard-code trong Admin
+<input v-if="fieldName === 'title'" type="text" />
+<input v-if="fieldName === 'email'" type="email" />
+
+// ✅ ĐÚNG - Render từ metadata
+<component :is="FIELD_COMPONENTS[field.type]" v-bind="field" />
+```
+
+### 📌 Nguyên Tắc 2: Field Type Registry
+
+```typescript
+// Mọi field type được map tự động sang component
+
+const FIELD_TYPE_MAP = {
+    text: "TextInput",
+    textarea: "TextareaInput",
+    number: "NumberInput",
+    boolean: "BooleanCheckbox",
+    select: "SelectDropdown",
+    image: "ImageUploader",
+    video: "VideoUploader",
+    richtext: "RichTextEditor", // ← TipTap
+    array: "ArrayEditor",
+    group: "FieldGroup",
+    date: "DatePicker",
+    color: "ColorPicker",
+};
+
+// Thêm field type mới chỉ 3 bước:
+// 1. Tạo component: admin/components/fields/NewType.vue
+// 2. Register vào FIELD_TYPE_MAP
+// 3. Dùng ngay: type: 'new-type'
+```
+
+### 📌 Nguyên Tắc 3: Sidebar Order & Grouping
+
+```typescript
+// Thay đổi thứ tự sidebar = sửa field "order"
+
+// home.config.ts
+export const homeConfig = {
+    page: "home",
+    pageName: "Trang chủ",
+    icon: "mdi:home",
+    order: 1, // ← Xuất hiện đầu tiên
+    group: "Trang", // ← Nhóm trên sidebar
+    // ...
+};
+
+// about.config.ts
+export const aboutConfig = {
+    order: 2, // ← Xuất hiện thứ 2
+    group: "Trang",
+};
+
+// openGraph.config.ts
+export const openGraphConfig = {
+    order: 100, // ← Số lớn = xuất hiện cuối
+    group: "Cài đặt", // ← Nhóm khác trên sidebar
+};
+
+// Sidebar tự động hiển thị:
+// ┌─────────────────┐
+// │ Trang           │
+// │  ├─ Trang chủ   │
+// │  └─ Giới thiệu  │
+// │ Cài đặt         │
+// │  └─ Open Graph  │
+// └─────────────────┘
+```
+
+### 📌 Nguyên Tắc 4: Auto Form Generation
+
+```typescript
+// Sửa config → Form tự động thay đổi
+
+// TRƯỚC: Text input
+fields: {
+    description: {
+        type: 'text',
+        label: 'Mô tả'
+    }
+}
+
+// SAU: Textarea (chỉ sửa type)
+fields: {
+    description: {
+        type: 'textarea',  // ← Đổi dòng này
+        label: 'Mô tả',
+        rows: 5
+    }
+}
+
+// Refresh browser → Form tự động đổi từ <input> sang <textarea>
+```
+
+### 📌 Nguyên Tắc 5: Rich Text Editor (TipTap)
+
+```typescript
+// Thêm TipTap editor = chỉ cần khai báo type: 'richtext'
+
+fields: {
+    content: {
+        type: 'richtext',
+        label: 'Nội dung',
+        toolbar: ['bold', 'italic', 'link', 'h2', 'h3', 'bulletList', 'image'],
+        max: 10000,
+        note: 'Hỗ trợ HTML formatting'
+    }
+}
+
+// Admin tự động render TipTap với toolbar được chỉ định
+```
+
+### 📌 Nguyên Tắc 6: Conditional Fields
+
+```typescript
+// Field tự động ẩn/hiện dựa trên showIf
+
+fields: {
+    enableFeature: {
+        type: 'boolean',
+        label: 'Bật tính năng?',
+        default: false
+    },
+    featureConfig: {
+        type: 'text',
+        label: 'Cấu hình',
+        showIf: { field: 'enableFeature', value: true }
+        // ↑ Tự động ẩn/hiện khi toggle checkbox
+    }
+}
+```
+
+---
+
+## 🛠️ WORKFLOW THÊM PAGE MỚI (METADATA-DRIVEN)
+
+### Bước 1: Tạo Config
+
+```typescript
+// pages/contact/contact.config.ts
+export const contactConfig = {
+    page: "contact",
+    pageName: "Liên hệ",
+    path: "pages/contact",
+    icon: "mdi:phone",
+    order: 5,
+    group: "Trang",
+    sections: {
+        info: {
+            label: "Thông tin liên hệ",
+            fields: {
+                phone: { type: "text", label: "Số điện thoại" },
+                email: { type: "text", label: "Email" },
+                address: { type: "richtext", label: "Địa chỉ" },
+            },
+        },
+    },
+};
+```
+
+### Bước 2: Import vào Registry
+
+```typescript
+// admin/page.config.ts
+import { contactConfig } from "@/pages/contact/contact.config";
+
+export const PAGE_CONFIGS = {
+    // ...existing
+    contact: contactConfig, // ← Thêm dòng này
+};
+```
+
+### Bước 3: Done!
+
+```
+✅ Sidebar tự động có "Liên hệ" (sorted by order)
+✅ Click vào → Form có 3 fields: phone, email, address
+✅ Address tự động là TipTap editor
+✅ Validation tự động với required
+✅ Data sync với Firestore path 'pages/contact'
+```
+
+---
+
+## 🔄 EXAMPLE: THAY ĐỔI METADATA → UI TỰ ĐỘNG CẬP NHẬT
+
+### Ví dụ 1: Đổi Text → Image
+
+```typescript
+// BEFORE
+logo: { type: 'text', label: 'URL Logo' }
+
+// AFTER (chỉ sửa type)
+logo: { type: 'image', label: 'Logo', note: '200x200px' }
+
+// → Admin tự động đổi từ text input sang Image Uploader
+```
+
+### Ví dụ 2: Thêm Validation
+
+```typescript
+// BEFORE
+email: { type: 'text', label: 'Email' }
+
+// AFTER (thêm required)
+email: {
+    type: 'text',
+    label: 'Email',
+    required: true  // ← Admin tự động hiện * và validate
+}
+```
+
+### Ví dụ 3: Thêm Array với TipTap
+
+```typescript
+// Thêm vào bất kỳ config
+faqs: {
+    type: 'array',
+    label: 'Câu hỏi thường gặp',
+    min: 1,
+    max: 20,
+    sortable: true,
+    schema: {
+        question: { type: 'text', label: 'Câu hỏi', required: true },
+        answer: {
+            type: 'richtext',  // ← TipTap trong array!
+            label: 'Câu trả lời',
+            toolbar: ['bold', 'italic', 'link']
+        }
+    }
+}
+
+// → Admin tự động tạo list editor với drag-drop và TipTap cho mỗi item
+```
+
+---
+
+## ✅ KẾT LUẬN
+
+**100% Metadata-Driven Admin:**
+
+| Thay đổi               | Cách làm                 | Code Admin cần sửa |
+| ---------------------- | ------------------------ | ------------------ |
+| Đổi thứ tự sidebar     | Sửa `order` trong config | ❌ Không           |
+| Thêm page mới          | Import vào PAGE_CONFIGS  | ❌ Không           |
+| Đổi field type         | Sửa `type` trong config  | ❌ Không           |
+| Thêm TipTap editor     | `type: 'richtext'`       | ❌ Không           |
+| Thêm validation        | `required: true`         | ❌ Không           |
+| Thêm conditional field | `showIf: {...}`          | ❌ Không           |
+| Thêm array editor      | `type: 'array'`          | ❌ Không           |
+
+**→ KHÔNG BAO GIỜ phải sửa code trong thư mục admin/ khi thay đổi metadata config!**

@@ -1,3 +1,7 @@
+// Cấu hình trang bài viết cho admin panel
+
+import { postDetailConfig } from "./postDetail.config";
+
 export interface Post {
     id: string;
     title: string;
@@ -73,3 +77,61 @@ export const POSTS: Post[] = [
 ];
 
 export const POST_CATEGORIES = ["Tất cả", "Công Nghệ", "Hạ Tầng Mạng", "An Ninh", "Giải Pháp", "Viễn Thông"];
+
+export const postPageConfig = {
+    page: "post",
+    pageName: "Bài viết",
+    path: "pages/post",
+    icon: "mdi:post-outline",
+    order: 4,
+    group: "Trang",
+
+    type: "collection" as const,
+    itemConfig: {
+        name: "bài viết",
+        namePlural: "Bài viết",
+        icon: "mdi:post-outline",
+        config: postDetailConfig,
+        data: POSTS,
+    },
+
+    sections: {
+        settings: {
+            label: "Cài đặt trang",
+            collapsed: false,
+            fields: {
+                pageTitle: {
+                    type: "text",
+                    label: "Tiêu đề trang",
+                    max: 60,
+                    default: "Tin Tức",
+                },
+                pageDescription: {
+                    type: "textarea",
+                    label: "Mô tả trang",
+                    max: 200,
+                    rows: 3,
+                },
+                postsPerPage: {
+                    type: "number",
+                    label: "Số bài/trang",
+                    min: 6,
+                    max: 24,
+                    default: 9,
+                },
+            },
+        },
+
+        seo: {
+            label: "SEO & Meta Tags",
+            collapsed: true,
+            fields: {
+                title: { type: "text", label: "Meta Title", max: 60 },
+                description: { type: "textarea", label: "Meta Description", max: 160, rows: 3 },
+                ogImage: { type: "image", label: "OG Image", note: "1200x630px" },
+            },
+        },
+    },
+};
+
+export type PostPageConfig = typeof postPageConfig;

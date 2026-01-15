@@ -1,3 +1,7 @@
+// Cấu hình trang dịch vụ cho admin panel
+
+import { serviceDetailConfig } from "./serviceDetail.config";
+
 export interface Service {
     id: string;
     title: string;
@@ -32,7 +36,7 @@ export const SERVICES: Service[] = [
     },
     {
         id: "3",
-        title: "WiFi 7 Tốc Độ Cao - Pokémon Go",
+        title: "WiFi 7 Tốc Độ Cao",
         slug: "wifi-7-toc-do-cao",
         description: "Giải pháp WiFi 7 mới nhất, hỗ trợ hàng nghìn thiết bị đồng thời với tốc độ vượt trội và độ trễ cực thấp.",
         thumbnail: "https://placehold.co/800x450/0f766e/ffffff/jpg?text=WiFi+7",
@@ -73,3 +77,73 @@ export const SERVICES: Service[] = [
 ];
 
 export const SERVICE_CATEGORIES = ["Tất cả", "Camera", "Hạ Tầng Mạng", "WiFi", "Kiểm Soát", "An Toàn", "Viễn Thông"];
+
+export const servicePageConfig = {
+    page: "service",
+    pageName: "Dịch vụ",
+    path: "pages/service",
+    icon: "mdi:briefcase",
+    order: 2,
+    group: "Trang",
+
+    type: "collection" as const,
+    itemConfig: {
+        name: "dịch vụ",
+        namePlural: "Dịch vụ",
+        icon: "mdi:briefcase",
+        config: serviceDetailConfig,
+        data: SERVICES,
+    },
+
+    sections: {
+        settings: {
+            label: "Cài đặt trang",
+            collapsed: false,
+            fields: {
+                pageTitle: {
+                    type: "text",
+                    label: "Tiêu đề trang",
+                    max: 60,
+                    default: "Dịch Vụ",
+                },
+                pageDescription: {
+                    type: "textarea",
+                    label: "Mô tả trang",
+                    max: 200,
+                    rows: 3,
+                },
+                servicesPerPage: {
+                    type: "number",
+                    label: "Số dịch vụ/trang",
+                    min: 6,
+                    max: 24,
+                    default: 9,
+                },
+            },
+        },
+
+        cta: {
+            label: "Call to Action",
+            collapsed: true,
+            fields: {
+                enabled: { type: "boolean", label: "Hiển thị CTA?", default: true },
+                title: { type: "text", label: "Tiêu đề", max: 60, default: "Cần Tư Vấn?" },
+                description: { type: "textarea", label: "Mô tả", max: 150 },
+                buttonText: { type: "text", label: "Text nút", max: 30, default: "Liên Hệ Ngay" },
+                buttonLink: { type: "text", label: "Link nút", note: "VD: /lien-he" },
+            },
+        },
+
+        seo: {
+            label: "SEO & Meta Tags",
+            collapsed: true,
+            fields: {
+                title: { type: "text", label: "Meta Title", max: 60 },
+                description: { type: "textarea", label: "Meta Description", max: 160, rows: 3 },
+                ogImage: { type: "image", label: "OG Image", note: "1200x630px" },
+            },
+        },
+    },
+};
+
+export type ServicePageConfig = typeof servicePageConfig;
