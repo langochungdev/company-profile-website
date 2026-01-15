@@ -47,7 +47,7 @@ export const homeConfig = {
                 sectionTitle: { type: "text", label: "Tiêu đề section", default: "Các Hạng Mục", max: 50 },
                 highlightText: { type: "text", label: "Text highlight", default: "Thi Công", max: 30 },
                 ctaText: { type: "text", label: "Text nút CTA", default: "XEM TẤT CẢ GIẢI PHÁP", max: 30 },
-                ctaLink: { type: "text", label: "Link nút CTA", note: "VD: /dich-vu" },
+                ctaLink: { type: "text", label: "Link nút CTA", note: "VD: /service" },
                 items: {
                     type: "array",
                     label: "Danh sách dịch vụ",

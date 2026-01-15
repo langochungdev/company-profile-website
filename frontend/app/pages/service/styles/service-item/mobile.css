@@ -1,0 +1,38 @@
+@media (max-width: 768px) {
+    .card-content {
+        padding: 20px;
+    }
+
+    .card-title {
+        font-size: 18px;
+        -webkit-line-clamp: 2;
+    }
+
+    .card-desc {
+        font-size: 14px;
+        line-height: 1.5;
+        -webkit-line-clamp: 2;
+    }
+
+    .features-list {
+        gap: 6px;
+    }
+
+    .feature-item {
+        font-size: 13px;
+    }
+
+    .link-text {
+        font-size: 14px;
+    }
+
+    .price-tag {
+        font-size: 13px;
+        padding: 5px 12px;
+    }
+
+    .category-badge {
+        font-size: 12px;
+        padding: 5px 12px;
+    }
+}

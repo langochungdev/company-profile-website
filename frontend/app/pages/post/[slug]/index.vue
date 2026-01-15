@@ -125,6 +125,6 @@ useSeoMeta({
 </script>
 
 <style scoped>
-@import "./styles/post-detail/desktop.css";
-@import "./styles/post-detail/mobile.css";
+@import "../styles/slug/desktop.css";
+@import "../styles/slug/mobile.css";
 </style>

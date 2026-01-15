@@ -28,7 +28,7 @@
                             </Transition>
                         </div>
 
-                        <NuxtLink to="/dich-vu" class="nav-link">Dịch Vụ</NuxtLink>
+                        <NuxtLink to="/service" class="nav-link">Dịch Vụ</NuxtLink>
                         <NuxtLink to="/post" class="nav-link">Tin Tức</NuxtLink>
                         <NuxtLink to="/contact" class="nav-link">Liên Hệ</NuxtLink>
                     </nav>
@@ -61,7 +61,7 @@
                                 </div>
                             </div>
 
-                            <NuxtLink to="/dich-vu" class="mobile-nav-link" @click="isMenuOpen = false">Dịch Vụ</NuxtLink>
+                            <NuxtLink to="/service" class="mobile-nav-link" @click="isMenuOpen = false">Dịch Vụ</NuxtLink>
                             <NuxtLink to="/post" class="mobile-nav-link" @click="isMenuOpen = false">Tin Tức</NuxtLink>
                             <NuxtLink to="/contact" class="mobile-nav-link" @click="isMenuOpen = false">Liên Hệ</NuxtLink>
                             <button class="cta-btn cta-mobile" @click="isMenuOpen = false">Báo Giá</button>
@@ -146,7 +146,7 @@ const breadcrumbItems = computed(() => {
         items.push({ label: 'Giới thiệu' })
     } else if (path === '/contact') {
         items.push({ label: 'Liên hệ' })
-    } else if (path === '/dich-vu') {
+    } else if (path === '/service') {
         items.push({ label: 'Dịch vụ' })
     } else {
         const pageName = path.replace('/', '').replace(/-/g, ' ')
