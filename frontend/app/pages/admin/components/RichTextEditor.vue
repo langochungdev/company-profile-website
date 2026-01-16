@@ -115,7 +115,8 @@ const editor = useEditor({
     content: props.modelValue || '',
     extensions: [
         StarterKit.configure({
-            heading: { levels: [2, 3, 4] }
+            heading: { levels: [2, 3, 4] },
+            link: false
         }),
         Link.configure({
             openOnClick: false,

@@ -1,5 +1,3 @@
-// Cấu hình trang chủ cho admin panel
-
 export const homeConfig = {
     page: "home",
     pageName: "Trang chủ",
@@ -12,12 +10,12 @@ export const homeConfig = {
         hero: {
             label: "Banner Slideshow",
             collapsed: false,
+            visible: true,
             fields: {
                 slides: {
                     type: "array",
                     label: "Danh sách slide",
-                    min: 1,
-                    max: 5,
+                    exact: 3,
                     sortable: true,
                     schema: {
                         badge: { type: "text", label: "Badge", max: 50, note: "VD: Giải Pháp An Ninh Toàn Diện" },
@@ -27,43 +25,20 @@ export const homeConfig = {
                         image: { type: "image", label: "Ảnh nền", note: "1920x1080, max 5MB", required: true },
                     },
                 },
-                ctaButtons: {
-                    type: "group",
-                    label: "Nút CTA",
-                    fields: {
-                        primaryText: { type: "text", label: "Text nút chính", default: "Liên Hệ Ngay", max: 30 },
-                        primaryLink: { type: "text", label: "Link nút chính", note: "VD: /lien-he" },
-                        secondaryText: { type: "text", label: "Text nút phụ", default: "Tìm Hiểu Thêm", max: 30 },
-                        secondaryLink: { type: "text", label: "Link nút phụ", note: "VD: /gioi-thieu" },
-                    },
-                },
-                visualImage: { type: "image", label: "Ảnh minh họa", note: "Ảnh sản phẩm bên phải slide" },
-            },
-        },
-
-        about: {
-            label: "Giới Thiệu Công Ty",
-            collapsed: true,
-            fields: {
-                sectionTitle: { type: "text", label: "Tiêu đề section", default: "Về Chúng Tôi", max: 50 },
-                content: { type: "richtext", label: "Nội dung giới thiệu", placeholder: "Nhập nội dung giới thiệu công ty..." },
-                image: { type: "image", label: "Ảnh minh họa", note: "800x600" },
             },
         },
 
         services: {
             label: "Lĩnh Vực Hoạt Động",
             collapsed: true,
+            visible: true,
             fields: {
                 sectionTitle: { type: "text", label: "Tiêu đề section", default: "Các Hạng Mục", max: 50 },
                 highlightText: { type: "text", label: "Text highlight", default: "Thi Công", max: 30 },
-                ctaText: { type: "text", label: "Text nút CTA", default: "XEM TẤT CẢ GIẢI PHÁP", max: 30 },
-                ctaLink: { type: "text", label: "Link nút CTA", note: "VD: /service" },
                 items: {
                     type: "array",
                     label: "Danh sách dịch vụ",
-                    min: 4,
-                    max: 8,
+                    exact: 8,
                     sortable: true,
                     schema: {
                         title: { type: "text", label: "Tên dịch vụ", max: 50, required: true },
@@ -79,17 +54,15 @@ export const homeConfig = {
         projects: {
             label: "Dự Án Tiêu Biểu",
             collapsed: true,
+            visible: true,
             fields: {
                 badge: { type: "text", label: "Badge", default: "Hồ sơ năng lực", max: 30 },
                 sectionTitle: { type: "text", label: "Tiêu đề section", default: "Dự Án Hạ Tầng Đã làm", max: 50 },
                 description: { type: "textarea", label: "Mô tả section", max: 300, rows: 3 },
-                ctaText: { type: "text", label: "Text nút CTA", default: "XEM TẤT CẢ DỰ ÁN", max: 30 },
-                ctaLink: { type: "text", label: "Link nút CTA", note: "VD: /du-an" },
                 items: {
                     type: "array",
                     label: "Danh sách dự án",
-                    min: 3,
-                    max: 6,
+                    exact: 5,
                     sortable: true,
                     schema: {
                         title: { type: "text", label: "Tên dự án", max: 50, required: true },
@@ -101,16 +74,61 @@ export const homeConfig = {
                         description: { type: "textarea", label: "Mô tả", max: 200, rows: 3 },
                         image: { type: "image", label: "Ảnh dự án", note: "800x600", required: true },
                         link: { type: "text", label: "Link chi tiết", note: "VD: /du-an/data-center-vng" },
-                        stats: {
-                            type: "array",
-                            label: "Thống kê",
-                            min: 0,
-                            max: 3,
-                            schema: {
-                                value: { type: "text", label: "Giá trị", max: 20, note: "VD: 10Gbps, 99.9%" },
-                                label: { type: "text", label: "Nhãn", max: 30, note: "VD: Băng thông, Uptime" },
-                            },
-                        },
+                    },
+                },
+            },
+        },
+
+        blog: {
+            label: "Kênh Truyền Thông",
+            collapsed: true,
+            visible: true,
+            fields: {
+                sectionTitle: { type: "text", label: "Tiêu đề section", default: "CÁC KÊNH", max: 50 },
+                highlightText: { type: "text", label: "Text highlight", default: "TRUYỀN THÔNG", max: 30 },
+                socialLinks: {
+                    type: "group",
+                    label: "Social Media Links",
+                    fields: {
+                        tiktokUrl: { type: "text", label: "TikTok URL", default: "https://tiktok.com/@huyphan_sht_co.ltd", note: "Link TikTok profile" },
+                        facebookUrl: { type: "text", label: "Facebook URL", default: "https://facebook.com/SHT.security", note: "Link Facebook page" },
+                        youtubeUrl: { type: "text", label: "YouTube URL", default: "https://youtube.com/@SHTsecurity", note: "Link YouTube channel" },
+                        facebookPageId: { type: "text", label: "Facebook Page ID", default: "https://www.facebook.com/SmartHomeTechnologySHT/", note: "Facebook Page URL cho embed widget" },
+                    },
+                },
+                tiktokVideos: {
+                    type: "array",
+                    label: "Danh sách TikTok Videos",
+                    exact: 3,
+                    sortable: true,
+                    schema: {
+                        videoId: { type: "text", label: "Video ID", max: 50, required: true, note: "VD: 7479305993915026705" },
+                        cite: { type: "text", label: "TikTok URL", max: 200, required: true, note: "VD: https://www.tiktok.com/@user/video/123456" },
+                        username: { type: "text", label: "Username", max: 50, note: "VD: @huyphan_sht_co.ltd" },
+                    },
+                },
+            },
+        },
+
+        news: {
+            label: "Tin Tức & Kiến Thức",
+            collapsed: true,
+            visible: true,
+            fields: {
+                sectionTitle: { type: "text", label: "Tiêu đề section", default: "Kiến Thức &", max: 50 },
+                highlightText: { type: "text", label: "Text highlight", default: "Giải Pháp", max: 30 },
+                items: {
+                    type: "array",
+                    label: "Danh sách tin tức nổi bật",
+                    exact: 3,
+                    sortable: true,
+                    schema: {
+                        title: { type: "text", label: "Tiêu đề bài viết", max: 100, required: true },
+                        description: { type: "textarea", label: "Mô tả ngắn", max: 200, rows: 3 },
+                        thumbnail: { type: "image", label: "Ảnh thumbnail", note: "800x600", required: true },
+                        category: { type: "text", label: "Danh mục", max: 30, note: "VD: Camera AI, Hạ Tầng Mạng" },
+                        publishedAt: { type: "text", label: "Ngày đăng", max: 20, note: "VD: 15/01/2025" },
+                        link: { type: "text", label: "Link bài viết", note: "VD: /post/camera-ai-2026", required: true },
                     },
                 },
             },
@@ -119,14 +137,15 @@ export const homeConfig = {
         certificates: {
             label: "Chứng Nhận",
             collapsed: true,
+            visible: true,
             fields: {
-                sectionTitle: { type: "text", label: "Tiêu đề section", default: "Giấy Chứng Nhận & Chứng Chỉ", max: 50 },
+                sectionTitle: { type: "text", label: "Tiêu đề section", default: "Giấy Chứng Nhận &", max: 50 },
+                highlightText: { type: "text", label: "Text highlight", default: "Chứng Chỉ", max: 30 },
                 subtitle: { type: "text", label: "Phụ đề", default: "Uy tín & Chất lượng được công nhận", max: 100 },
                 items: {
                     type: "array",
                     label: "Danh sách chứng nhận",
-                    min: 1,
-                    max: 20,
+                    exact: 10,
                     sortable: true,
                     schema: {
                         image: { type: "image", label: "Ảnh chứng nhận", note: "Ảnh giấy chứng nhận/chứng chỉ", required: true },
@@ -139,14 +158,15 @@ export const homeConfig = {
         partners: {
             label: "Đối Tác",
             collapsed: true,
+            visible: true,
             fields: {
-                sectionTitle: { type: "text", label: "Tiêu đề section", default: "Đối Tác Tin Cậy", max: 50 },
+                sectionTitle: { type: "text", label: "Tiêu đề section", default: "Đối Tác", max: 50 },
+                highlightText: { type: "text", label: "Text highlight", default: "Tin Cậy", max: 30 },
                 subtitle: { type: "text", label: "Phụ đề", default: "Hợp tác cùng các thương hiệu hàng đầu", max: 100 },
                 items: {
                     type: "array",
                     label: "Danh sách đối tác",
-                    min: 1,
-                    max: 30,
+                    exact: 10,
                     sortable: true,
                     schema: {
                         logo: { type: "image", label: "Logo đối tác", note: "Logo thương hiệu, nền trong suốt", required: true },
@@ -154,22 +174,6 @@ export const homeConfig = {
                         link: { type: "text", label: "Link website", note: "VD: https://dahua.com" },
                     },
                 },
-            },
-        },
-
-        seo: {
-            label: "SEO & Meta Tags",
-            collapsed: true,
-            fields: {
-                title: { type: "text", label: "Meta Title", max: 60, required: true, note: "Tối đa 60 ký tự để hiển thị đầy đủ trên Google" },
-                description: { type: "textarea", label: "Meta Description", max: 160, rows: 3, required: true, note: "Tối đa 160 ký tự" },
-                keywords: { type: "text", label: "Keywords", note: "Ngăn cách bởi dấu phẩy. VD: camera an ninh, hạ tầng mạng" },
-                ogTitle: { type: "text", label: "OG Title", max: 60, note: "Để trống sẽ dùng Meta Title" },
-                ogDescription: { type: "textarea", label: "OG Description", max: 160, rows: 3, note: "Để trống sẽ dùng Meta Description" },
-                ogImage: { type: "image", label: "Open Graph Image", note: "1200x630px cho Facebook/Twitter share", required: true },
-                ogUrl: { type: "text", label: "OG URL", note: "URL trang. VD: https://sht.langochung.me" },
-                noindex: { type: "boolean", label: "No Index", default: false, note: "Bật để ngăn Google index trang này" },
-                nofollow: { type: "boolean", label: "No Follow", default: false, note: "Bật để ngăn Google follow links" },
             },
         },
     },

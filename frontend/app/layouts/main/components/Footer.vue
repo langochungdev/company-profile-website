@@ -13,7 +13,7 @@
                         Chuyên cung cấp giải pháp an ninh và hạ tầng mạng cho gia đình, doanh nghiệp.
                         Camera AI, mạng LAN, WiFi, Access Control, Báo cháy, Tổng đài IP.
                     </p>
-                    <NuxtLink to="/gioi-thieu" class="brand-btn">
+                    <NuxtLink to="/about-us" class="brand-btn">
                         Về Chúng Tôi
                     </NuxtLink>
                     <div class="bct-badge bct-desktop" title="Đã đăng ký Bộ Công Thương">
