@@ -24,6 +24,7 @@ interface CollectionContentResult {
     updateItem: (id: string, data: Partial<CollectionItem>) => Promise<void>;
     deleteItem: (id: string) => Promise<void>;
     getItem: (id: string) => CollectionItem | undefined;
+    checkDuplicateSlug: (slug: string, excludeId?: string) => boolean;
 }
 
 interface LoadOptions {
@@ -110,8 +111,21 @@ export function useDetailContext(config: CollectionConfig): CollectionContentRes
         }
     };
 
+    const checkDuplicateSlug = (slug: string, excludeId?: string): boolean => {
+        if (!slug) return false;
+        const trimmedSlug = slug.trim();
+        return items.value.some((item) => {
+            if (excludeId && item.id === excludeId) return false;
+            return item.slug === trimmedSlug;
+        });
+    };
+
     const addItem = async (itemData: Omit<CollectionItem, "id">): Promise<string> => {
         if (import.meta.server) return "";
+
+        if (itemData.slug && checkDuplicateSlug(itemData.slug)) {
+            throw new Error(`Slug "${itemData.slug}" đã tồn tại! Vui lòng chọn slug khác.`);
+        }
 
         loading.value = true;
         error.value = null;
@@ -149,6 +163,10 @@ export function useDetailContext(config: CollectionConfig): CollectionContentRes
 
     const updateItem = async (id: string, data: Partial<CollectionItem>): Promise<void> => {
         if (import.meta.server) return;
+
+        if (data.slug && checkDuplicateSlug(data.slug, id)) {
+            throw new Error(`Slug "${data.slug}" đã tồn tại! Vui lòng chọn slug khác.`);
+        }
 
         loading.value = true;
         error.value = null;
@@ -217,5 +235,6 @@ export function useDetailContext(config: CollectionConfig): CollectionContentRes
         updateItem,
         deleteItem,
         getItem,
+        checkDuplicateSlug,
     };
 }

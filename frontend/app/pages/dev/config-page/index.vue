@@ -637,23 +637,6 @@ const confirmDeleteItem = async (id: string) => {
 
 const saveItem = async () => {
     try {
-        const newSlug = tempItemData.value.slug?.trim()
-
-        if (newSlug && collectionManager.value) {
-            const existingItems = unref(collectionManager.value.items) || []
-            const duplicateSlug = existingItems.find((item: any) => {
-                if (editingItem.value && item.id === editingItem.value.id) {
-                    return false
-                }
-                return item.slug === newSlug
-            })
-
-            if (duplicateSlug) {
-                alert(`❌ Slug "${newSlug}" đã tồn tại! Vui lòng chọn slug khác.`)
-                return
-            }
-        }
-
         if (editingItem.value) {
             await collectionManager.value?.updateItem(editingItem.value.id, tempItemData.value)
             showSuccessMessage('✅ Item updated')
@@ -663,7 +646,7 @@ const saveItem = async () => {
         }
         closeItemEditor()
     } catch (e) {
-        alert('Save failed: ' + (e as Error).message)
+        alert((e as Error).message)
     }
 }
 
