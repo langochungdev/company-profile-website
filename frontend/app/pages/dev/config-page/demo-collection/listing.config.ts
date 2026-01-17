@@ -5,8 +5,7 @@ export const demoListingConfig: ListingConfig = {
     collection: "demo-items",
     collectionName: "Demo Items",
 
-    path: "collections/demo-items",
-    itemsPath: "collections/demo-items/items",
+    path: "collections/demo-items/items",
 
     icon: "mdi:folder-multiple",
     order: 98,

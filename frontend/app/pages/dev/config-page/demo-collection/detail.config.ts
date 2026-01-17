@@ -5,8 +5,7 @@ export const demoDetailConfig: DetailConfig = {
     collection: "demo-items",
     collectionName: "Demo Item Detail",
 
-    path: "collections/demo-items",
-    itemsPath: "collections/demo-items/items",
+    path: "collections/demo-items/items",
 
     icon: "mdi:file-document",
     order: 99,
@@ -27,13 +26,6 @@ export const demoDetailConfig: DetailConfig = {
     },
 
     itemFields: {
-        id: {
-            type: "text",
-            label: "ID",
-            required: true,
-            unique: true,
-            note: "Slug-friendly ID (e.g., item-1, demo-post)",
-        },
         title: {
             type: "text",
             label: "Title",

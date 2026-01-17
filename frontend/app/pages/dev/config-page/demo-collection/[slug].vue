@@ -100,8 +100,8 @@
                     <h3>🔧 Debug Info</h3>
                     <div class="debug-card">
                         <p><strong>Collection Path:</strong> <code>{{ firestorePath }}</code></p>
-                        <p><strong>Item Index:</strong> {{ itemIndex }}</p>
-                        <p><strong>Total Items:</strong> {{ data?.items?.length || 0 }}</p>
+                        <p><strong>Item ID:</strong> {{ item?.id || 'N/A' }}</p>
+                        <p><strong>Total Items:</strong> {{ totalItems }}</p>
                     </div>
                     <details class="debug-details">
                         <summary>View Raw Data</summary>
@@ -117,26 +117,21 @@
 import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { demoDetailConfig } from './detail.config'
-import { useCollectionContent } from '@/composables/useCollectionContent'
+import { useDetailContext } from '@/composables/useDetailContext'
 import { getFirestoreInfo, getFirestorePath } from '@/utils/firestore'
 
 const route = useRoute()
 const envInfo = getFirestoreInfo()
 const firestorePath = computed(() => getFirestorePath(demoDetailConfig.path))
 
-const { data, loading, error, loadData } = useCollectionContent(demoDetailConfig)
+const { items, loading, error, loadItems, totalItems } = useDetailContext(demoDetailConfig)
 
 const item = computed(() => {
-    if (!data.value?.items) return null
+    if (!items.value?.length) return null
     const slug = route.params.slug
-    return data.value.items.find((item: any) =>
+    return items.value.find((item: any) =>
         item.slug === slug || item.id === slug
     )
-})
-
-const itemIndex = computed(() => {
-    if (!data.value?.items || !item.value) return -1
-    return data.value.items.findIndex((i: any) => i.id === item.value.id)
 })
 
 const formatDate = (date: string) => {
@@ -151,7 +146,7 @@ const formatDate = (date: string) => {
 onMounted(() => {
     console.log('📄 Item Detail Loading...')
     console.log('🔍 Slug:', route.params.slug)
-    loadData()
+    loadItems()
 })
 </script>
 

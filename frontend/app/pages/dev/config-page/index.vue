@@ -88,132 +88,235 @@
             </div>
 
             <div v-else-if="isCollectionMode && data" class="content collection-mode">
-                <div class="actions-bar">
-                    <div class="left-actions">
-                        <h3>Items: {{ (data as any).items?.length || 0 }}</h3>
-                    </div>
-                    <div class="btn-group">
-                        <button @click="openAddItemModal" class="btn-primary">
-                            ➕ Add New Item
-                        </button>
-                        <button @click="handleSave" :disabled="loading" class="btn-success">
-                            💾 Save Collection
-                        </button>
-                        <button @click="reloadData" :disabled="loading" class="btn-secondary">
-                            ↻ Reload
-                        </button>
-                    </div>
+                <div class="collection-tabs">
+                    <button @click="collectionTab = 'items'" :class="['tab-btn', { active: collectionTab === 'items' }]">
+                        📦 Items ({{ (data as any).items?.length || 0 }})
+                    </button>
+                    <button @click="collectionTab = 'settings'" :class="['tab-btn', { active: collectionTab === 'settings' }]">
+                        ⚙️ Listing Settings
+                    </button>
                 </div>
 
-                <div v-if="isCollectionMode" class="collection-toolbar">
-                    <div class="search-box">
-                        <span class="search-icon">🔍</span>
-                        <input v-model="searchQuery" type="text" placeholder="Search items..." class="search-input" />
-                    </div>
-
-                    <div class="filters">
-                        <select v-model="sortBy" class="filter-select">
-                            <option value="">Sort By...</option>
-                            <option v-for="opt in listConfig?.sortOptions" :key="opt" :value="opt">
-                                {{ formatLabel(opt) }}
-                            </option>
-                        </select>
-
-                        <select v-for="filter in listConfig?.filterBy" :key="filter" v-model="activeFilters[filter]" class="filter-select">
-                            <option value="">All {{ formatLabel(filter) }}</option>
-                            <option v-for="opt in getFilterOptions(filter)" :key="String(opt)" :value="opt">
-                                {{ opt }}
-                            </option>
-                        </select>
-                    </div>
-
-                    <div class="pagination-controls" v-if="totalPages > 1">
-                        <button @click="currentPage--" :disabled="currentPage === 1" class="page-btn">←</button>
-                        <span class="page-info">{{ currentPage }} / {{ totalPages }}</span>
-                        <button @click="currentPage++" :disabled="currentPage === totalPages" class="page-btn">→</button>
-                    </div>
-                </div>
-
-                <div v-if="isCollectionMode" class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th class="actions-col">Actions</th>
-                                <th v-for="field in previewFields" :key="field">{{ formatLabel(field) }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(item, index) in paginatedItems" :key="item.id || index">
-                                <td class="actions-cell">
-                                    <button @click="editItem(item)" class="btn-icon edit" title="Edit">✏️</button>
-                                    <button @click="confirmDeleteItem(item.id)" class="btn-icon delete" title="Delete">🗑️</button>
-                                </td>
-                                <td v-for="field in previewFields" :key="field">
-                                    <div v-if="isImageField(field)" class="cell-image">
-                                        <img v-if="item[field]" :src="item[field]" alt="thumb" />
-                                        <span v-else class="no-img">No Img</span>
-                                    </div>
-                                    <span v-else-if="isStatusField(field)" class="badge-status" :data-status="item[field]">
-                                        {{ item[field] }}
-                                    </span>
-                                    <span v-else>
-                                        {{ formatValue(item[field]) }}
-                                    </span>
-                                </td>
-                            </tr>
-                            <tr v-if="!paginatedItems.length">
-                                <td :colspan="previewFields.length + 1" class="empty-cell">
-                                    No items match your criteria.
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div v-if="showItemEditor" class="modal-overlay">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h3>{{ editingItem?.id ? 'Edit Item' : 'New Item' }}</h3>
-                            <button @click="closeItemEditor" class="close-btn">×</button>
-                        </div>
-                        <div class="modal-body">
-                            <div v-for="(fieldConfig, key) in currentCollectionFields" :key="key" class="field-wrapper">
-                                <label class="field-label">
-                                    {{ fieldConfig.label || formatLabel(String(key)) }}
-                                    <span v-if="fieldConfig.required" class="required">*</span>
-                                </label>
-                                <p v-if="fieldConfig.note" class="field-note">{{ fieldConfig.note }}</p>
-
-                                <div v-if="fieldConfig.type === 'image'" class="image-input-wrapper">
-                                    <input type="text" v-model="tempItemData[key]" placeholder="Image URL..." class="input-text" />
-                                    <div v-if="tempItemData[key]" class="image-preview">
-                                        <img :src="tempItemData[key]" alt="Preview" />
-                                    </div>
-                                </div>
-
-                                <textarea v-else-if="fieldConfig.type === 'textarea'" v-model="tempItemData[key]" class="input-textarea" rows="4"></textarea>
-
-                                <select v-else-if="fieldConfig.type === 'select'" v-model="tempItemData[key]" class="input-select">
-                                    <option v-for="opt in fieldConfig.options" :key="opt" :value="opt">
-                                        {{ opt }}
-                                    </option>
+                <div v-if="collectionTab === 'settings'" class="listing-settings-tab">
+                    <div class="settings-section">
+                        <h3>📐 Layout</h3>
+                        <div class="settings-grid">
+                            <div class="setting-item">
+                                <label>Grid Columns</label>
+                                <select v-model="listingSettingsLocal.layout.gridColumns" class="setting-input">
+                                    <option :value="2">2 cột</option>
+                                    <option :value="3">3 cột</option>
+                                    <option :value="4">4 cột</option>
+                                    <option :value="5">5 cột</option>
                                 </select>
-
-                                <input v-else-if="fieldConfig.type === 'boolean'" type="checkbox" v-model="tempItemData[key]" class="input-checkbox" />
-
-                                <input v-else-if="fieldConfig.type === 'date'" type="date" v-model="tempItemData[key]" class="input-date" />
-
-                                <div v-else-if="fieldConfig.type === 'array'" class="array-input">
-                                    <textarea :value="JSON.stringify(tempItemData[key], null, 2)" @input="e => tryParseJson(String(key), (e.target as HTMLTextAreaElement).value)" class="input-code" rows="4"></textarea>
-                                    <small>Enter valid JSON array</small>
-                                </div>
-
-                                <input v-else type="text" v-model="tempItemData[key]" class="input-text" />
+                            </div>
+                            <div class="setting-item">
+                                <label>Items Per Page</label>
+                                <select v-model="listingSettingsLocal.layout.itemsPerPage" class="setting-input">
+                                    <option :value="6">6</option>
+                                    <option :value="9">9</option>
+                                    <option :value="12">12</option>
+                                    <option :value="16">16</option>
+                                    <option :value="24">24</option>
+                                </select>
+                            </div>
+                            <div class="setting-item">
+                                <label>Card Style</label>
+                                <select v-model="listingSettingsLocal.layout.cardStyle" class="setting-input">
+                                    <option value="grid">Grid</option>
+                                    <option value="list">List</option>
+                                    <option value="compact">Compact</option>
+                                </select>
+                            </div>
+                            <div class="setting-item checkbox">
+                                <label>
+                                    <input type="checkbox" v-model="listingSettingsLocal.layout.showSidebar" />
+                                    Show Sidebar Filter
+                                </label>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button @click="closeItemEditor" class="btn-secondary">Cancel</button>
-                            <button @click="saveItem" class="btn-primary">Apply Changes</button>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>👁️ Display Options</h3>
+                        <div class="settings-grid checkboxes">
+                            <label><input type="checkbox" v-model="listingSettingsLocal.display.showPrice" /> Show Price</label>
+                            <label><input type="checkbox" v-model="listingSettingsLocal.display.showBadge" /> Show Badge</label>
+                            <label><input type="checkbox" v-model="listingSettingsLocal.display.showRating" /> Show Rating</label>
+                            <label><input type="checkbox" v-model="listingSettingsLocal.display.showQuickView" /> Quick View Button</label>
+                            <label><input type="checkbox" v-model="listingSettingsLocal.display.showAddToCart" /> Add to Cart Button</label>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>🎨 Hero Banner</h3>
+                        <div class="settings-grid">
+                            <div class="setting-item checkbox">
+                                <label>
+                                    <input type="checkbox" v-model="listingSettingsLocal.hero.enabled" />
+                                    Enable Hero Banner
+                                </label>
+                            </div>
+                            <div class="setting-item full-width">
+                                <label>Hero Title</label>
+                                <input type="text" v-model="listingSettingsLocal.hero.title" class="setting-input" placeholder="Page Title" />
+                            </div>
+                            <div class="setting-item full-width">
+                                <label>Hero Subtitle</label>
+                                <input type="text" v-model="listingSettingsLocal.hero.subtitle" class="setting-input" placeholder="Short description" />
+                            </div>
+                            <div class="setting-item full-width">
+                                <label>Hero Image URL</label>
+                                <input type="text" v-model="listingSettingsLocal.hero.image" class="setting-input" placeholder="https://..." />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>🔍 SEO</h3>
+                        <div class="settings-grid">
+                            <div class="setting-item full-width">
+                                <label>Page Title</label>
+                                <input type="text" v-model="listingSettingsLocal.seo.pageTitle" class="setting-input" placeholder="Page Title | Site Name" />
+                            </div>
+                            <div class="setting-item full-width">
+                                <label>Meta Description</label>
+                                <textarea v-model="listingSettingsLocal.seo.metaDescription" class="setting-input" rows="2" placeholder="Description for search engines"></textarea>
+                            </div>
+                            <div class="setting-item full-width">
+                                <label>OG Image URL</label>
+                                <input type="text" v-model="listingSettingsLocal.seo.ogImage" class="setting-input" placeholder="Social share image URL" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-actions">
+                        <button @click="saveListingSettings" class="btn-success">💾 Save Listing Settings</button>
+                    </div>
+                </div>
+
+                <div v-else class="items-tab">
+                    <div class="actions-bar">
+                        <div class="btn-group">
+                            <button @click="openAddItemModal" class="btn-primary">
+                                ➕ Add New Item
+                            </button>
+                            <button @click="reloadData" :disabled="loading" class="btn-secondary">
+                                ↻ Reload
+                            </button>
+                        </div>
+                    </div>
+
+                    <div v-if="isCollectionMode" class="collection-toolbar">
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input v-model="searchQuery" type="text" placeholder="Search items..." class="search-input" />
+                        </div>
+
+                        <div class="filters">
+                            <select v-model="sortBy" class="filter-select">
+                                <option value="">Sort By...</option>
+                                <option v-for="opt in listConfig?.sortOptions" :key="opt" :value="opt">
+                                    {{ formatLabel(opt) }}
+                                </option>
+                            </select>
+
+                            <select v-for="filter in listConfig?.filterBy" :key="filter" v-model="activeFilters[filter]" class="filter-select">
+                                <option value="">All {{ formatLabel(filter) }}</option>
+                                <option v-for="opt in getFilterOptions(filter)" :key="String(opt)" :value="opt">
+                                    {{ opt }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="pagination-controls" v-if="totalPages > 1">
+                            <button @click="currentPage--" :disabled="currentPage === 1" class="page-btn">←</button>
+                            <span class="page-info">{{ currentPage }} / {{ totalPages }}</span>
+                            <button @click="currentPage++" :disabled="currentPage === totalPages" class="page-btn">→</button>
+                        </div>
+                    </div>
+
+                    <div v-if="isCollectionMode" class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th class="actions-col">Actions</th>
+                                    <th v-for="field in previewFields" :key="field">{{ formatLabel(field) }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item, index) in paginatedItems" :key="item.id || index">
+                                    <td class="actions-cell">
+                                        <button @click="editItem(item)" class="btn-icon edit" title="Edit">✏️</button>
+                                        <button @click="confirmDeleteItem(item.id)" class="btn-icon delete" title="Delete">🗑️</button>
+                                    </td>
+                                    <td v-for="field in previewFields" :key="field">
+                                        <div v-if="isImageField(field)" class="cell-image">
+                                            <img v-if="item[field]" :src="item[field]" alt="thumb" />
+                                            <span v-else class="no-img">No Img</span>
+                                        </div>
+                                        <span v-else-if="isStatusField(field)" class="badge-status" :data-status="item[field]">
+                                            {{ item[field] }}
+                                        </span>
+                                        <span v-else>
+                                            {{ formatValue(item[field]) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr v-if="!paginatedItems.length">
+                                    <td :colspan="previewFields.length + 1" class="empty-cell">
+                                        No items match your criteria.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div v-if="showItemEditor" class="modal-overlay">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3>{{ editingItem?.id ? 'Edit Item' : 'New Item' }}</h3>
+                                <button @click="closeItemEditor" class="close-btn">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div v-for="(fieldConfig, key) in currentCollectionFields" :key="key" class="field-wrapper">
+                                    <label class="field-label">
+                                        {{ fieldConfig.label || formatLabel(String(key)) }}
+                                        <span v-if="fieldConfig.required" class="required">*</span>
+                                    </label>
+                                    <p v-if="fieldConfig.note" class="field-note">{{ fieldConfig.note }}</p>
+
+                                    <div v-if="fieldConfig.type === 'image'" class="image-input-wrapper">
+                                        <input type="text" v-model="tempItemData[key]" placeholder="Image URL..." class="input-text" />
+                                        <div v-if="tempItemData[key]" class="image-preview">
+                                            <img :src="tempItemData[key]" alt="Preview" />
+                                        </div>
+                                    </div>
+
+                                    <textarea v-else-if="fieldConfig.type === 'textarea'" v-model="tempItemData[key]" class="input-textarea" rows="4"></textarea>
+
+                                    <select v-else-if="fieldConfig.type === 'select'" v-model="tempItemData[key]" class="input-select">
+                                        <option v-for="opt in fieldConfig.options" :key="opt" :value="opt">
+                                            {{ opt }}
+                                        </option>
+                                    </select>
+
+                                    <input v-else-if="fieldConfig.type === 'boolean'" type="checkbox" v-model="tempItemData[key]" class="input-checkbox" />
+
+                                    <input v-else-if="fieldConfig.type === 'date'" type="date" v-model="tempItemData[key]" class="input-date" />
+
+                                    <div v-else-if="fieldConfig.type === 'array'" class="array-input">
+                                        <textarea :value="JSON.stringify(tempItemData[key], null, 2)" @input="e => tryParseJson(String(key), (e.target as HTMLTextAreaElement).value)" class="input-code" rows="4"></textarea>
+                                        <small>Enter valid JSON array</small>
+                                    </div>
+
+                                    <input v-else type="text" v-model="tempItemData[key]" class="input-text" />
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button @click="closeItemEditor" class="btn-secondary">Cancel</button>
+                                <button @click="saveItem" class="btn-primary">Apply Changes</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -228,14 +331,13 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, defineComponent, h, unref } from 'vue'
-import { doc, deleteDoc } from 'firebase/firestore'
-import { db } from '@/config/firebase.config'
+import { doc, deleteDoc, type Firestore } from 'firebase/firestore'
 import { SIDEBAR_PAGES } from '@/pages/admin/page.config'
 import { demoConfig } from './demo-page/demo.config'
 import { demoListingConfig } from './demo-collection/listing.config'
 import { demoDetailConfig } from './demo-collection/detail.config'
-import { usePageContent } from '@/composables/usePageContent'
-import { useCollectionContent } from '@/composables/useCollectionContent'
+import { usePageContext } from '@/composables/usePageContext'
+import { useDetailContext } from '@/composables/useDetailContext'
 import { getFirestoreInfo, getFirestorePath } from '@/utils/firestore'
 import type { PageConfig } from '@/pages/admin/page.config'
 
@@ -253,13 +355,59 @@ const collectionConfigs = availableConfigs.filter(c => (c.config as any).type ==
 const selectedConfigKey = ref('')
 const currentConfig = ref<any>(null)
 const isCollectionMode = computed(() => currentConfig.value?.type === 'collection')
+const collectionTab = ref<'items' | 'settings'>('items')
+
+const listingSettingsLocal = ref({
+    layout: {
+        gridColumns: 3 as 2 | 3 | 4 | 5,
+        itemsPerPage: 9 as 6 | 9 | 12 | 16 | 24,
+        cardStyle: 'grid' as 'grid' | 'list' | 'compact',
+        showSidebar: true,
+    },
+    display: {
+        showPrice: true,
+        showBadge: true,
+        showRating: false,
+        showQuickView: true,
+        showAddToCart: false,
+    },
+    hero: {
+        enabled: true,
+        title: '',
+        subtitle: '',
+        image: '',
+    },
+    seo: {
+        pageTitle: '',
+        metaDescription: '',
+        ogImage: '',
+    },
+})
+
+const saveListingSettings = async () => {
+    try {
+        const { $db } = useNuxtApp()
+        if (!$db) throw new Error('Firebase not initialized')
+
+        const basePath = currentConfig.value?.path?.replace(/\/items$/, '') || 'collections/demo-items'
+        const settingsPath = getFirestorePath(basePath)
+        const docRef = doc($db as Firestore, settingsPath)
+
+        const { setDoc } = await import('firebase/firestore')
+        await setDoc(docRef, { settings: listingSettingsLocal.value }, { merge: true })
+
+        showSuccessMessage('✅ Listing settings saved!')
+    } catch (e) {
+        alert('Save failed: ' + (e as Error).message)
+    }
+}
 
 const currentFirestorePath = computed(() =>
     currentConfig.value ? getFirestorePath(currentConfig.value.path) : ''
 )
 
-type PageManager = ReturnType<typeof usePageContent>
-type CollectionManager = ReturnType<typeof useCollectionContent>
+type PageManager = ReturnType<typeof usePageContext>
+type CollectionManager = ReturnType<typeof useDetailContext>
 
 const pageManager = ref<PageManager | null>(null)
 const collectionManager = ref<CollectionManager | null>(null)
@@ -268,7 +416,7 @@ const data = computed(() => {
     if (isCollectionMode.value) {
         const manager = collectionManager.value
         if (!manager) return null
-        return unref(manager.data)
+        return { items: unref(manager.items) }
     }
     const manager = pageManager.value
     if (!manager) return null
@@ -310,17 +458,17 @@ const handleConfigChange = () => {
     collectionManager.value = null
 
     if (isCollectionMode.value) {
-        collectionManager.value = useCollectionContent(selectedItem.config)
-        collectionManager.value?.loadData()
+        collectionManager.value = useDetailContext(selectedItem.config)
+        collectionManager.value?.loadItems()
     } else {
-        pageManager.value = usePageContent(selectedItem.config)
+        pageManager.value = usePageContext(selectedItem.config)
         pageManager.value?.loadData()
     }
 }
 
 const reloadData = () => {
     if (isCollectionMode.value && collectionManager.value) {
-        collectionManager.value.loadData()
+        collectionManager.value.loadItems()
     } else if (pageManager.value) {
         pageManager.value.loadData()
     }
@@ -328,9 +476,12 @@ const reloadData = () => {
 
 const handleSave = async () => {
     try {
-        if (isCollectionMode.value && collectionManager.value) {
-            await collectionManager.value.saveData()
-        } else if (pageManager.value) {
+        if (isCollectionMode.value) {
+            showSuccessMessage('✅ Collection items are auto-saved on each change')
+            return
+        }
+
+        if (pageManager.value) {
             await pageManager.value.saveData()
         }
 
@@ -343,8 +494,10 @@ const handleSave = async () => {
 const handleDelete = async () => {
     if (!confirm('Are you sure? This will DELETE the ENTIRE document!')) return
     try {
+        const { $db } = useNuxtApp()
+        if (!$db) throw new Error('Firebase not initialized')
         const fullPath = getFirestorePath(currentConfig.value.path)
-        await deleteDoc(doc(db, fullPath))
+        await deleteDoc(doc($db as Firestore, fullPath))
         showSuccessMessage('🗑️ Document deleted')
         reloadData()
     } catch (e) {
@@ -355,7 +508,7 @@ const handleDelete = async () => {
 const resetToDefaults = () => {
     if (confirm('Reset to defaults? Unsaved changes will be lost.')) {
         if (isCollectionMode.value && collectionManager.value) {
-            collectionManager.value.resetToDefaults()
+            collectionManager.value.loadItems()
         } else if (pageManager.value) {
             pageManager.value.resetToDefaults()
         }
@@ -454,13 +607,12 @@ const currentCollectionFields = computed(() => {
 const previewFields = computed(() => {
     if (!isCollectionMode.value) return []
     const fields = Object.keys(currentCollectionFields.value)
-    return ['id', 'title', 'name', 'slug', 'status'].filter(f => fields.includes(f)).slice(0, 5)
+    return ['title', 'name', 'slug', 'status', 'category'].filter(f => fields.includes(f)).slice(0, 5)
 })
 
 const openAddItemModal = () => {
     editingItem.value = null
     tempItemData.value = {
-        id: `item-${Date.now()}`,
         ...generateDefaults(currentCollectionFields.value)
     }
     showItemEditor.value = true
@@ -472,21 +624,47 @@ const editItem = (item: any) => {
     showItemEditor.value = true
 }
 
-const confirmDeleteItem = (id: string) => {
+const confirmDeleteItem = async (id: string) => {
     if (confirm('Delete this item?')) {
-        collectionManager.value?.deleteItem(id)
+        try {
+            await collectionManager.value?.deleteItem(id)
+            showSuccessMessage('🗑️ Item deleted')
+        } catch (e) {
+            alert('Delete failed: ' + (e as Error).message)
+        }
     }
 }
 
-const saveItem = () => {
-    if (editingItem.value) {
-        // Update
-        collectionManager.value?.updateItem(editingItem.value.id, tempItemData.value)
-    } else {
-        // Add
-        collectionManager.value?.addItem(tempItemData.value)
+const saveItem = async () => {
+    try {
+        const newSlug = tempItemData.value.slug?.trim()
+
+        if (newSlug && collectionManager.value) {
+            const existingItems = unref(collectionManager.value.items) || []
+            const duplicateSlug = existingItems.find((item: any) => {
+                if (editingItem.value && item.id === editingItem.value.id) {
+                    return false
+                }
+                return item.slug === newSlug
+            })
+
+            if (duplicateSlug) {
+                alert(`❌ Slug "${newSlug}" đã tồn tại! Vui lòng chọn slug khác.`)
+                return
+            }
+        }
+
+        if (editingItem.value) {
+            await collectionManager.value?.updateItem(editingItem.value.id, tempItemData.value)
+            showSuccessMessage('✅ Item updated')
+        } else {
+            await collectionManager.value?.addItem(tempItemData.value)
+            showSuccessMessage('✅ Item added')
+        }
+        closeItemEditor()
+    } catch (e) {
+        alert('Save failed: ' + (e as Error).message)
     }
-    closeItemEditor()
 }
 
 const closeItemEditor = () => {

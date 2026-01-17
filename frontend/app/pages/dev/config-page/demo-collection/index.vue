@@ -19,11 +19,11 @@
             </div>
         </div>
 
-        <div v-else-if="data && data.items" class="content-section">
+        <div v-else-if="items.length > 0" class="content-section">
             <div class="container">
                 <div class="toolbar">
                     <div class="stats">
-                        <span><strong>Total:</strong> {{ data.items.length }}</span>
+                        <span><strong>Total:</strong> {{ items.length }}</span>
                         <span><strong>Published:</strong> {{ publishedCount }}</span>
                         <span><strong>Featured:</strong> {{ featuredCount }}</span>
                     </div>
@@ -32,7 +32,7 @@
                     </NuxtLink>
                 </div>
 
-                <div v-if="data.items.length === 0" class="empty-state">
+                <div v-if="items.length === 0" class="empty-state">
                     <h2>No items yet</h2>
                     <p>Use the config manager to add demo items</p>
                     <NuxtLink to="/dev/config-page" class="btn-primary">
@@ -91,7 +91,7 @@
                 <div class="debug-card">
                     <p><strong>Firestore Path:</strong> <code>{{ firestorePath }}</code></p>
                     <p><strong>Environment:</strong> {{ envInfo.siteName }}/{{ envInfo.environment }}</p>
-                    <p><strong>Collection Type:</strong> Array-based</p>
+                    <p><strong>Collection Type:</strong> Subcollection-based</p>
                 </div>
             </div>
         </div>
@@ -101,25 +101,25 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { demoListingConfig } from './listing.config'
-import { useCollectionContent } from '@/composables/useCollectionContent'
+import { useDetailContext } from '@/composables/useDetailContext'
 import { getFirestoreInfo, getFirestorePath } from '@/utils/firestore'
 
 const envInfo = getFirestoreInfo()
 const firestorePath = computed(() => getFirestorePath(demoListingConfig.path))
 
-const { data, loading, error, loadData } = useCollectionContent(demoListingConfig)
+const { items, loading, error, loadItems, totalItems } = useDetailContext(demoListingConfig)
 
 const publishedCount = computed(() =>
-    data.value?.items?.filter((item: any) => item.status === 'published').length || 0
+    items.value?.filter((item: any) => item.status === 'published').length || 0
 )
 
 const featuredCount = computed(() =>
-    data.value?.items?.filter((item: any) => item.featured).length || 0
+    items.value?.filter((item: any) => item.featured).length || 0
 )
 
 const sortedItems = computed(() => {
-    if (!data.value?.items) return []
-    return [...data.value.items].sort((a: any, b: any) => (b.priority || 0) - (a.priority || 0))
+    if (!items.value?.length) return []
+    return [...items.value].sort((a: any, b: any) => (b.priority || 0) - (a.priority || 0))
 })
 
 const truncate = (text: string, length: number) => {
@@ -135,7 +135,7 @@ const formatDate = (date: string) => {
 onMounted(() => {
     console.log('📦 Collection Demo Loading...')
     console.log('🔥 Firestore Path:', firestorePath.value)
-    loadData()
+    loadItems()
 })
 </script>
 

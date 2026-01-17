@@ -50,14 +50,14 @@
 <script setup lang="ts">
 import { onMounted, computed } from 'vue'
 import { demoConfig } from './demo.config'
-import { usePageContent } from '@/composables/usePageContent'
+import { usePageContext } from '@/composables/usePageContext'
 import { getFirestoreInfo, getFirestorePath } from '@/utils/firestore'
 import type { PageConfig } from '@/pages/admin/page.config'
 
 const envInfo = getFirestoreInfo()
 const firestorePath = computed(() => getFirestorePath(demoConfig.path))
 
-const { data, loading, error, loadData } = usePageContent(demoConfig as PageConfig)
+const { data, loading, error, loadData } = usePageContext(demoConfig as PageConfig)
 
 onMounted(() => {
     console.log('📄 Demo Page Loading...')

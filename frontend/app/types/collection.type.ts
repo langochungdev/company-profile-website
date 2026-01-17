@@ -5,7 +5,7 @@ export interface ListingConfig {
     collection: string;
     collectionName: string;
     path: string;
-    itemsPath: string;
+    itemsPath?: string;
 
     icon?: string;
     order?: number;
@@ -41,7 +41,7 @@ export interface DetailConfig {
     collection: string;
     collectionName: string;
     path: string;
-    itemsPath: string;
+    itemsPath?: string;
 
     icon?: string;
     order?: number;

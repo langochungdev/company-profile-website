@@ -54,7 +54,7 @@ function generateFieldDefault(field: FieldConfig): any {
         case "select":
             if (field.options && field.options.length > 0) {
                 const firstOption = field.options[0];
-                return typeof firstOption === "string" ? firstOption : firstOption?.value ?? "";
+                return typeof firstOption === "string" ? firstOption : (firstOption?.value ?? "");
             }
             return "";
 
@@ -98,7 +98,7 @@ function generateFieldDefault(field: FieldConfig): any {
     }
 }
 
-export function usePageContent(config: PageConfig): PageContentResult {
+export function usePageContext(config: PageConfig): PageContentResult {
     const data = ref<Record<string, any> | null>(null);
     const loading = ref(false);
     const error = ref<Error | null>(null);
