@@ -1,24 +1,48 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getAnalytics } from "firebase/analytics";
+import { initializeApp, type FirebaseApp } from "firebase/app";
+import { getFirestore, type Firestore } from "firebase/firestore";
+import { getAnalytics, type Analytics } from "firebase/analytics";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyCO0vlGyMbgbNI_RmnHTTwunhACpC92dyw",
-    authDomain: "langochung-se23.firebaseapp.com",
-    projectId: "langochung-se23",
-    storageBucket: "langochung-se23.firebasestorage.app",
-    messagingSenderId: "835274043977",
-    appId: "1:835274043977:web:7cea8c43e9edd7362b0598",
-    measurementId: "G-SJJ6750C4F",
-};
+let app: FirebaseApp | null = null;
+let dbInstance: Firestore | null = null;
+let analyticsInstance: Analytics | null = null;
+let isInitialized = false;
 
-const app = initializeApp(firebaseConfig);
-
-export const db = getFirestore(app);
-
-let analytics: ReturnType<typeof getAnalytics> | null = null;
-if (typeof window !== "undefined") {
-    analytics = getAnalytics(app);
+export interface FirebaseConfig {
+    apiKey: string;
+    authDomain: string;
+    projectId: string;
+    storageBucket: string;
+    messagingSenderId: string;
+    appId: string;
+    measurementId: string;
 }
 
-export { analytics };
+export const initFirebase = (config: FirebaseConfig) => {
+    if (isInitialized) return { app: app!, db: dbInstance!, analytics: analyticsInstance };
+
+    app = initializeApp(config);
+    dbInstance = getFirestore(app);
+
+    if (typeof window !== "undefined") {
+        analyticsInstance = getAnalytics(app);
+    }
+
+    isInitialized = true;
+    return { app, db: dbInstance, analytics: analyticsInstance };
+};
+
+export const db: Firestore = new Proxy({} as Firestore, {
+    get(_, prop) {
+        if (!dbInstance) {
+            throw new Error("Firebase not initialized. Ensure firebase.client.ts plugin is loaded.");
+        }
+        return Reflect.get(dbInstance, prop);
+    },
+});
+
+export const analytics: Analytics | null = new Proxy({} as Analytics, {
+    get(_, prop) {
+        if (!analyticsInstance) return undefined;
+        return Reflect.get(analyticsInstance, prop);
+    },
+});

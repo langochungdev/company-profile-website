@@ -9,6 +9,13 @@ export default defineNuxtConfig({
         public: {
             siteName: process.env.SITE_NAME || "default",
             nodeEnv: process.env.NODE_ENV || "development",
+            firebaseApiKey: "",
+            firebaseAuthDomain: "",
+            firebaseProjectId: "",
+            firebaseStorageBucket: "",
+            firebaseMessagingSenderId: "",
+            firebaseAppId: "",
+            firebaseMeasurementId: "",
         },
     },
     app: {
