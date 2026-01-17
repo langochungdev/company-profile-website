@@ -100,7 +100,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import { demoListingConfig } from './listing.config'
+import { demoListingConfig } from './demoListing.cms'
 import { useDetailContext } from '@/composables/useDetailContext'
 import { getFirestoreInfo, getFirestorePath } from '@/utils/firestore'
 

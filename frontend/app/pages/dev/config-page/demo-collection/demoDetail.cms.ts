@@ -1,7 +1,7 @@
-import type { DetailConfig } from "@/types/collection.type";
+import type { DetailConfig } from "@/types/cms.type";
 
 export const demoDetailConfig: DetailConfig = {
-    type: "collection",
+    type: "detail",
     collection: "demo-items",
     collectionName: "Demo Item Detail",
 

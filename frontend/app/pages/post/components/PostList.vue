@@ -37,7 +37,7 @@
 
 <script setup>
 import PostItem from './PostItem.vue'
-import { POSTS, POST_CATEGORIES } from '../post.config'
+import { POSTS, POST_CATEGORIES } from '../postListing.cms'
 
 const categories = POST_CATEGORIES
 const currentCategory = ref('Tất cả')

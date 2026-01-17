@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import { POSTS } from '../../post/post.config'
+import { POSTS } from '../../post/postListing.cms'
 
 const recentPosts = computed(() => POSTS.slice(0, 3))
 </script>

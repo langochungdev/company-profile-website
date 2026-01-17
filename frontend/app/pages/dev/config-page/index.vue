@@ -333,9 +333,9 @@
 import { ref, computed, watch, defineComponent, h, unref } from 'vue'
 import { doc, deleteDoc, type Firestore } from 'firebase/firestore'
 import { SIDEBAR_PAGES } from '@/pages/admin/page.config'
-import { demoConfig } from './demo-page/demo.config'
-import { demoListingConfig } from './demo-collection/listing.config'
-import { demoDetailConfig } from './demo-collection/detail.config'
+import { demoConfig } from './demo-page/demo.cms'
+import { demoListingConfig } from './demo-collection/demoListing.cms'
+import { demoDetailConfig } from './demo-collection/demoDetail.cms'
 import { usePageContext } from '@/composables/usePageContext'
 import { useDetailContext } from '@/composables/useDetailContext'
 import { getFirestoreInfo, getFirestorePath } from '@/utils/firestore'
@@ -349,12 +349,12 @@ const availableConfigs = [
     ...SIDEBAR_PAGES
 ]
 
-const pageConfigs = availableConfigs.filter(c => (c.config as any).type !== 'collection')
-const collectionConfigs = availableConfigs.filter(c => (c.config as any).type === 'collection')
+const pageConfigs = availableConfigs.filter(c => (c.config as any).type === 'page' || !(c.config as any).type)
+const collectionConfigs = availableConfigs.filter(c => (c.config as any).type === 'listing' || (c.config as any).type === 'detail')
 
 const selectedConfigKey = ref('')
 const currentConfig = ref<any>(null)
-const isCollectionMode = computed(() => currentConfig.value?.type === 'collection')
+const isCollectionMode = computed(() => currentConfig.value?.type === 'listing' || currentConfig.value?.type === 'detail')
 const collectionTab = ref<'items' | 'settings'>('items')
 
 const listingSettingsLocal = ref({

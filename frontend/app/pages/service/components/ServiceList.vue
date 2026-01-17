@@ -37,7 +37,7 @@
 
 <script setup>
 import ServiceItem from './ServiceItem.vue'
-import { SERVICES, SERVICE_CATEGORIES } from '../service.config'
+import { SERVICES, SERVICE_CATEGORIES } from '../serviceListing.cms'
 
 const categories = SERVICE_CATEGORIES
 const currentCategory = ref('Tất cả')

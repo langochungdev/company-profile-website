@@ -2,7 +2,7 @@
 import { ref, type Ref } from "vue";
 import { doc, getDoc, setDoc, type Firestore } from "firebase/firestore";
 import { getFirestorePath } from "@/utils/firestore";
-import type { ListingSettings } from "@/pages/dev/config-page/demo-collection/collection.config";
+import type { ListingSettings } from "@/types/cms.type";
 
 interface ListingSettingsResult {
     settings: Ref<ListingSettings | null>;

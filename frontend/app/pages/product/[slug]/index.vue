@@ -77,7 +77,7 @@
 </template>
 
 <script setup>
-import { PRODUCTS } from '../product.config'
+import { PRODUCTS } from '../productListing.cms'
 
 const route = useRoute()
 const slug = route.params.slug

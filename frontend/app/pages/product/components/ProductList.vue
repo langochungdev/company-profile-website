@@ -30,7 +30,7 @@
 
 <script setup>
 import ProductItem from './ProductItem.vue'
-import { PRODUCTS, PRODUCT_CATEGORIES } from '../product.config'
+import { PRODUCTS, PRODUCT_CATEGORIES } from '../productListing.cms'
 
 const categories = PRODUCT_CATEGORIES
 const currentCategory = ref('Tất cả')

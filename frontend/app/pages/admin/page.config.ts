@@ -1,18 +1,109 @@
-// Admin Page Config Registry - Central configuration import
+// Admin Page Config Registry - Auto-Discovery Architecture
 
-import { homeConfig } from "@/pages/home/home.config";
-import { servicePageConfig } from "@/pages/service/service.config";
-import { productPageConfig } from "@/pages/product/product.config";
-import { postPageConfig } from "@/pages/post/post.config";
-import { seoOpenGraphConfig } from "./config/seoOpenGraph.config";
+import type { CmsConfig, ParsedCmsConfig } from "@/types/cms.type";
 
-export const SIDEBAR_PAGES: Array<{ key: string; config: PageConfig; group?: string }> = [
-    { key: "home", config: homeConfig as PageConfig },
-    // { key: "service", config: servicePageConfig as unknown as PageConfig },
-    { key: "product", config: productPageConfig as unknown as PageConfig },
-    // { key: "post", config: postPageConfig as unknown as PageConfig },
-    // { key: "seo-open-graph", config: seoOpenGraphConfig as PageConfig, group: "Cài đặt" },
-];
+const cmsModules = import.meta.glob("../**/*.cms.ts", { eager: true });
+
+function parseConfigType(config: any): "page" | "listing" | "detail" {
+    if (config.type === "listing") return "listing";
+    if (config.type === "detail") return "detail";
+    if (config.type === "page") return "page";
+    if (config.itemFields) return "detail";
+    if (config.listConfig) return "listing";
+    if (config.sections && !config.listConfig) return "page";
+    return "page";
+}
+
+function parseCmsConfigs(modules: Record<string, unknown>): ParsedCmsConfig[] {
+    return Object.entries(modules)
+        .map(([filePath, module]) => {
+            const fileName = filePath.split("/").pop()?.replace(".cms.ts", "") || "";
+            const mod = module as Record<string, any>;
+            const exportedValues = Object.values(mod).filter((v) => v && typeof v === "object" && !Array.isArray(v));
+            const config = exportedValues.find((v: any) => v.path || v.collection || v.sections || v.itemFields);
+            if (!config) return null;
+
+            return {
+                key: fileName,
+                filePath,
+                config: config as CmsConfig,
+                configType: parseConfigType(config),
+            };
+        })
+        .filter((c): c is ParsedCmsConfig => c !== null)
+        .sort((a, b) => (a.config.order || 100) - (b.config.order || 100));
+}
+
+export const ALL_CMS_CONFIGS = parseCmsConfigs(cmsModules);
+export const PAGE_CMS_CONFIGS = ALL_CMS_CONFIGS.filter((c) => c.configType === "page");
+export const LISTING_CMS_CONFIGS = ALL_CMS_CONFIGS.filter((c) => c.configType === "listing");
+export const DETAIL_CMS_CONFIGS = ALL_CMS_CONFIGS.filter((c) => c.configType === "detail");
+
+export function getCollectionPair(collectionName: string) {
+    const listing = LISTING_CMS_CONFIGS.find((c) => (c.config as any).collection === collectionName);
+    const detail = DETAIL_CMS_CONFIGS.find((c) => (c.config as any).collection === collectionName);
+    return { listing: listing?.config, detail: detail?.config };
+}
+
+export function getDetailConfigForListing(listingKey: string) {
+    const listingConfig = LISTING_CMS_CONFIGS.find((c) => c.key === listingKey);
+    if (!listingConfig) return null;
+    const collectionName = (listingConfig.config as any).collection;
+    const detailConfig = DETAIL_CMS_CONFIGS.find((c) => (c.config as any).collection === collectionName);
+    return detailConfig?.config || null;
+}
+
+export interface CollectionPageConfig {
+    key: string;
+    listing: any;
+    detail: any;
+    pageName: string;
+    icon: string;
+    order: number;
+    group: string;
+    path: string;
+}
+
+export const COLLECTION_PAGES: CollectionPageConfig[] = LISTING_CMS_CONFIGS.map((lc) => {
+    const listing = lc.config as any;
+    const detail = getDetailConfigForListing(lc.key);
+    return {
+        key: lc.key.replace("Listing", ""),
+        listing,
+        detail,
+        pageName: listing.collectionName || listing.pageName || lc.key,
+        icon: listing.icon || "mdi:folder",
+        order: listing.order || 100,
+        group: listing.group || "Trang",
+        path: listing.path || "",
+    };
+});
+
+export const SIDEBAR_PAGES: Array<{ key: string; config: PageConfig; group?: string; configType: "page" | "listing" }> = [
+    ...PAGE_CMS_CONFIGS.map((c) => ({
+        key: c.key,
+        config: c.config as unknown as PageConfig,
+        group: c.config.group,
+        configType: "page" as const,
+    })),
+    ...COLLECTION_PAGES.map((cp) => ({
+        key: cp.key,
+        config: {
+            page: cp.key,
+            pageName: cp.pageName,
+            path: cp.path,
+            icon: cp.icon,
+            order: cp.order,
+            group: cp.group,
+            type: "listing" as const,
+            sections: cp.listing.sections || {},
+            listConfig: cp.listing.listConfig,
+            detailConfig: cp.detail,
+        } as unknown as PageConfig,
+        group: cp.group,
+        configType: "listing" as const,
+    })),
+].sort((a, b) => ((a.config as any).order || 100) - ((b.config as any).order || 100));
 
 export interface FieldConfig {
     type: "text" | "textarea" | "number" | "boolean" | "select" | "image" | "video" | "array" | "group" | "richtext" | "date" | "color" | "object";
@@ -47,18 +138,6 @@ export interface TableColumn {
     width?: number;
 }
 
-export interface ItemConfig {
-    name: string;
-    namePlural: string;
-    icon: string;
-    config: {
-        sections: Record<string, SectionConfig>;
-        tableColumns: TableColumn[];
-        defaultValues: Record<string, unknown>;
-    };
-    data: Record<string, unknown>[];
-}
-
 export interface PageConfig {
     page: string;
     pageName: string;
@@ -66,9 +145,10 @@ export interface PageConfig {
     icon: string;
     order: number;
     group?: string;
-    type?: "page" | "collection";
-    itemConfig?: ItemConfig;
+    type?: "page" | "listing";
     sections: Record<string, SectionConfig>;
+    listConfig?: any;
+    detailConfig?: any;
 }
 
 export interface SidebarGroupConfig {
@@ -79,6 +159,7 @@ export interface SidebarGroupConfig {
 export const SIDEBAR_GROUPS: SidebarGroupConfig[] = [
     { name: "Trang", visible: true },
     { name: "Cài đặt", visible: true },
+    { name: "Dev Tools", visible: true },
 ];
 
 export const PAGE_CONFIGS: Record<string, PageConfig> = Object.fromEntries(SIDEBAR_PAGES.map(({ key, config }) => [key, config]));
@@ -89,8 +170,8 @@ export const getPageConfig = (pageKey: string): PageConfig | undefined => {
     return PAGE_CONFIGS[pageKey];
 };
 
-export const getAllPages = (): Array<{ key: string } & PageConfig> => {
-    return SIDEBAR_PAGES.map(({ key, config }) => ({ key, ...config }));
+export const getAllPages = (): Array<{ key: string; configType: "page" | "listing" } & PageConfig> => {
+    return SIDEBAR_PAGES.map(({ key, config, configType }) => ({ key, configType, ...config }));
 };
 
 export interface SidebarGroup {
@@ -103,6 +184,7 @@ export interface SidebarItem {
     label: string;
     icon: string;
     path: string;
+    type: "page" | "listing";
 }
 
 export const getSidebarItems = (): SidebarGroup[] => {
@@ -113,7 +195,7 @@ export const getSidebarItems = (): SidebarGroup[] => {
         groupMap.set(g.name, { name: g.name, items: [] });
     });
 
-    SIDEBAR_PAGES.forEach(({ key, config, group }) => {
+    SIDEBAR_PAGES.forEach(({ key, config, group, configType }) => {
         const groupName = group ?? config.group ?? "Trang";
         let sidebarGroup = groupMap.get(groupName);
 
@@ -127,6 +209,7 @@ export const getSidebarItems = (): SidebarGroup[] => {
             label: config.pageName,
             icon: config.icon,
             path: `/admin/${key}`,
+            type: configType,
         });
     });
 
@@ -135,7 +218,17 @@ export const getSidebarItems = (): SidebarGroup[] => {
 
 export const isCollectionPage = (pageKey: string): boolean => {
     const config = PAGE_CONFIGS[pageKey];
-    return config?.type === "collection" && !!config.itemConfig;
+    return config?.type === "listing";
+};
+
+export const getListingConfig = (pageKey: string) => {
+    const config = PAGE_CONFIGS[pageKey];
+    return config?.listConfig || null;
+};
+
+export const getDetailConfig = (pageKey: string) => {
+    const config = PAGE_CONFIGS[pageKey];
+    return config?.detailConfig || null;
 };
 
 export const getFirestorePath = (pageKey: string, sectionId?: string): string => {

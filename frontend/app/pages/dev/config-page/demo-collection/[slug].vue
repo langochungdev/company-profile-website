@@ -116,7 +116,7 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { demoDetailConfig } from './detail.config'
+import { demoDetailConfig } from './demoDetail.cms'
 import { useDetailContext } from '@/composables/useDetailContext'
 import { getFirestoreInfo, getFirestorePath } from '@/utils/firestore'
 

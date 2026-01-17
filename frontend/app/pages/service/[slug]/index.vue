@@ -125,7 +125,7 @@
 </template>
 
 <script setup>
-import { SERVICES } from '../service.config'
+import { SERVICES } from '../serviceListing.cms'
 
 const route = useRoute()
 const slug = route.params.slug

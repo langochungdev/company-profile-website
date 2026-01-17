@@ -49,7 +49,7 @@
 
 <script setup lang="ts">
 import { onMounted, computed } from 'vue'
-import { demoConfig } from './demo.config'
+import { demoConfig } from './demo.cms'
 import { usePageContext } from '@/composables/usePageContext'
 import { getFirestoreInfo, getFirestorePath } from '@/utils/firestore'
 import type { PageConfig } from '@/pages/admin/page.config'

@@ -103,7 +103,7 @@
 </template>
 
 <script setup>
-import { POSTS } from '../post.config'
+import { POSTS } from '../postListing.cms'
 
 const route = useRoute()
 const slug = route.params.slug
