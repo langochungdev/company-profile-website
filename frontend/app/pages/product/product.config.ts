@@ -1,5 +1,3 @@
-// Cấu hình trang sản phẩm cho admin panel
-
 import { productDetailConfig } from "./productDetail.config";
 
 export interface Product {

@@ -1,5 +1,3 @@
-// Cấu hình chi tiết sản phẩm cho admin CRUD
-
 export const productDetailConfig = {
     sections: {
         basic: {

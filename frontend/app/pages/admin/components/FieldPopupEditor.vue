@@ -1,0 +1,246 @@
+<!-- Chức năng: Popup editor cho Live Edit mode -->
+<template>
+    <Teleport to="body">
+        <Transition name="popup">
+            <div v-if="isOpen" class="popup-overlay" @click.self="$emit('close')">
+                <div class="popup-editor">
+                    <header class="popup-header">
+                        <div class="header-info">
+                            <Icon name="mdi:pencil" class="header-icon" />
+                            <h3>{{ fieldConfig?.label || 'Chỉnh sửa' }}</h3>
+                        </div>
+                        <button class="btn-close" @click="$emit('close')">
+                            <Icon name="mdi:close" />
+                        </button>
+                    </header>
+
+                    <div class="popup-content">
+                        <AdminField v-if="fieldConfig" :field="(fieldConfig as any)" :model-value="localValue" @update:model-value="localValue = $event" />
+                        <p v-if="fieldConfig?.note" class="field-note">
+                            <Icon name="mdi:information-outline" />
+                            {{ fieldConfig.note }}
+                        </p>
+                    </div>
+
+                    <footer class="popup-footer">
+                        <button class="btn-cancel" @click="$emit('close')">
+                            <Icon name="mdi:close" />
+                            <span>Hủy</span>
+                        </button>
+                        <button class="btn-apply" @click="handleApply">
+                            <Icon name="mdi:check" />
+                            <span>Áp dụng</span>
+                        </button>
+                    </footer>
+                </div>
+            </div>
+        </Transition>
+    </Teleport>
+</template>
+
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+import AdminField from './AdminField.vue'
+import type { FieldConfig } from '../page.config'
+
+const props = defineProps<{
+    isOpen: boolean
+    fieldConfig: FieldConfig | null
+    initialValue: unknown
+}>()
+
+const emit = defineEmits<{
+    close: []
+    apply: [value: unknown]
+}>()
+
+const localValue = ref<unknown>(props.initialValue)
+
+watch(() => props.initialValue, (newVal) => {
+    localValue.value = newVal
+}, { immediate: true })
+
+watch(() => props.isOpen, (isOpen) => {
+    if (isOpen) {
+        localValue.value = props.initialValue
+    }
+})
+
+const handleApply = () => {
+    emit('apply', localValue.value)
+}
+</script>
+
+<style scoped>
+.popup-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+}
+
+.popup-editor {
+    width: 100%;
+    max-width: 520px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+}
+
+.popup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.header-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-icon {
+    width: 22px;
+    height: 22px;
+    color: #3b82f6;
+}
+
+.popup-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.btn-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-close:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.btn-close svg {
+    width: 20px;
+    height: 20px;
+}
+
+.popup-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.field-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: #f0f9ff;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #0369a1;
+}
+
+.field-note svg {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    margin-top: 1px;
+}
+
+.popup-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 20px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+}
+
+.btn-cancel,
+.btn-apply {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.btn-cancel:hover {
+    background: #cbd5e1;
+}
+
+.btn-apply {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: #ffffff;
+}
+
+.btn-apply:hover {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.btn-cancel svg,
+.btn-apply svg {
+    width: 18px;
+    height: 18px;
+}
+
+.popup-enter-active,
+.popup-leave-active {
+    transition: opacity 0.2s ease;
+}
+
+.popup-enter-active .popup-editor,
+.popup-leave-active .popup-editor {
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.popup-enter-from,
+.popup-leave-to {
+    opacity: 0;
+}
+
+.popup-enter-from .popup-editor,
+.popup-leave-to .popup-editor {
+    transform: scale(0.95) translateY(-10px);
+    opacity: 0;
+}
+</style>

@@ -80,7 +80,8 @@ const sidebarPages = computed(() => {
     return getAllPages().map(page => ({
         key: page.key,
         name: page.pageName,
-        icon: page.icon
+        icon: page.icon,
+        type: page.type
     }))
 })
 

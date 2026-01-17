@@ -12,10 +12,15 @@
         </div>
 
         <nav class="sidebar-nav">
-            <button v-for="page in pages" :key="page.key" :class="['nav-item', { active: activePage === page.key }]" @click="$emit('switch', page.key)">
-                <Icon :name="page.icon" class="nav-icon" />
-                <span v-if="!isCollapsed" class="nav-text">{{ page.name }}</span>
-            </button>
+            <div v-for="page in pages" :key="page.key" class="nav-item-wrapper">
+                <button :class="['nav-item', { active: activePage === page.key }]" @click="$emit('switch', page.key)">
+                    <Icon :name="page.icon" class="nav-icon" />
+                    <span v-if="!isCollapsed" class="nav-text">{{ page.name }}</span>
+                </button>
+                <NuxtLink v-if="!isCollapsed && page.type !== 'collection'" :to="`/admin/live/${page.key}`" class="btn-live-edit" title="Live Edit">
+                    <Icon name="mdi:pencil-box-outline" />
+                </NuxtLink>
+            </div>
         </nav>
 
         <div class="sidebar-footer">
@@ -29,7 +34,7 @@
 
 <script setup lang="ts">
 defineProps<{
-    pages: Array<{ key: string; name: string; icon: string }>
+    pages: Array<{ key: string; name: string; icon: string; type?: string }>
     activePage: string
     isCollapsed: boolean
 }>()
@@ -146,6 +151,41 @@ defineEmits<{
 .nav-text {
     font-size: 14px;
     font-weight: 500;
+}
+
+.nav-item-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.nav-item-wrapper .nav-item {
+    flex: 1;
+}
+
+.btn-live-edit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.btn-live-edit:hover {
+    background: #334155;
+    color: #60a5fa;
+}
+
+.btn-live-edit svg {
+    width: 16px;
+    height: 16px;
 }
 
 .sidebar-footer {

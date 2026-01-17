@@ -4,6 +4,13 @@ export default defineNuxtConfig({
     devtools: { enabled: true },
     modules: ["@nuxtjs/tailwindcss", "@nuxt/icon"],
     css: ["~/assets/css/reset.css"],
+
+    runtimeConfig: {
+        public: {
+            siteName: process.env.SITE_NAME || "default",
+            nodeEnv: process.env.NODE_ENV || "development",
+        },
+    },
     app: {
         head: {
             title: "Toptech - IT Solution Agency",

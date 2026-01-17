@@ -15,13 +15,15 @@ export const SIDEBAR_PAGES: Array<{ key: string; config: PageConfig; group?: str
 ];
 
 export interface FieldConfig {
-    type: "text" | "textarea" | "number" | "boolean" | "select" | "image" | "video" | "array" | "group" | "richtext" | "date" | "color";
+    type: "text" | "textarea" | "number" | "boolean" | "select" | "image" | "video" | "array" | "group" | "richtext" | "date" | "color" | "object";
     label: string;
     note?: string;
     max?: number;
     min?: number;
+    exact?: number;
     rows?: number;
     required?: boolean;
+    unique?: boolean;
     default?: string | number | boolean;
     options?: string[] | { value: string; label: string }[];
     placeholder?: string;
