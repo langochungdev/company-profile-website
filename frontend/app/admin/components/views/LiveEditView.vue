@@ -8,7 +8,7 @@
             </div>
 
             <template v-else-if="hasLiveEditSupport">
-                <EditOverlay v-for="(section, sectionId) in config?.sections" :key="sectionId" :label="section.label" :editable="true" :visible="sectionVisibility[sectionId] ?? true" @toggle-visible="toggleSectionVisibility(sectionId)">
+                <EditOverlay v-for="(section, sectionId) in enabledSections" :key="sectionId" :label="section.label" :editable="true" :visible="sectionVisibility[sectionId] ?? true" @toggle-visible="toggleSectionVisibility(sectionId)">
                     <component :is="getSectionComponent(sectionId)" :data="getSectionData(sectionId)" :editable="true" @edit="(fieldPath: string) => openEditor(sectionId, fieldPath)" />
                 </EditOverlay>
             </template>
@@ -63,6 +63,13 @@ const sectionComponents = computed(() => {
 
 const hasLiveEditSupport = computed(() => {
     return Object.keys(sectionComponents.value).length > 0;
+});
+
+const enabledSections = computed(() => {
+    if (!config.value?.sections) return {};
+    return Object.fromEntries(
+        Object.entries(config.value.sections).filter(([, section]) => (section as any).enabled !== false)
+    );
 });
 
 const getSectionComponent = (sectionId: string) => {

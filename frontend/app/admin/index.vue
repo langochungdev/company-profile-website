@@ -99,8 +99,6 @@ import LiveEditView from "./components/views/LiveEditView.vue";
 import SettingsView from "./components/views/SettingsView.vue";
 import { PAGE_CONFIGS, getAllPages, getPageConfig, isCollectionPage as checkIsCollection, getListingConfig, getDetailConfig } from "./config/page.config";
 
-definePageMeta({ layout: false });
-
 const sidebarPages = computed(() => {
     return getAllPages().map((page) => ({
         key: page.key,

@@ -11,6 +11,7 @@ export const homeConfig = {
         hero: {
             label: "Banner Slideshow",
             component: "HeroSection",
+            enabled: true,
             collapsed: false,
             visible: true,
             fields: {
@@ -33,6 +34,7 @@ export const homeConfig = {
         services: {
             label: "Lĩnh Vực Hoạt Động",
             component: "ServicesSection",
+            enabled: true,
             collapsed: true,
             visible: true,
             fields: {
@@ -57,6 +59,7 @@ export const homeConfig = {
         projects: {
             label: "Dự Án Tiêu Biểu",
             component: "ProjectSection",
+            enabled: true,
             collapsed: true,
             visible: true,
             fields: {
@@ -86,6 +89,7 @@ export const homeConfig = {
         blog: {
             label: "Kênh Truyền Thông",
             component: "BlogSection",
+            enabled: false,
             collapsed: true,
             visible: true,
             fields: {
@@ -118,6 +122,7 @@ export const homeConfig = {
         news: {
             label: "Tin Tức & Kiến Thức",
             component: "NewsSection",
+            enabled: true,
             collapsed: true,
             visible: true,
             fields: {
@@ -143,6 +148,7 @@ export const homeConfig = {
         certificates: {
             label: "Chứng Nhận",
             component: "CertSection",
+            enabled: true,
             collapsed: true,
             visible: true,
             fields: {
@@ -165,6 +171,7 @@ export const homeConfig = {
         partners: {
             label: "Đối Tác",
             component: "PartnerSection",
+            enabled: true,
             collapsed: true,
             visible: true,
             fields: {

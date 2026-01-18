@@ -10,6 +10,8 @@
 
             <NewsSection />
 
+            <!-- <BlogSection /> -->
+
             <CertSection />
 
             <PartnerSection />
@@ -25,6 +27,7 @@ import ProjectSection from './components/ProjectSection.vue'
 import NewsSection from './components/NewsSection.vue'
 import CertSection from './components/CertSection.vue'
 import PartnerSection from './components/PartnerSection.vue'
+import BlogSection from './components/BlogSection.vue'
 
 useSeoMeta({
     title: 'SHT Security - Giải Pháp An Ninh & Hạ Tầng Mạng Chuyên Nghiệp',
