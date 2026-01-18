@@ -17,7 +17,7 @@
                 <template v-else-if="!isCollectionPage">
                     <LiveEditView ref="liveEditRef" v-if="activeContentTab === 'live'" :page-key="activePage" @dirty-change="hasChanges = $event" @saving-change="isSaving = $event" />
 
-                    <SettingsView ref="settingsRef" v-else :page-key="activePage" :page-name="currentPageName" @dirty-change="hasChanges = $event" @saving-change="isSaving = $event" />
+                    <SettingsView ref="settingsRef" v-else :key="activePage" :page-key="activePage" :page-name="currentPageName" :config-path="currentConfigPath" :schema-type="currentSchemaType" @dirty-change="hasChanges = $event" @saving-change="isSaving = $event" />
                 </template>
 
                 <div v-else-if="currentConfig" class="editor-container">
@@ -62,17 +62,7 @@
                             </div>
                         </div>
 
-                        <div v-else class="settings-content">
-                            <Section v-for="(section, sectionKey) in currentConfig.sections" :key="sectionKey" :label="section.label" :is-collapsed="collapsedSections[sectionKey as string] ?? section.collapsed ?? false" @toggle="toggleSection(sectionKey as string)">
-                                <template v-for="(field, fieldKey) in section.fields" :key="fieldKey">
-                                    <GroupField v-if="field.type === 'group'" :field="field">
-                                        <Field v-for="(subField, subKey) in field.fields" :key="subKey" :field="(subField as any)" :model-value="getFieldValue(sectionKey as string, fieldKey as string, subKey as string)" @update:model-value="setFieldValue(sectionKey as string, fieldKey as string, subKey as string, $event)" />
-                                    </GroupField>
-                                    <ArrayField v-else-if="field.type === 'array'" :field="field as any" :model-value="(getFieldValue(sectionKey, fieldKey) as any[]) || []" @update:model-value="setFieldValue(sectionKey as string, fieldKey as string, null, $event)" />
-                                    <Field v-else :field="(field as any)" :model-value="getFieldValue(sectionKey as string, fieldKey as string)" @update:model-value="setFieldValue(sectionKey as string, fieldKey as string, null, $event)" />
-                                </template>
-                            </Section>
-                        </div>
+                        <SettingsView v-else ref="collectionSettingsRef" :key="activePage" :page-key="activePage" :page-name="currentPageName" :config-path="currentConfigPath" :schema-type="currentSchemaType" @dirty-change="hasChanges = $event" @saving-change="isSaving = $event" />
                     </div>
                 </div>
             </div>
@@ -104,7 +94,7 @@ const sidebarPages = computed(() => {
         key: page.key,
         name: page.pageName,
         icon: page.icon || "mdi:circle-small",
-        type: page.configType === "listing" ? "collection" : "page",
+        type: page.configType === "detail" ? "collection" : "page",
     }));
 });
 
@@ -121,6 +111,7 @@ const loading = ref(false);
 
 const liveEditRef = ref<{ handleSave: () => Promise<void> } | null>(null);
 const settingsRef = ref<{ handleSave: () => Promise<void> } | null>(null);
+const collectionSettingsRef = ref<{ handleSave: () => Promise<void> } | null>(null);
 
 const isEditorOpen = ref(false);
 const isNewItem = ref(true);
@@ -138,6 +129,8 @@ const firstKey = Object.keys(PAGE_CONFIGS)[0] as string;
 const currentConfig = computed(() => getPageConfig(activePage.value) || PAGE_CONFIGS[firstKey]);
 const currentPageName = computed(() => currentConfig.value?.pageName || "");
 const isCollectionPage = computed(() => checkIsCollection(activePage.value));
+const currentConfigPath = computed(() => currentConfig.value?.path || "");
+const currentSchemaType = computed(() => (currentConfig.value as any)?.schemaType || "home");
 
 const listConfig = computed(() => getListingConfig(activePage.value));
 const detailConfig = computed(() => getDetailConfig(activePage.value));
@@ -244,7 +237,13 @@ const switchPage = (pageKey: string) => {
 };
 
 const handleGlobalSave = async () => {
-    if (isCollectionPage.value) return;
+    if (isCollectionPage.value) {
+        if (activeTab.value === "settings") {
+            await collectionSettingsRef.value?.handleSave();
+        }
+        hasChanges.value = false;
+        return;
+    }
 
     if (activeContentTab.value === "live") {
         await liveEditRef.value?.handleSave();

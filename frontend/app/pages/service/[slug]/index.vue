@@ -1,6 +1,13 @@
 <template>
     <NuxtLayout name="main">
-        <main v-if="service">
+        <main v-if="loading" class="loading-wrapper">
+            <div class="container">
+                <Icon name="mdi:loading" class="spin loading-icon" />
+                <p>Đang tải dịch vụ...</p>
+            </div>
+        </main>
+
+        <main v-else-if="service" class="service-detail-wrapper">
             <article class="service-detail-content">
                 <div class="container">
                     <div class="service-grid">
@@ -13,37 +20,40 @@
                                 </span>
                             </div>
 
-                            <h1 class="service-title">{{ service.title }}</h1>
+                            <h1 class="service-title">{{ service.title || service.name }}</h1>
 
                             <div class="service-thumbnail">
-                                <img :src="service.thumbnail" :alt="service.title" />
+                                <img :src="service.thumbnail || service.image" :alt="service.title || service.name" />
                             </div>
 
                             <div class="service-body">
                                 <p class="lead">{{ service.description }}</p>
 
-                                <h2>Tính Năng Nổi Bật</h2>
-                                <div class="features-grid">
-                                    <div v-for="(feature, index) in service.features" :key="index" class="feature-box">
-                                        <Icon name="mdi:check-decagram" class="feature-icon" />
-                                        <span>{{ feature }}</span>
+                                <div v-if="service.features?.length">
+                                    <h2>Tính Năng Nổi Bật</h2>
+                                    <div class="features-grid">
+                                        <div v-for="(feature, index) in service.features" :key="index" class="feature-box">
+                                            <Icon name="mdi:check-decagram" class="feature-icon" />
+                                            <span>{{ feature.text || feature }}</span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <h2>Giới Thiệu Dịch Vụ</h2>
-                                <p>Chúng tôi cung cấp giải pháp chuyên nghiệp với đội ngũ kỹ thuật giàu kinh nghiệm, cam kết mang đến sự hài lòng tuyệt đối cho khách hàng. Sản phẩm và dịch vụ của chúng tôi đã được hàng nghìn doanh nghiệp tin dùng.</p>
+                                <div v-if="service.content" v-html="service.content"></div>
 
-                                <h2>Quy Trình Triển Khai</h2>
-                                <ul>
-                                    <li>Khảo sát và tư vấn giải pháp phù hợp</li>
-                                    <li>Thiết kế hệ thống chi tiết theo yêu cầu</li>
-                                    <li>Thi công lắp đặt chuyên nghiệp</li>
-                                    <li>Chạy thử và nghiệm thu hoàn thiện</li>
-                                    <li>Bảo hành và hỗ trợ kỹ thuật 24/7</li>
-                                </ul>
+                                <template v-else>
+                                    <h2>Giới Thiệu Dịch Vụ</h2>
+                                    <p>Chúng tôi cung cấp giải pháp chuyên nghiệp với đội ngũ kỹ thuật giàu kinh nghiệm, cam kết mang đến sự hài lòng tuyệt đối cho khách hàng.</p>
 
-                                <h2>Cam Kết Của SHT Security</h2>
-                                <p>Chúng tôi cam kết sử dụng thiết bị chính hãng, thi công đúng tiêu chuẩn kỹ thuật và cung cấp chế độ bảo hành dài hạn. Đội ngũ hỗ trợ kỹ thuật luôn sẵn sàng 24/7 để đảm bảo hệ thống hoạt động ổn định.</p>
+                                    <h2>Quy Trình Triển Khai</h2>
+                                    <ul>
+                                        <li>Khảo sát và tư vấn giải pháp phù hợp</li>
+                                        <li>Thiết kế hệ thống chi tiết theo yêu cầu</li>
+                                        <li>Thi công lắp đặt chuyên nghiệp</li>
+                                        <li>Chạy thử và nghiệm thu hoàn thiện</li>
+                                        <li>Bảo hành và hỗ trợ kỹ thuật 24/7</li>
+                                    </ul>
+                                </template>
                             </div>
 
                             <div class="service-cta-box">
@@ -95,13 +105,13 @@
                                 </NuxtLink>
                             </div>
 
-                            <div class="sidebar-related">
+                            <div class="sidebar-related" v-if="relatedServices.length">
                                 <h3>Dịch Vụ Liên Quan</h3>
                                 <div class="related-list">
                                     <NuxtLink v-for="item in relatedServices" :key="item.id" :to="`/service/${item.slug}`" class="related-item">
-                                        <img :src="item.thumbnail" :alt="item.title" class="related-thumb" />
+                                        <img :src="item.thumbnail || item.image" :alt="item.title || item.name" class="related-thumb" />
                                         <div class="related-info">
-                                            <h4 class="related-title">{{ item.title }}</h4>
+                                            <h4 class="related-title">{{ item.title || item.name }}</h4>
                                             <span class="related-price">{{ item.price }}</span>
                                         </div>
                                     </NuxtLink>
@@ -125,24 +135,72 @@
 </template>
 
 <script setup>
-import { SERVICES } from '../serviceListing.cms'
+import { usePreviewContext } from '@/admin/composables/usePreviewContext'
+import { generateBreadcrumbSchema } from '@/admin/utils/schema-generator'
+
+const SITE_URL = 'https://sht.langochung.me'
 
 const route = useRoute()
 const slug = route.params.slug
 
-const service = computed(() => SERVICES.find(s => s.slug === slug))
+const { previews, loading, loadPreviews } = usePreviewContext('collections/services/items')
 
-const relatedServices = computed(() => {
-    if (!service.value) return []
-    return SERVICES.filter(s => s.category === service.value.category && s.id !== service.value.id).slice(0, 3)
+const service = ref(null)
+const relatedServices = ref([])
+
+onMounted(async () => {
+    await loadPreviews({ limitCount: 50 })
+    service.value = previews.value.find(s => s.slug === slug)
+
+    if (service.value) {
+        relatedServices.value = previews.value.filter(s => s.category === service.value.category && s.id !== service.value.id).slice(0, 3)
+    }
+})
+
+const serviceSchema = computed(() => {
+    if (!service.value) return null
+    return {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        name: service.value.title || service.value.name,
+        description: service.value.description,
+        image: service.value.thumbnail || service.value.image,
+        provider: {
+            "@type": "Organization",
+            name: "SHT Security",
+        },
+    }
+})
+
+const breadcrumbSchema = computed(() => {
+    if (!service.value) return null
+    return generateBreadcrumbSchema([
+        { name: 'Trang Chủ', url: SITE_URL },
+        { name: 'Dịch Vụ', url: `${SITE_URL}/service` },
+        { name: service.value.title || service.value.name, url: `${SITE_URL}/service/${service.value.slug}` },
+    ])
 })
 
 useSeoMeta({
-    title: () => service.value ? `${service.value.title} - SHT Security` : 'Dịch vụ không tồn tại',
+    title: () => service.value ? `${service.value.title || service.value.name} - SHT Security` : 'Dịch vụ không tồn tại',
     description: () => service.value?.description || '',
-    ogTitle: () => service.value?.title || '',
+    ogTitle: () => service.value?.title || service.value?.name || '',
     ogDescription: () => service.value?.description || '',
-    ogImage: () => service.value?.thumbnail || '',
+    ogImage: () => service.value?.thumbnail || service.value?.image || '',
+})
+
+useHead({
+    script: computed(() => {
+        if (!service.value) return []
+        const scripts = []
+        if (serviceSchema.value) {
+            scripts.push({ type: 'application/ld+json', innerHTML: JSON.stringify(serviceSchema.value) })
+        }
+        if (breadcrumbSchema.value) {
+            scripts.push({ type: 'application/ld+json', innerHTML: JSON.stringify(breadcrumbSchema.value) })
+        }
+        return scripts
+    }),
 })
 </script>
 

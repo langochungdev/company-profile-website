@@ -1,4 +1,3 @@
-<!-- Chức năng: Settings tab cho SEO, Open Graph, Analytics và Advanced settings -->
 <template>
     <div class="settings-view-wrapper">
         <div class="settings-content">
@@ -19,23 +18,18 @@
                         </label>
                         <p v-if="(field as any).note" class="field-note">{{ (field as any).note }}</p>
 
-                        <input v-if="field.type === 'text'" v-model="formData[sectionKey][fieldKey]" type="text" class="field-input" :placeholder="(field as any).placeholder" :maxlength="(field as any).max" />
+                        <input v-if="field.type === 'text'" v-model="settingsData[sectionKey][fieldKey]" type="text" class="field-input" :placeholder="(field as any).placeholder" :maxlength="(field as any).max" />
 
-                        <textarea v-else-if="field.type === 'textarea'" v-model="formData[sectionKey][fieldKey]" class="field-textarea" :placeholder="(field as any).placeholder" :maxlength="(field as any).max" :rows="(field as any).rows || 3" />
+                        <textarea v-else-if="field.type === 'textarea'" v-model="settingsData[sectionKey][fieldKey]" class="field-textarea" :placeholder="(field as any).placeholder" :maxlength="(field as any).max" :rows="(field as any).rows || 3" />
 
-                        <select v-else-if="field.type === 'select'" v-model="formData[sectionKey][fieldKey]" class="field-select">
-                            <option v-for="opt in (field as any).options" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                        <select v-else-if="field.type === 'select'" v-model="settingsData[sectionKey][fieldKey]" class="field-select">
+                            <option v-for="opt in getSelectOptions((field as any).options)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                         </select>
 
-                        <div v-else-if="field.type === 'color'" class="color-field">
-                            <input v-model="formData[sectionKey][fieldKey]" type="color" class="color-picker" />
-                            <input v-model="formData[sectionKey][fieldKey]" type="text" class="color-text" placeholder="#000000" />
-                        </div>
-
                         <div v-else-if="field.type === 'image'" class="image-field">
-                            <div v-if="formData[sectionKey][fieldKey]" class="image-preview">
-                                <img :src="formData[sectionKey][fieldKey]" :alt="field.label" />
-                                <button class="btn-remove" @click="formData[sectionKey][fieldKey] = ''">
+                            <div v-if="settingsData[sectionKey][fieldKey]" class="image-preview">
+                                <img :src="settingsData[sectionKey][fieldKey]" :alt="field.label" />
+                                <button class="btn-remove" @click="settingsData[sectionKey][fieldKey] = ''">
                                     <Icon name="mdi:close" />
                                 </button>
                             </div>
@@ -47,11 +41,49 @@
                             <p v-if="(field as any).size" class="size-hint">Kích thước: {{ (field as any).size }}</p>
                         </div>
 
-                        <div v-else-if="field.type === 'code'" class="code-field">
-                            <textarea v-model="formData[sectionKey][fieldKey]" class="code-textarea" :placeholder="(field as any).placeholder" :rows="(field as any).rows || 5" spellcheck="false" />
-                        </div>
+                        <span v-if="(field as any).max && field.type !== 'code'" class="char-count">{{ (settingsData[sectionKey][fieldKey] || '').length }}/{{ (field as any).max }}</span>
+                    </div>
+                </div>
+            </section>
 
-                        <span v-if="(field as any).max" class="char-count">{{ (formData[sectionKey][fieldKey] || '').length }}/{{ (field as any).max }}</span>
+            <section class="settings-section">
+                <button class="section-header" @click="toggleSection('schema')">
+                    <div class="section-title">
+                        <Icon name="mdi:code-json" />
+                        <span>Schema Markup</span>
+                    </div>
+                    <Icon :name="collapsedSections.schema ? 'mdi:chevron-down' : 'mdi:chevron-up'" class="collapse-icon" />
+                </button>
+
+                <div v-show="!collapsedSections.schema" class="section-body">
+                    <div class="schema-type-info">
+                        <Icon name="mdi:information-outline" />
+                        <span>Schema Type: <strong>{{ currentSchemaTypeName }}</strong></span>
+                    </div>
+
+                    <div class="schema-subsection">
+                        <h4 class="subsection-title">Cấu hình Schema</h4>
+                        <div v-for="(field, fieldKey) in schemaConfigFields" :key="fieldKey" class="field-group">
+                            <label class="field-label">{{ field.label }}</label>
+                            <p v-if="field.note" class="field-note">{{ field.note }}</p>
+
+                            <input v-if="field.type === 'text'" v-model="schemaData.config[fieldKey]" type="text" class="field-input" :placeholder="field.default as string" />
+
+                            <textarea v-else-if="field.type === 'textarea'" v-model="schemaData.config[fieldKey]" class="field-textarea" :rows="field.rows || 2" />
+
+                            <select v-else-if="field.type === 'select'" v-model="schemaData.config[fieldKey]" class="field-select">
+                                <option v-for="opt in getSelectOptions(field.options)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div v-if="Object.keys(schemaFieldMappingFields).length > 0" class="schema-subsection">
+                        <h4 class="subsection-title">Field Mapping</h4>
+                        <p class="subsection-note">Định nghĩa field nào trong data sẽ được dùng cho schema</p>
+                        <div v-for="(field, fieldKey) in schemaFieldMappingFields" :key="fieldKey" class="field-group field-inline">
+                            <label class="field-label">{{ field.label }}</label>
+                            <input v-model="schemaData.fieldMapping[fieldKey]" type="text" class="field-input" :placeholder="field.default as string" />
+                        </div>
                     </div>
                 </div>
             </section>
@@ -61,24 +93,50 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, watch, onMounted } from "vue";
+import { useSettingsContext } from "@/admin/composables/useSettingsContext";
+import { SCHEMA_TYPE_MAP, type SchemaPageType } from "@/admin/types/schema";
+import { generateDefaultSchema } from "@/admin/utils/schema-generator";
+import { getSchemaConfigFields, getSchemaFieldMappingFields } from "@/admin/config/schema-settings.config";
 
 const props = defineProps<{
     pageKey: string;
     pageName: string;
+    configPath: string;
+    schemaType?: SchemaPageType;
 }>();
+
+console.log("[SettingsView] Prop schemaType:", props.schemaType);
+console.log("[SettingsView] Prop pageKey:", props.pageKey);
 
 const emit = defineEmits<{
     "dirty-change": [isDirty: boolean];
     "saving-change": [isSaving: boolean];
 }>();
 
+const { settings, loading, isDirty, loadSettings, saveSettings } = useSettingsContext(props.configPath);
+
+const currentSchemaTypeName = computed(() => {
+    if (!props.schemaType) return "WebPage";
+    return SCHEMA_TYPE_MAP[props.schemaType] || "WebPage";
+});
+
+const schemaConfigFields = computed(() => {
+    if (!props.schemaType) return {};
+    return getSchemaConfigFields(props.schemaType);
+});
+
+const schemaFieldMappingFields = computed(() => {
+    if (!props.schemaType) return {};
+    return getSchemaFieldMappingFields(props.schemaType);
+});
+
 const settingsSections = {
     seo: {
         label: "SEO & Meta",
         icon: "mdi:magnify",
         fields: {
-            title: { type: "text", label: "Page Title", placeholder: "Tiêu đề trang...", max: 60, note: "Tiêu đề hiển thị trên tab trình duyệt và kết quả tìm kiếm" },
-            description: { type: "textarea", label: "Meta Description", placeholder: "Mô tả trang...", max: 160, rows: 3, note: "Mô tả ngắn gọn nội dung trang (tối đa 160 ký tự)" },
+            title: { type: "text", label: "Meta Title", placeholder: "Tiêu đề trang...", max: 60, note: "Tiêu đề hiển thị trên tab trình duyệt và kết quả tìm kiếm", required: true },
+            description: { type: "textarea", label: "Meta Description", placeholder: "Mô tả trang...", max: 160, rows: 3, note: "Mô tả ngắn gọn nội dung trang (tối đa 160 ký tự)", required: true },
             keywords: { type: "text", label: "Meta Keywords", placeholder: "từ khóa 1, từ khóa 2, ...", note: "Các từ khóa cách nhau bởi dấu phẩy" },
             canonical: { type: "text", label: "Canonical URL", placeholder: "https://example.com/page" },
             robots: {
@@ -97,15 +155,16 @@ const settingsSections = {
         label: "Open Graph (Social)",
         icon: "mdi:share-variant",
         fields: {
-            ogTitle: { type: "text", label: "OG Title", placeholder: "Tiêu đề khi chia sẻ...", max: 60 },
-            ogDescription: { type: "textarea", label: "OG Description", placeholder: "Mô tả khi chia sẻ...", max: 200, rows: 2 },
-            ogImage: { type: "image", label: "OG Image", size: "1200x630px", note: "Ảnh hiển thị khi chia sẻ lên Facebook, LinkedIn..." },
+            ogTitle: { type: "text", label: "OG Title", placeholder: "Tiêu đề khi chia sẻ...", max: 60, note: "Để trống sẽ dùng Meta Title" },
+            ogDescription: { type: "textarea", label: "OG Description", placeholder: "Mô tả khi chia sẻ...", max: 200, rows: 2, note: "Để trống sẽ dùng Meta Description" },
+            ogImage: { type: "image", label: "OG Image", size: "1200x630px", note: "Ảnh hiển thị khi chia sẻ lên Facebook, LinkedIn...", required: true },
             ogType: {
                 type: "select",
                 label: "OG Type",
                 options: [
                     { value: "website", label: "Website" },
                     { value: "article", label: "Article" },
+                    { value: "product", label: "Product" },
                 ],
             },
             twitterCard: {
@@ -118,52 +177,30 @@ const settingsSections = {
             },
         },
     },
-    branding: {
-        label: "Favicon & Branding",
-        icon: "mdi:palette",
-        fields: {
-            favicon: { type: "image", label: "Favicon", size: "32x32px", note: "Icon hiển thị trên tab trình duyệt" },
-            appleTouchIcon: { type: "image", label: "Apple Touch Icon", size: "180x180px" },
-            themeColor: { type: "color", label: "Theme Color", note: "Màu theme cho mobile browser" },
-        },
-    },
-    analytics: {
-        label: "Analytics & Tracking",
-        icon: "mdi:chart-line",
-        fields: {
-            gaId: { type: "text", label: "Google Analytics 4 ID", placeholder: "G-XXXXXXXXXX" },
-            gtmId: { type: "text", label: "Google Tag Manager ID", placeholder: "GTM-XXXXXXX" },
-            fbPixelId: { type: "text", label: "Facebook Pixel ID", placeholder: "123456789012345" },
-            customHeadScripts: { type: "code", label: "Custom Head Scripts", placeholder: "<!-- Thêm scripts vào <head> -->", rows: 4 },
-        },
-    },
-    advanced: {
-        label: "Advanced",
-        icon: "mdi:code-tags",
-        fields: {
-            customCss: { type: "code", label: "Custom CSS", placeholder: "/* Custom styles */", rows: 6 },
-            customFooterScripts: { type: "code", label: "Footer Scripts", placeholder: "<!-- Scripts trước </body> -->", rows: 4 },
-            googleVerification: { type: "text", label: "Google Site Verification", placeholder: "google-site-verification=..." },
-            bingVerification: { type: "text", label: "Bing Verification", placeholder: "msvalidate.01=..." },
-        },
-    },
 };
 
 type SectionKey = keyof typeof settingsSections;
 
-const formData = reactive<Record<SectionKey, Record<string, string>>>({
+const settingsData = reactive<Record<SectionKey, Record<string, string>>>({
     seo: { title: "", description: "", keywords: "", canonical: "", robots: "index,follow" },
     openGraph: { ogTitle: "", ogDescription: "", ogImage: "", ogType: "website", twitterCard: "summary_large_image" },
-    branding: { favicon: "", appleTouchIcon: "", themeColor: "#3b82f6" },
-    analytics: { gaId: "", gtmId: "", fbPixelId: "", customHeadScripts: "" },
-    advanced: { customCss: "", customFooterScripts: "", googleVerification: "", bingVerification: "" },
 });
 
-const originalData = ref<string>("");
-const collapsedSections = ref<Record<string, boolean>>({});
-const isSaving = ref(false);
+const schemaData = reactive<{ config: Record<string, string>; fieldMapping: Record<string, string> }>({
+    config: {},
+    fieldMapping: {},
+});
 
-const isDirty = computed(() => JSON.stringify(formData) !== originalData.value);
+const collapsedSections = ref<Record<string, boolean>>({
+    seo: false,
+    openGraph: true,
+    schema: true,
+});
+
+const getSelectOptions = (options: any) => {
+    if (!options) return [];
+    return options;
+};
 
 const toggleSection = (key: string) => {
     collapsedSections.value[key] = !collapsedSections.value[key];
@@ -175,32 +212,58 @@ const handleImageUpload = (event: Event, sectionKey: string, fieldKey: string) =
     if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
-            (formData as any)[sectionKey][fieldKey] = e.target?.result as string;
+            (settingsData as any)[sectionKey][fieldKey] = e.target?.result as string;
         };
         reader.readAsDataURL(file);
     }
 };
 
-const handleSave = async () => {
-    isSaving.value = true;
-    try {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        originalData.value = JSON.stringify(formData);
-    } finally {
-        isSaving.value = false;
+const syncFromContext = () => {
+    if (settings.value) {
+        settingsData.seo = { ...settingsData.seo, ...settings.value.seo };
+        settingsData.openGraph = { ...settingsData.openGraph, ...settings.value.openGraph };
+
+        if (settings.value.schema) {
+            const savedSchema = settings.value.schema as any;
+            if (savedSchema.config) {
+                schemaData.config = { ...savedSchema.config };
+            }
+            if (savedSchema.fieldMapping) {
+                schemaData.fieldMapping = { ...savedSchema.fieldMapping };
+            }
+        }
     }
+};
+
+const syncToContext = () => {
+    settings.value.seo = { ...settingsData.seo } as any;
+    settings.value.openGraph = { ...settingsData.openGraph } as any;
+    settings.value.schema = {
+        config: { ...schemaData.config },
+        fieldMapping: { ...schemaData.fieldMapping },
+    } as any;
+};
+
+const handleSave = async () => {
+    syncToContext();
+    await saveSettings();
 };
 
 watch(isDirty, (val) => {
     emit("dirty-change", val);
 });
 
-watch(isSaving, (val) => {
+watch(loading, (val) => {
     emit("saving-change", val);
 });
 
-onMounted(() => {
-    originalData.value = JSON.stringify(formData);
+watch([settingsData, schemaData], () => {
+    syncToContext();
+}, { deep: true });
+
+onMounted(async () => {
+    await loadSettings();
+    syncFromContext();
 });
 
 defineExpose({ handleSave });
@@ -208,4 +271,59 @@ defineExpose({ handleSave });
 
 <style scoped>
 @import "../../styles/components/views/settings-view/desktop.css";
+
+.schema-type-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--bg-secondary, #f8f9fa);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: var(--text-secondary, #666);
+}
+
+.schema-type-info strong {
+    color: var(--primary, #3b82f6);
+}
+
+.schema-subsection {
+    margin-bottom: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border, #e5e7eb);
+}
+
+.schema-subsection:first-of-type {
+    border-top: none;
+    padding-top: 0;
+}
+
+.subsection-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary, #1f2937);
+    margin-bottom: 8px;
+}
+
+.subsection-note {
+    font-size: 12px;
+    color: var(--text-secondary, #666);
+    margin-bottom: 16px;
+}
+
+.field-inline {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.field-inline .field-label {
+    min-width: 140px;
+    margin-bottom: 0;
+}
+
+.field-inline .field-input {
+    flex: 1;
+}
 </style>

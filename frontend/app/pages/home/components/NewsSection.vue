@@ -12,10 +12,14 @@
                 </NuxtLink>
             </div>
 
-            <div class="news-grid">
+            <div v-if="loading" class="loading-state">
+                <Icon name="mdi:loading" class="spin" />
+            </div>
+
+            <div v-else class="news-grid">
                 <NuxtLink v-for="post in recentPosts" :key="post.id" :to="`/post/${post.slug}`" class="news-card">
                     <div class="card-image">
-                        <img :src="post.thumbnail" :alt="post.title" loading="lazy" />
+                        <img :src="post.thumbnail || post.image" :alt="post.title" loading="lazy" />
                         <span class="card-category">{{ post.category }}</span>
                     </div>
                     <div class="card-body">
@@ -25,7 +29,7 @@
                             </span>
                         </div>
                         <h3 class="card-title">{{ post.title }}</h3>
-                        <p class="card-excerpt">{{ post.description }}</p>
+                        <p class="card-excerpt">{{ post.description || post.excerpt }}</p>
                         <div class="card-footer">
                             <span class="read-more">Đọc tiếp
                                 <Icon name="mdi:arrow-right" />
@@ -34,14 +38,24 @@
                     </div>
                 </NuxtLink>
             </div>
+
+            <div v-if="!loading && recentPosts.length === 0" class="empty-state">
+                <p>Chưa có bài viết nào.</p>
+            </div>
         </div>
     </section>
 </template>
 
 <script setup>
-import { POSTS } from '../../post/postListing.cms'
+import { usePreviewContext } from '@/admin/composables/usePreviewContext'
 
-const recentPosts = computed(() => POSTS.slice(0, 3))
+const { previews, loading, loadPreviews } = usePreviewContext('collections/posts/items')
+
+onMounted(() => {
+    loadPreviews({ limitCount: 3, orderByField: 'publishedAt', orderDirection: 'desc' })
+})
+
+const recentPosts = computed(() => previews.value.slice(0, 3))
 </script>
 
 <style scoped>

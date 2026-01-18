@@ -1,6 +1,13 @@
 <template>
     <NuxtLayout name="main">
-        <main v-if="product">
+        <main v-if="loading" class="loading-wrapper">
+            <div class="container">
+                <Icon name="mdi:loading" class="spin loading-icon" />
+                <p>Đang tải sản phẩm...</p>
+            </div>
+        </main>
+
+        <main v-else-if="product" class="product-detail-wrapper">
             <section class="product-detail-content">
                 <div class="container">
                     <div class="detail-grid">
@@ -24,12 +31,12 @@
                                 <span class="price-contact" v-else>Liên hệ để được báo giá</span>
                             </div>
 
-                            <div class="features-section">
+                            <div class="features-section" v-if="product.features?.length">
                                 <h3 class="features-title">Tính năng nổi bật</h3>
                                 <ul class="features-list">
                                     <li v-for="(feature, index) in product.features" :key="index">
                                         <Icon name="mdi:check-circle" class="check-icon" />
-                                        {{ feature }}
+                                        {{ feature.text || feature }}
                                     </li>
                                 </ul>
                             </div>
@@ -47,7 +54,7 @@
                         </div>
                     </div>
 
-                    <div class="related-section">
+                    <div class="related-section" v-if="relatedProducts.length">
                         <h2 class="related-title">Sản Phẩm Liên Quan</h2>
                         <div class="related-grid">
                             <NuxtLink v-for="item in relatedProducts" :key="item.id" :to="`/product/${item.slug}`" class="related-card">
@@ -77,16 +84,30 @@
 </template>
 
 <script setup>
-import { PRODUCTS } from './productListing.cms'
+import { useDetailContext } from '@/admin/composables/useDetailContext'
+import { usePreviewContext } from '@/admin/composables/usePreviewContext'
+import { productDetailConfig } from './productDetail.cms'
+import { generateProductSchema, generateBreadcrumbSchema } from '@/admin/utils/schema-generator'
+
+const SITE_URL = 'https://sht.langochung.me'
 
 const route = useRoute()
 const slug = route.params.slug
 
-const product = computed(() => PRODUCTS.find(p => p.slug === slug))
+const { items, loading, loadItems } = useDetailContext(productDetailConfig)
+const { previews, loadPreviews } = usePreviewContext('collections/products/items')
 
-const relatedProducts = computed(() => {
-    if (!product.value) return []
-    return PRODUCTS.filter(p => p.category === product.value.category && p.id !== product.value.id).slice(0, 3)
+const product = ref(null)
+const relatedProducts = ref([])
+
+onMounted(async () => {
+    await loadItems()
+    product.value = items.value.find(p => p.slug === slug)
+
+    if (product.value) {
+        await loadPreviews({ category: product.value.category, limitCount: 4 })
+        relatedProducts.value = previews.value.filter(p => p.id !== product.value.id).slice(0, 3)
+    }
 })
 
 const formatPrice = (price) => {
@@ -99,11 +120,41 @@ const getBadgeClass = (badge) => {
     return 'badge-default'
 }
 
+const productSchema = computed(() => {
+    if (!product.value) return null
+    return generateProductSchema(product.value, SITE_URL)
+})
+
+const breadcrumbSchema = computed(() => {
+    if (!product.value) return null
+    return generateBreadcrumbSchema([
+        { name: 'Trang Chủ', url: SITE_URL },
+        { name: 'Sản Phẩm', url: `${SITE_URL}/product` },
+        { name: product.value.name, url: `${SITE_URL}/product/${product.value.slug}` },
+    ])
+})
+
 useSeoMeta({
     title: () => product.value ? `${product.value.name} - SHT Security` : 'Sản phẩm không tồn tại',
     description: () => product.value?.description || '',
     ogTitle: () => product.value?.name || '',
     ogDescription: () => product.value?.description || '',
+    ogImage: () => product.value?.image || '',
+    ogType: 'product',
+})
+
+useHead({
+    script: computed(() => {
+        if (!product.value) return []
+        const scripts = []
+        if (productSchema.value) {
+            scripts.push({ type: 'application/ld+json', innerHTML: JSON.stringify(productSchema.value) })
+        }
+        if (breadcrumbSchema.value) {
+            scripts.push({ type: 'application/ld+json', innerHTML: JSON.stringify(breadcrumbSchema.value) })
+        }
+        return scripts
+    }),
 })
 </script>
 

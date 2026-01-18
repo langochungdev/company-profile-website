@@ -1,17 +1,20 @@
-// Composable quản lý CRUD cho collection items - useDetailContext
+// Composable quản lý CRUD cho collection items với auto-sync preview
+
 import { ref, type Ref } from "vue";
-import { collection, doc, getDocs, addDoc, updateDoc, deleteDoc, query, orderBy, limit, startAfter, type Firestore, type DocumentData, type QueryDocumentSnapshot } from "firebase/firestore";
+import { collection, doc, getDocs, addDoc, updateDoc, deleteDoc, setDoc, query, orderBy, limit, startAfter, type Firestore, type DocumentData, type QueryDocumentSnapshot, type QueryConstraint } from "firebase/firestore";
 import { getFirestorePath } from "@/admin/utils/firestore";
+import { extractPreview } from "@/admin/utils/preview-extractor";
+import type { FieldConfig } from "@/admin/config/page.config";
 
 interface CollectionConfig {
     path: string;
-    itemFields?: Record<string, any>;
-    [key: string]: any;
+    itemFields?: Record<string, FieldConfig>;
+    [key: string]: unknown;
 }
 
 interface CollectionItem {
     id: string;
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 interface CollectionContentResult {
@@ -48,12 +51,37 @@ export function useDetailContext(config: CollectionConfig): CollectionContentRes
         return getFirestorePath(config.path);
     };
 
+    const getPreviewsPath = () => {
+        const itemsPath = getCollectionPath();
+        return itemsPath.replace(/\/items$/, "/previews");
+    };
+
     const getDb = (): Firestore => {
         const { $db } = useNuxtApp();
         if (!$db) {
             throw new Error("Firebase not initialized");
         }
         return $db as Firestore;
+    };
+
+    const syncPreview = async (db: Firestore, itemId: string, itemData: Record<string, unknown>) => {
+        if (!config.itemFields) return;
+
+        const preview = extractPreview(itemData, config.itemFields);
+        const previewsPath = getPreviewsPath();
+        const previewRef = doc(db, previewsPath, itemId);
+
+        await setDoc(previewRef, {
+            ...preview,
+            id: itemId,
+            updatedAt: new Date().toISOString(),
+        });
+    };
+
+    const deletePreview = async (db: Firestore, itemId: string) => {
+        const previewsPath = getPreviewsPath();
+        const previewRef = doc(db, previewsPath, itemId);
+        await deleteDoc(previewRef);
     };
 
     const loadItems = async (options: LoadOptions = {}) => {
@@ -67,7 +95,7 @@ export function useDetailContext(config: CollectionConfig): CollectionContentRes
             const collectionPath = getCollectionPath();
             const colRef = collection(db, collectionPath);
 
-            const constraints: any[] = [];
+            const constraints: QueryConstraint[] = [];
 
             if (options.orderByField) {
                 constraints.push(orderBy(options.orderByField, options.orderDirection || "asc"));
@@ -123,7 +151,7 @@ export function useDetailContext(config: CollectionConfig): CollectionContentRes
     const addItem = async (itemData: Omit<CollectionItem, "id">): Promise<string> => {
         if (import.meta.server) return "";
 
-        if (itemData.slug && checkDuplicateSlug(itemData.slug)) {
+        if (itemData.slug && checkDuplicateSlug(itemData.slug as string)) {
             throw new Error(`Slug "${itemData.slug}" đã tồn tại! Vui lòng chọn slug khác.`);
         }
 
@@ -135,17 +163,20 @@ export function useDetailContext(config: CollectionConfig): CollectionContentRes
             const collectionPath = getCollectionPath();
             const colRef = collection(db, collectionPath);
 
-            const docRef = await addDoc(colRef, {
+            const timestamp = new Date().toISOString();
+            const fullItemData = {
                 ...itemData,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-            });
+                createdAt: timestamp,
+                updatedAt: timestamp,
+            };
+
+            const docRef = await addDoc(colRef, fullItemData);
+
+            await syncPreview(db, docRef.id, fullItemData as Record<string, unknown>);
 
             const newItem: CollectionItem = {
                 id: docRef.id,
-                ...itemData,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
+                ...fullItemData,
             };
 
             items.value = [...items.value, newItem];
@@ -164,7 +195,7 @@ export function useDetailContext(config: CollectionConfig): CollectionContentRes
     const updateItem = async (id: string, data: Partial<CollectionItem>): Promise<void> => {
         if (import.meta.server) return;
 
-        if (data.slug && checkDuplicateSlug(data.slug, id)) {
+        if (data.slug && checkDuplicateSlug(data.slug as string, id)) {
             throw new Error(`Slug "${data.slug}" đã tồn tại! Vui lòng chọn slug khác.`);
         }
 
@@ -184,9 +215,14 @@ export function useDetailContext(config: CollectionConfig): CollectionContentRes
 
             await updateDoc(docRef, updateData);
 
+            const existingItem = items.value.find((item) => item.id === id);
+            const fullItem = { ...existingItem, ...updateData, id };
+
+            await syncPreview(db, id, fullItem as Record<string, unknown>);
+
             const index = items.value.findIndex((item) => item.id === id);
             if (index !== -1) {
-                items.value[index] = { ...items.value[index], ...updateData, id };
+                items.value[index] = fullItem as CollectionItem;
             }
         } catch (e) {
             error.value = e as Error;
@@ -209,6 +245,7 @@ export function useDetailContext(config: CollectionConfig): CollectionContentRes
             const docRef = doc(db, collectionPath, id);
 
             await deleteDoc(docRef);
+            await deletePreview(db, id);
 
             items.value = items.value.filter((item) => item.id !== id);
             totalItems.value = items.value.length;

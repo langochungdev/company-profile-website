@@ -1,20 +1,22 @@
 <template>
-    <section class="service-list-section">
+    <section class="service-list-wrapper">
         <div class="container">
-
             <div class="filter-bar">
                 <button v-for="cat in categories" :key="cat" class="filter-btn" :class="{ active: currentCategory === cat }" @click="setCategory(cat)">
                     {{ cat }}
                 </button>
             </div>
 
+            <div v-if="loading" class="loading-state">
+                <Icon name="mdi:loading" class="spin" />
+                <span>Đang tải dịch vụ...</span>
+            </div>
 
-            <transition-group name="fade" tag="div" class="service-grid">
-                <ServiceItem v-for="service in filteredServices" :key="service.id" :service="service" />
+            <transition-group v-else name="fade" tag="div" class="service-grid">
+                <ServiceItem v-for="service in previews" :key="service.id" :service="service" />
             </transition-group>
 
-
-            <div v-if="filteredServices.length === 0" class="empty-state">
+            <div v-if="!loading && previews.length === 0" class="empty-state">
                 <div class="empty-icon">
                     <Icon name="mdi:file-search-outline" />
                 </div>
@@ -22,13 +24,10 @@
                 <p>Vui lòng thử chọn danh mục khác</p>
             </div>
 
-
-            <div class="pagination" v-if="filteredServices.length > 0">
-                <button class="page-btn active">1</button>
-                <button class="page-btn">2</button>
-                <button class="page-btn">3</button>
-                <button class="page-btn next">
-                    <Icon name="mdi:chevron-right" />
+            <div v-if="hasMore && !loading" class="load-more-wrapper">
+                <button class="load-more-btn" @click="loadMore">
+                    <Icon name="mdi:plus" />
+                    Xem thêm dịch vụ
                 </button>
             </div>
         </div>
@@ -37,19 +36,31 @@
 
 <script setup>
 import ServiceItem from './ServiceItem.vue'
-import { SERVICES, SERVICE_CATEGORIES } from '../serviceListing.cms'
+import { usePreviewContext } from '@/admin/composables/usePreviewContext'
+
+const SERVICE_CATEGORIES = ['Tất cả', 'Camera', 'Mạng WiFi', 'Tổng đài', 'Báo cháy', 'Access Control']
 
 const categories = SERVICE_CATEGORIES
 const currentCategory = ref('Tất cả')
 
-const setCategory = (cat) => {
+const { previews, loading, hasMore, loadPreviews, loadMore: loadMorePreviews, filterByCategory } = usePreviewContext('collections/services/items')
+
+onMounted(() => {
+    loadPreviews({ limitCount: 12 })
+})
+
+const setCategory = async (cat) => {
     currentCategory.value = cat
+    if (cat === 'Tất cả') {
+        await filterByCategory(null)
+    } else {
+        await filterByCategory(cat)
+    }
 }
 
-const filteredServices = computed(() => {
-    if (currentCategory.value === 'Tất cả') return SERVICES
-    return SERVICES.filter(service => service.category === currentCategory.value)
-})
+const loadMore = () => {
+    loadMorePreviews()
+}
 </script>
 
 <style scoped>

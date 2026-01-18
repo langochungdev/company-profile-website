@@ -1,6 +1,13 @@
 <template>
     <NuxtLayout name="main">
-        <main v-if="post">
+        <main v-if="loading" class="loading-wrapper">
+            <div class="container">
+                <Icon name="mdi:loading" class="spin loading-icon" />
+                <p>Đang tải bài viết...</p>
+            </div>
+        </main>
+
+        <main v-else-if="post" class="post-detail-wrapper">
             <article class="post-detail-content">
                 <div class="container">
                     <div class="post-grid">
@@ -20,28 +27,10 @@
                             <h1 class="post-title">{{ post.title }}</h1>
 
                             <div class="post-thumbnail">
-                                <img :src="post.thumbnail" :alt="post.title" />
+                                <img :src="post.thumbnail || post.image" :alt="post.title" />
                             </div>
 
-                            <div class="post-body">
-                                <p class="lead">{{ post.description }}</p>
-
-                                <h2>Giới thiệu</h2>
-                                <p>Trong bối cảnh công nghệ phát triển nhanh chóng, việc cập nhật những xu hướng mới nhất là điều cần thiết cho mọi doanh nghiệp. Bài viết này sẽ chia sẻ những thông tin hữu ích và giải pháp thiết thực.</p>
-
-                                <h2>Nội dung chính</h2>
-                                <p>Chúng tôi đã nghiên cứu và tổng hợp những kiến thức chuyên sâu từ các chuyên gia hàng đầu trong lĩnh vực này. Dưới đây là những điểm quan trọng mà bạn cần biết:</p>
-
-                                <ul>
-                                    <li>Phân tích xu hướng thị trường hiện tại</li>
-                                    <li>So sánh các giải pháp công nghệ phổ biến</li>
-                                    <li>Đề xuất lộ trình triển khai phù hợp</li>
-                                    <li>Chi phí đầu tư và ROI dự kiến</li>
-                                </ul>
-
-                                <h2>Kết luận</h2>
-                                <p>Với những thông tin đã chia sẻ, hy vọng bạn có thể đưa ra quyết định phù hợp cho doanh nghiệp của mình. Nếu cần tư vấn thêm, đừng ngại liên hệ với đội ngũ chuyên gia của SHT Security.</p>
-                            </div>
+                            <div class="post-body" v-html="post.content || defaultContent"></div>
 
                             <div class="post-tags">
                                 <span class="tag">{{ post.category }}</span>
@@ -73,11 +62,11 @@
                                 </NuxtLink>
                             </div>
 
-                            <div class="sidebar-related">
+                            <div class="sidebar-related" v-if="relatedPosts.length">
                                 <h3>Bài Viết Liên Quan</h3>
                                 <div class="related-list">
                                     <NuxtLink v-for="item in relatedPosts" :key="item.id" :to="`/post/${item.slug}`" class="related-item">
-                                        <img :src="item.thumbnail" :alt="item.title" class="related-thumb" />
+                                        <img :src="item.thumbnail || item.image" :alt="item.title" class="related-thumb" />
                                         <div class="related-info">
                                             <span class="related-date">{{ item.publishedAt }}</span>
                                             <h4 class="related-title">{{ item.title }}</h4>
@@ -103,24 +92,69 @@
 </template>
 
 <script setup>
-import { POSTS } from './postListing.cms'
+import { usePreviewContext } from '@/admin/composables/usePreviewContext'
+import { generatePostSchema, generateBreadcrumbSchema } from '@/admin/utils/schema-generator'
+
+const SITE_URL = 'https://sht.langochung.me'
 
 const route = useRoute()
 const slug = route.params.slug
 
-const post = computed(() => POSTS.find(p => p.slug === slug))
+const { previews, loading, loadPreviews } = usePreviewContext('collections/posts/items')
 
-const relatedPosts = computed(() => {
-    if (!post.value) return []
-    return POSTS.filter(p => p.category === post.value.category && p.id !== post.value.id).slice(0, 3)
+const post = ref(null)
+const relatedPosts = ref([])
+
+const defaultContent = `
+    <p class="lead">Bài viết đang được cập nhật nội dung...</p>
+    <h2>Giới thiệu</h2>
+    <p>Trong bối cảnh công nghệ phát triển nhanh chóng, việc cập nhật những xu hướng mới nhất là điều cần thiết cho mọi doanh nghiệp.</p>
+`
+
+onMounted(async () => {
+    await loadPreviews({ limitCount: 50 })
+    post.value = previews.value.find(p => p.slug === slug)
+
+    if (post.value) {
+        relatedPosts.value = previews.value.filter(p => p.category === post.value.category && p.id !== post.value.id).slice(0, 3)
+    }
+})
+
+const postSchema = computed(() => {
+    if (!post.value) return null
+    return generatePostSchema(post.value, SITE_URL)
+})
+
+const breadcrumbSchema = computed(() => {
+    if (!post.value) return null
+    return generateBreadcrumbSchema([
+        { name: 'Trang Chủ', url: SITE_URL },
+        { name: 'Tin Tức', url: `${SITE_URL}/post` },
+        { name: post.value.title, url: `${SITE_URL}/post/${post.value.slug}` },
+    ])
 })
 
 useSeoMeta({
     title: () => post.value ? `${post.value.title} - SHT Security Blog` : 'Bài viết không tồn tại',
-    description: () => post.value?.description || '',
+    description: () => post.value?.description || post.value?.excerpt || '',
     ogTitle: () => post.value?.title || '',
-    ogDescription: () => post.value?.description || '',
-    ogImage: () => post.value?.thumbnail || '',
+    ogDescription: () => post.value?.description || post.value?.excerpt || '',
+    ogImage: () => post.value?.thumbnail || post.value?.image || '',
+    ogType: 'article',
+})
+
+useHead({
+    script: computed(() => {
+        if (!post.value) return []
+        const scripts = []
+        if (postSchema.value) {
+            scripts.push({ type: 'application/ld+json', innerHTML: JSON.stringify(postSchema.value) })
+        }
+        if (breadcrumbSchema.value) {
+            scripts.push({ type: 'application/ld+json', innerHTML: JSON.stringify(breadcrumbSchema.value) })
+        }
+        return scripts
+    }),
 })
 </script>
 

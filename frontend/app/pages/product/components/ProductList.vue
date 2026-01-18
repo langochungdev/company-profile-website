@@ -1,7 +1,6 @@
 <template>
-    <section class="product-list-section">
+    <section class="product-list-wrapper">
         <div class="container">
-
             <div class="filter-wrapper">
                 <div class="filter-label">Danh mục:</div>
                 <div class="filter-list">
@@ -11,18 +10,28 @@
                 </div>
             </div>
 
-
-            <div class="product-grid">
-                <ProductItem v-for="product in filteredProducts" :key="product.id" :product="product" />
+            <div v-if="loading" class="loading-state">
+                <Icon name="mdi:loading" class="spin" />
+                <span>Đang tải sản phẩm...</span>
             </div>
 
+            <div v-else class="product-grid">
+                <ProductItem v-for="product in previews" :key="product.id" :product="product" />
+            </div>
 
-            <div v-if="filteredProducts.length === 0" class="empty-state">
+            <div v-if="!loading && previews.length === 0" class="empty-state">
                 <div class="empty-icon">
                     <Icon name="mdi:package-variant-closed-remove" />
                 </div>
                 <h3>Không tìm thấy sản phẩm</h3>
                 <p>Vui lòng thử chọn danh mục khác</p>
+            </div>
+
+            <div v-if="hasMore && !loading" class="load-more-wrapper">
+                <button class="load-more-btn" @click="loadMore">
+                    <Icon name="mdi:plus" />
+                    Xem thêm sản phẩm
+                </button>
             </div>
         </div>
     </section>
@@ -30,19 +39,38 @@
 
 <script setup>
 import ProductItem from './ProductItem.vue'
-import { PRODUCTS, PRODUCT_CATEGORIES } from '../productListing.cms'
+import { usePreviewContext } from '@/admin/composables/usePreviewContext'
 
-const categories = PRODUCT_CATEGORIES
-const currentCategory = ref('Tất cả')
-
-const setCategory = (cat) => {
-    currentCategory.value = cat
+const LISTING_CONFIG = {
+    gridColumns: 3,
+    itemsPerPage: 12,
+    showPrice: true,
+    showBadge: true,
 }
 
-const filteredProducts = computed(() => {
-    if (currentCategory.value === 'Tất cả') return PRODUCTS
-    return PRODUCTS.filter(product => product.category === currentCategory.value)
+const CATEGORIES = ['Tất cả', 'Camera AI', 'WiFi Doanh Nghiệp', 'Switch & Router', 'Báo Cháy', 'Access Control']
+
+const categories = CATEGORIES
+const currentCategory = ref('Tất cả')
+
+const { previews, loading, hasMore, loadPreviews, loadMore: loadMorePreviews, filterByCategory } = usePreviewContext('collections/products/items')
+
+onMounted(() => {
+    loadPreviews({ limitCount: LISTING_CONFIG.itemsPerPage })
 })
+
+const setCategory = async (cat) => {
+    currentCategory.value = cat
+    if (cat === 'Tất cả') {
+        await filterByCategory(null)
+    } else {
+        await filterByCategory(cat)
+    }
+}
+
+const loadMore = () => {
+    loadMorePreviews()
+}
 </script>
 
 <style scoped>

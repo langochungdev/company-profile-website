@@ -1,20 +1,22 @@
 <template>
-    <section class="post-list-section">
+    <section class="post-list-wrapper">
         <div class="container">
-
             <div class="filter-bar">
                 <button v-for="cat in categories" :key="cat" class="filter-btn" :class="{ active: currentCategory === cat }" @click="setCategory(cat)">
                     {{ cat }}
                 </button>
             </div>
 
+            <div v-if="loading" class="loading-state">
+                <Icon name="mdi:loading" class="spin" />
+                <span>Đang tải bài viết...</span>
+            </div>
 
-            <transition-group name="fade" tag="div" class="post-grid">
-                <PostItem v-for="post in filteredPosts" :key="post.id" :post="post" />
+            <transition-group v-else name="fade" tag="div" class="post-grid">
+                <PostItem v-for="post in previews" :key="post.id" :post="post" />
             </transition-group>
 
-
-            <div v-if="filteredPosts.length === 0" class="empty-state">
+            <div v-if="!loading && previews.length === 0" class="empty-state">
                 <div class="empty-icon">
                     <Icon name="mdi:file-search-outline" />
                 </div>
@@ -22,13 +24,10 @@
                 <p>Vui lòng thử chọn danh mục khác</p>
             </div>
 
-
-            <div class="pagination" v-if="filteredPosts.length > 0">
-                <button class="page-btn active">1</button>
-                <button class="page-btn">2</button>
-                <button class="page-btn">3</button>
-                <button class="page-btn next">
-                    <Icon name="mdi:chevron-right" />
+            <div v-if="hasMore && !loading" class="load-more-wrapper">
+                <button class="load-more-btn" @click="loadMore">
+                    <Icon name="mdi:plus" />
+                    Xem thêm bài viết
                 </button>
             </div>
         </div>
@@ -37,19 +36,31 @@
 
 <script setup>
 import PostItem from './PostItem.vue'
-import { POSTS, POST_CATEGORIES } from '../postListing.cms'
+import { usePreviewContext } from '@/admin/composables/usePreviewContext'
+
+const POST_CATEGORIES = ['Tất cả', 'Công nghệ', 'Hướng dẫn', 'Tin tức', 'Sự kiện']
 
 const categories = POST_CATEGORIES
 const currentCategory = ref('Tất cả')
 
-const setCategory = (cat) => {
+const { previews, loading, hasMore, loadPreviews, loadMore: loadMorePreviews, filterByCategory } = usePreviewContext('collections/posts/items')
+
+onMounted(() => {
+    loadPreviews({ limitCount: 12 })
+})
+
+const setCategory = async (cat) => {
     currentCategory.value = cat
+    if (cat === 'Tất cả') {
+        await filterByCategory(null)
+    } else {
+        await filterByCategory(cat)
+    }
 }
 
-const filteredPosts = computed(() => {
-    if (currentCategory.value === 'Tất cả') return POSTS
-    return POSTS.filter(post => post.category === currentCategory.value)
-})
+const loadMore = () => {
+    loadMorePreviews()
+}
 </script>
 
 <style scoped>

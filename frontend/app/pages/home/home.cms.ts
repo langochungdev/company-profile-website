@@ -6,6 +6,7 @@ export const homeConfig = {
     order: 1,
     group: "Trang",
     componentBase: "components",
+    schemaType: "home",
 
     sections: {
         hero: {
