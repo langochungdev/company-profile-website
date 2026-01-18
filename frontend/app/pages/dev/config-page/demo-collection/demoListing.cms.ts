@@ -1,4 +1,4 @@
-import type { ListingConfig } from "@/types/cms.type";
+import type { ListingConfig } from "@/admin/types/cms.type";
 
 export const demoListingConfig: ListingConfig = {
     type: "listing",

@@ -1,4 +1,4 @@
-import type { DetailConfig } from "@/types/cms.type";
+import type { DetailConfig } from "@/admin/types/cms.type";
 
 export const demoDetailConfig: DetailConfig = {
     type: "detail",

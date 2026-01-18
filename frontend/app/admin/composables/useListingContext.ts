@@ -1,8 +1,8 @@
 // Composable quản lý Listing Settings - useListingContext
 import { ref, type Ref } from "vue";
 import { doc, getDoc, setDoc, type Firestore } from "firebase/firestore";
-import { getFirestorePath } from "@/utils/firestore";
-import type { ListingSettings } from "@/types/cms.type";
+import { getFirestorePath } from "@/admin/utils/firestore";
+import type { ListingSettings } from "@/admin/types/cms.type";
 
 interface ListingSettingsResult {
     settings: Ref<ListingSettings | null>;

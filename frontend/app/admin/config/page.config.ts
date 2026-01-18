@@ -1,7 +1,7 @@
 // Admin Page Config Registry - Auto-Discovery Architecture
 
-import type { CmsConfig, ParsedCmsConfig } from "@/types/cms.type";
-import { SIDEBAR_ORDER } from "@/pages/admin/sidebar.config";
+import type { CmsConfig, ParsedCmsConfig } from "@/admin/types/cms.type";
+import { SIDEBAR_ORDER } from "@/admin/sidebar.config";
 
 const cmsModules = import.meta.glob("/pages/**/*.cms.ts", { eager: true });
 

@@ -117,8 +117,8 @@
 import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { demoDetailConfig } from './demoDetail.cms'
-import { useDetailContext } from '@/composables/useDetailContext'
-import { getFirestoreInfo, getFirestorePath } from '@/utils/firestore'
+import { useDetailContext } from '@/admin/composables/useDetailContext'
+import { getFirestoreInfo, getFirestorePath } from '@/admin/utils/firestore'
 
 const route = useRoute()
 const envInfo = getFirestoreInfo()

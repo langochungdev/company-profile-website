@@ -332,14 +332,14 @@
 <script setup lang="ts">
 import { ref, computed, watch, defineComponent, h, unref } from 'vue'
 import { doc, deleteDoc, type Firestore } from 'firebase/firestore'
-import { SIDEBAR_PAGES } from '~/pages/admin/config/page.config'
+import { SIDEBAR_PAGES } from '@/admin/config/page.config'
 import { demoConfig } from './demo-page/demo.cms'
 import { demoListingConfig } from './demo-collection/demoListing.cms'
 import { demoDetailConfig } from './demo-collection/demoDetail.cms'
-import { usePageContext } from '@/composables/usePageContext'
-import { useDetailContext } from '@/composables/useDetailContext'
-import { getFirestoreInfo, getFirestorePath } from '@/utils/firestore'
-import type { PageConfig } from '~/pages/admin/config/page.config'
+import { usePageContext } from '@/admin/composables/usePageContext'
+import { useDetailContext } from '@/admin/composables/useDetailContext'
+import { getFirestoreInfo, getFirestorePath } from '@/admin/utils/firestore'
+import type { PageConfig } from '@/admin/config/page.config'
 
 const envInfo = getFirestoreInfo()
 

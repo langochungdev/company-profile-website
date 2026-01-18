@@ -50,9 +50,9 @@
 <script setup lang="ts">
 import { onMounted, computed } from 'vue'
 import { demoConfig } from './demo.cms'
-import { usePageContext } from '@/composables/usePageContext'
-import { getFirestoreInfo, getFirestorePath } from '@/utils/firestore'
-import type { PageConfig } from '~/pages/admin/config/page.config'
+import { usePageContext } from '@/admin/composables/usePageContext'
+import { getFirestoreInfo, getFirestorePath } from '@/admin/utils/firestore'
+import type { PageConfig } from '@/admin/config/page.config'
 
 const envInfo = getFirestoreInfo()
 const firestorePath = computed(() => getFirestorePath(demoConfig.path))

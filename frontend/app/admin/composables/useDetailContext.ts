@@ -1,7 +1,7 @@
 // Composable quản lý CRUD cho collection items - useDetailContext
 import { ref, type Ref } from "vue";
 import { collection, doc, getDocs, addDoc, updateDoc, deleteDoc, query, orderBy, limit, startAfter, type Firestore, type DocumentData, type QueryDocumentSnapshot } from "firebase/firestore";
-import { getFirestorePath } from "@/utils/firestore";
+import { getFirestorePath } from "@/admin/utils/firestore";
 
 interface CollectionConfig {
     path: string;

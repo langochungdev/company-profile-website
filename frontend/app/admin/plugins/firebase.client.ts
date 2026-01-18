@@ -1,4 +1,4 @@
-import { initFirebase } from "~/config/firebase.config";
+import { initFirebase } from "@/admin/config/firebase.config";
 
 export default defineNuxtPlugin(() => {
     const config = useRuntimeConfig();

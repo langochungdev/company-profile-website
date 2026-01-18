@@ -101,8 +101,8 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { demoListingConfig } from './demoListing.cms'
-import { useDetailContext } from '@/composables/useDetailContext'
-import { getFirestoreInfo, getFirestorePath } from '@/utils/firestore'
+import { useDetailContext } from '@/admin/composables/useDetailContext'
+import { getFirestoreInfo, getFirestorePath } from '@/admin/utils/firestore'
 
 const envInfo = getFirestoreInfo()
 const firestorePath = computed(() => getFirestorePath(demoListingConfig.path))
