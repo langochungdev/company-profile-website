@@ -46,6 +46,6 @@ const filteredProducts = computed(() => {
 </script>
 
 <style scoped>
-@import "../styles/product-list/desktop.css";
-@import "../styles/product-list/mobile.css";
+@import "@/styles/product/product-list/desktop.css";
+@import "@/styles/product/product-list/mobile.css";
 </style>

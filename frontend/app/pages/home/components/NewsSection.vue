@@ -45,6 +45,6 @@ const recentPosts = computed(() => POSTS.slice(0, 3))
 </script>
 
 <style scoped>
-@import "../styles/news-section/desktop.css";
-@import "../styles/news-section/mobile.css";
+@import "@/styles/home/news-section/desktop.css";
+@import "@/styles/home/news-section/mobile.css";
 </style>

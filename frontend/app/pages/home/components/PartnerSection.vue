@@ -30,6 +30,6 @@ const pausePartners = ref(false)
 </script>
 
 <style scoped>
-@import "../styles/partner-section/desktop.css";
-@import "../styles/partner-section/mobile.css";
+@import "@/styles/home/partner-section/desktop.css";
+@import "@/styles/home/partner-section/mobile.css";
 </style>

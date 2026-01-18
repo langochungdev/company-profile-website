@@ -128,6 +128,6 @@ function getGridClass(index: number) {
 </script>
 
 <style scoped>
-@import "../styles/services-section/desktop.css";
-@import "../styles/services-section/mobile.css";
+@import "@/styles/home/services-section/desktop.css";
+@import "@/styles/home/services-section/mobile.css";
 </style>

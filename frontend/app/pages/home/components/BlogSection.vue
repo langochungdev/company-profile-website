@@ -91,6 +91,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-@import "../styles/blog-section/desktop.css";
-@import "../styles/blog-section/mobile.css";
+@import "@/styles/home/blog-section/desktop.css";
+@import "@/styles/home/blog-section/mobile.css";
 </style>

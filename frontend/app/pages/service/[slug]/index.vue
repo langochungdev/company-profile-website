@@ -147,6 +147,6 @@ useSeoMeta({
 </script>
 
 <style scoped>
-@import "../styles/slug/desktop.css";
-@import "../styles/slug/mobile.css";
+@import "@/styles/service/slug/desktop.css";
+@import "@/styles/service/slug/mobile.css";
 </style>

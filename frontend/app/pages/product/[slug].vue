@@ -77,7 +77,7 @@
 </template>
 
 <script setup>
-import { PRODUCTS } from '../productListing.cms'
+import { PRODUCTS } from './productListing.cms'
 
 const route = useRoute()
 const slug = route.params.slug
@@ -108,6 +108,6 @@ useSeoMeta({
 </script>
 
 <style scoped>
-@import "./styles/product-detail/desktop.css";
-@import "./styles/product-detail/mobile.css";
+@import "@/styles/product/slug/desktop.css";
+@import "@/styles/product/slug/mobile.css";
 </style>

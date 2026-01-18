@@ -55,6 +55,6 @@ const getBadgeClass = (badge) => {
 </script>
 
 <style scoped>
-@import "../styles/product-item/desktop.css";
-@import "../styles/product-item/mobile.css";
+@import "@/styles/product/product-item/desktop.css";
+@import "@/styles/product/product-item/mobile.css";
 </style>

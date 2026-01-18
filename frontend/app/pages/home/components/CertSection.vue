@@ -62,6 +62,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-@import "../styles/cert-section/desktop.css";
-@import "../styles/cert-section/mobile.css";
+@import "@/styles/home/cert-section/desktop.css";
+@import "@/styles/home/cert-section/mobile.css";
 </style>

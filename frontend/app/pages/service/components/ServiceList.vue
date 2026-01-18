@@ -53,6 +53,6 @@ const filteredServices = computed(() => {
 </script>
 
 <style scoped>
-@import "../styles/service-list/desktop.css";
-@import "../styles/service-list/mobile.css";
+@import "@/styles/service/service-list/desktop.css";
+@import "@/styles/service/service-list/mobile.css";
 </style>

@@ -156,6 +156,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-@import "../styles/project-section/desktop.css";
-@import "../styles/project-section/mobile.css";
+@import "@/styles/home/project-section/desktop.css";
+@import "@/styles/home/project-section/mobile.css";
 </style>

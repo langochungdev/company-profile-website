@@ -103,7 +103,7 @@
 </template>
 
 <script setup>
-import { POSTS } from '../postListing.cms'
+import { POSTS } from './postListing.cms'
 
 const route = useRoute()
 const slug = route.params.slug
@@ -125,6 +125,6 @@ useSeoMeta({
 </script>
 
 <style scoped>
-@import "../styles/slug/desktop.css";
-@import "../styles/slug/mobile.css";
+@import "@/styles/post/slug/desktop.css";
+@import "@/styles/post/slug/mobile.css";
 </style>

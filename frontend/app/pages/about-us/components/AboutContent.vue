@@ -91,6 +91,6 @@ const values = [
 </script>
 
 <style scoped>
-@import "../styles/about-content/desktop.css";
-@import "../styles/about-content/mobile.css";
+@import "@/styles/about-us/about-content/desktop.css";
+@import "@/styles/about-us/about-content/mobile.css";
 </style>

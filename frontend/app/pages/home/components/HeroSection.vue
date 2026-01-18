@@ -149,8 +149,8 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-@import "../styles/hero-section/desktop.css";
-@import "../styles/hero-section/mobile.css";
+@import "@/styles/home/hero-section/desktop.css";
+@import "@/styles/home/hero-section/mobile.css";
 
 .is-editable .editable-field {
     position: relative;
