@@ -130,7 +130,9 @@ export interface FieldConfig {
 
 export interface SectionConfig {
     label: string;
+    component?: string;
     collapsed?: boolean;
+    visible?: boolean;
     fields: Record<string, FieldConfig>;
 }
 
@@ -149,6 +151,7 @@ export interface PageConfig {
     order: number;
     group?: string;
     type?: "page" | "listing";
+    componentBase?: string;
     sections: Record<string, SectionConfig>;
     listConfig?: any;
     detailConfig?: any;

@@ -6,7 +6,7 @@
         <AdminSidebar :pages="sidebarPages" :active-page="activePage" :is-collapsed="isSidebarCollapsed" @toggle="toggleSidebar" @switch="switchPage" />
 
         <main :class="['admin-main', { 'sidebar-collapsed': isSidebarCollapsed }]">
-            <AdminHeader :page-name="currentPageName" :has-changes="hasChanges" @save="saveForm" />
+            <AdminHeader :page-name="currentPageName" :has-changes="hasChanges" :is-saving="isSaving" :show-save-button="showHeaderSaveButton" :tabs="headerTabs" :active-tab="currentActiveTab" @save="handleGlobalSave" @tab-change="handleTabChange" />
 
             <div class="admin-content">
                 <div v-if="loading" class="loading-state">
@@ -14,20 +14,14 @@
                     <p>Đang tải dữ liệu...</p>
                 </div>
 
+                <template v-else-if="!isCollectionPage">
+                    <LiveEditView ref="liveEditRef" v-if="activeContentTab === 'live'" :page-key="activePage" @dirty-change="hasChanges = $event" @saving-change="isSaving = $event" />
+
+                    <SettingsView ref="settingsRef" v-else :page-key="activePage" :page-name="currentPageName" @dirty-change="hasChanges = $event" @saving-change="isSaving = $event" />
+                </template>
+
                 <div v-else-if="currentConfig" class="editor-container">
                     <div v-if="isCollectionPage" class="collection-page">
-                        <div class="page-tabs">
-                            <button :class="['tab-btn', { active: activeTab === 'items' }]" @click="activeTab = 'items'">
-                                <Icon :name="currentConfig.icon || 'mdi:view-list'" />
-                                <span>{{ getCollectionName }}</span>
-                                <span class="tab-count">{{ itemsList.length }}</span>
-                            </button>
-                            <button :class="['tab-btn', { active: activeTab === 'settings' }]" @click="activeTab = 'settings'">
-                                <Icon name="mdi:cog" />
-                                <span>Cài đặt trang</span>
-                            </button>
-                        </div>
-
                         <div v-if="activeTab === 'items'" class="items-content">
                             <div class="items-toolbar">
                                 <div class="search-box">
@@ -80,18 +74,6 @@
                             </AdminSection>
                         </div>
                     </div>
-
-                    <template v-else>
-                        <AdminSection v-for="(section, sectionKey) in currentConfig.sections" :key="sectionKey" :label="section.label" :is-collapsed="collapsedSections[sectionKey as string] ?? section.collapsed ?? false" @toggle="toggleSection(sectionKey as string)">
-                            <template v-for="(field, fieldKey) in section.fields" :key="fieldKey">
-                                <AdminGroupField v-if="field.type === 'group'" :field="field">
-                                    <AdminField v-for="(subField, subKey) in field.fields" :key="subKey" :field="(subField as any)" :model-value="getFieldValue(sectionKey as string, fieldKey as string, subKey as string)" @update:model-value="setFieldValue(sectionKey as string, fieldKey as string, subKey as string, $event)" />
-                                </AdminGroupField>
-                                <AdminArrayField v-else-if="field.type === 'array'" :field="field as any" :model-value="(getFieldValue(sectionKey, fieldKey) as any[]) || []" @update:model-value="setFieldValue(sectionKey as string, fieldKey as string, null, $event)" />
-                                <AdminField v-else :field="(field as any)" :model-value="getFieldValue(sectionKey as string, fieldKey as string)" @update:model-value="setFieldValue(sectionKey as string, fieldKey as string, null, $event)" />
-                            </template>
-                        </AdminSection>
-                    </template>
                 </div>
             </div>
         </main>
@@ -113,6 +95,8 @@ import AdminArrayField from "./components/AdminArrayField.vue";
 import AdminGroupField from "./components/AdminGroupField.vue";
 import AdminItemsList from "./components/AdminItemsList.vue";
 import AdminItemEditor from "./components/AdminItemEditor.vue";
+import LiveEditView from "./components/LiveEditView.vue";
+import SettingsView from "./components/SettingsView.vue";
 import { PAGE_CONFIGS, getAllPages, getPageConfig, isCollectionPage as checkIsCollection, getListingConfig, getDetailConfig } from "./page.config";
 
 definePageMeta({ layout: false });
@@ -128,12 +112,17 @@ const sidebarPages = computed(() => {
 
 const activePage = ref("home");
 const activeTab = ref<"items" | "settings">("items");
+const activeContentTab = ref<"live" | "settings">("live");
 const formData = ref<Record<string, Record<string, Record<string, unknown>>>>({});
 const collapsedSections = ref<Record<string, boolean>>({});
 const isSidebarCollapsed = ref(false);
 const isMobileMenuOpen = ref(false);
 const hasChanges = ref(false);
+const isSaving = ref(false);
 const loading = ref(false);
+
+const liveEditRef = ref<{ handleSave: () => Promise<void> } | null>(null);
+const settingsRef = ref<{ handleSave: () => Promise<void> } | null>(null);
 
 const isEditorOpen = ref(false);
 const isNewItem = ref(true);
@@ -170,6 +159,41 @@ const itemConfigForList = computed(() => ({
     namePlural: getCollectionName.value,
     icon: currentConfig.value?.icon || "mdi:file",
 }));
+
+interface TabItem {
+    key: string
+    label: string
+    icon: string
+    count?: number
+}
+
+const headerTabs = computed<TabItem[]>(() => {
+    if (isCollectionPage.value) {
+        return [
+            { key: "items", label: getCollectionName.value, icon: currentConfig.value?.icon || "mdi:view-list", count: itemsList.value.length },
+            { key: "settings", label: "Cài đặt", icon: "mdi:cog" },
+        ];
+    }
+    return [
+        { key: "live", label: "Live Edit", icon: "mdi:eye" },
+        { key: "settings", label: "Cài đặt", icon: "mdi:cog" },
+    ];
+});
+
+const currentActiveTab = computed(() => (isCollectionPage.value ? activeTab.value : activeContentTab.value));
+
+const showHeaderSaveButton = computed(() => {
+    if (isCollectionPage.value) return activeTab.value === "settings";
+    return true;
+});
+
+const handleTabChange = (key: string) => {
+    if (isCollectionPage.value) {
+        activeTab.value = key as "items" | "settings";
+    } else {
+        activeContentTab.value = key as "live" | "settings";
+    }
+};
 
 const filteredItems = computed(() => {
     let items = [...itemsList.value];
@@ -212,12 +236,24 @@ const paginatedItems = computed(() => {
 const switchPage = (pageKey: string) => {
     activePage.value = pageKey;
     activeTab.value = checkIsCollection(pageKey) ? "items" : "settings";
+    activeContentTab.value = "live";
     isMobileMenuOpen.value = false;
     searchQuery.value = "";
     sortBy.value = "";
     activeFilters.value = {};
     currentPage.value = 1;
     loadPageData();
+};
+
+const handleGlobalSave = async () => {
+    if (isCollectionPage.value) return;
+
+    if (activeContentTab.value === "live") {
+        await liveEditRef.value?.handleSave();
+    } else {
+        await settingsRef.value?.handleSave();
+    }
+    hasChanges.value = false;
 };
 
 const loadPageData = async () => {

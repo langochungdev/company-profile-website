@@ -56,3 +56,46 @@
     width: 24px;
     height: 24px;
 }
+
+.content-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 6px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 20px;
+    width: fit-content;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.content-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.content-tab:hover {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+.content-tab.active {
+    background: #3b82f6;
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.content-tab svg {
+    width: 18px;
+    height: 18px;
+}

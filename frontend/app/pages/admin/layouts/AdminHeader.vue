@@ -1,4 +1,4 @@
-<!-- Chức năng: Header với breadcrumb và nút Save cho admin panel -->
+<!-- Chức năng: Header với breadcrumb, tabs và nút Save global cho admin panel -->
 <template>
     <header class="admin-header">
         <div class="breadcrumb">
@@ -7,27 +7,43 @@
             <span class="breadcrumb-item active">{{ pageName }}</span>
         </div>
 
-        <div class="header-actions">
-            <button class="preview-btn">
-                <Icon name="mdi:eye" />
-                <span>Preview</span>
+        <div v-if="tabs?.length" class="header-tabs">
+            <button v-for="tab in tabs" :key="tab.key" :class="['header-tab', { active: activeTab === tab.key }]" @click="$emit('tab-change', tab.key)">
+                <Icon :name="tab.icon" />
+                <span>{{ tab.label }}</span>
+                <span v-if="tab.count !== undefined" class="tab-count">{{ tab.count }}</span>
             </button>
-            <button :class="['save-btn', { 'has-changes': hasChanges }]" @click="$emit('save')">
-                <Icon name="mdi:content-save" />
-                <span>Lưu thay đổi</span>
+        </div>
+
+        <div class="header-actions">
+            <button v-if="showSaveButton" :class="['save-btn', { 'has-changes': hasChanges, disabled: isSaving }]" :disabled="!hasChanges || isSaving" @click="$emit('save')">
+                <Icon :name="isSaving ? 'mdi:loading' : 'mdi:content-save'" :class="{ spin: isSaving }" />
+                <span>{{ isSaving ? 'Đang lưu...' : 'Lưu thay đổi' }}</span>
             </button>
         </div>
     </header>
 </template>
 
 <script setup lang="ts">
+interface TabItem {
+    key: string
+    label: string
+    icon: string
+    count?: number
+}
+
 defineProps<{
     pageName: string
-    hasChanges: boolean
+    hasChanges?: boolean
+    isSaving?: boolean
+    showSaveButton?: boolean
+    tabs?: TabItem[]
+    activeTab?: string
 }>()
 
 defineEmits<{
     save: []
+    'tab-change': [key: string]
 }>()
 </script>
 
@@ -67,78 +83,145 @@ defineEmits<{
     color: #9ca3af;
 }
 
+.header-tabs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #f3f4f6;
+    padding: 4px;
+    border-radius: 10px;
+}
+
+.header-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.header-tab:hover {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.header-tab.active {
+    background: #ffffff;
+    color: #111827;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.header-tab svg {
+    width: 16px;
+    height: 16px;
+}
+
+.header-tab .tab-count {
+    padding: 2px 6px;
+    background: #e5e7eb;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.header-tab.active .tab-count {
+    background: #3b82f6;
+    color: #ffffff;
+}
+
 .header-actions {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.preview-btn,
 .save-btn {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 16px;
-    border-radius: 6px;
+    padding: 10px 20px;
+    border-radius: 8px;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
     border: none;
+    background: #e2e8f0;
+    color: #64748b;
 }
 
-.preview-btn {
-    background: #e5e7eb;
-    color: #374151;
-}
-
-.preview-btn:hover {
-    background: #d1d5db;
-}
-
-.save-btn {
-    background: #3b82f6;
-    color: #ffffff;
-}
-
-.save-btn:hover {
-    background: #2563eb;
+.save-btn:not(.disabled):hover {
+    background: #cbd5e1;
 }
 
 .save-btn.has-changes {
-    background: #10b981;
-    animation: pulse-save 2s infinite;
+    background: #3b82f6;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 
-.preview-btn svg,
+.save-btn.has-changes:hover {
+    background: #2563eb;
+}
+
+.save-btn.disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
 .save-btn svg {
     width: 18px;
     height: 18px;
 }
 
-@keyframes pulse-save {
+.spin {
+    animation: spin 1s linear infinite;
+}
 
-    0%,
-    100% {
-        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
     }
 
-    50% {
-        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+    to {
+        transform: rotate(360deg);
     }
 }
 
 @media (max-width: 768px) {
     .admin-header {
-        padding: 0 16px;
+        padding: 0 12px;
+        gap: 8px;
     }
 
-    .preview-btn span,
+    .breadcrumb {
+        display: none;
+    }
+
+    .header-tabs {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .header-tab span:not(.tab-count) {
+        display: none;
+    }
+
+    .header-tab {
+        padding: 8px 12px;
+    }
+
     .save-btn span {
         display: none;
     }
 
-    .preview-btn,
     .save-btn {
         padding: 10px;
     }

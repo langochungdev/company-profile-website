@@ -5,10 +5,12 @@ export const homeConfig = {
     icon: "mdi:home",
     order: 1,
     group: "Trang",
+    componentBase: "components",
 
     sections: {
         hero: {
             label: "Banner Slideshow",
+            component: "HeroSection",
             collapsed: false,
             visible: true,
             fields: {
@@ -30,6 +32,7 @@ export const homeConfig = {
 
         services: {
             label: "Lĩnh Vực Hoạt Động",
+            component: "ServicesSection",
             collapsed: true,
             visible: true,
             fields: {
@@ -53,6 +56,7 @@ export const homeConfig = {
 
         projects: {
             label: "Dự Án Tiêu Biểu",
+            component: "ProjectSection",
             collapsed: true,
             visible: true,
             fields: {
@@ -81,6 +85,7 @@ export const homeConfig = {
 
         blog: {
             label: "Kênh Truyền Thông",
+            component: "BlogSection",
             collapsed: true,
             visible: true,
             fields: {
@@ -112,6 +117,7 @@ export const homeConfig = {
 
         news: {
             label: "Tin Tức & Kiến Thức",
+            component: "NewsSection",
             collapsed: true,
             visible: true,
             fields: {
@@ -136,6 +142,7 @@ export const homeConfig = {
 
         certificates: {
             label: "Chứng Nhận",
+            component: "CertSection",
             collapsed: true,
             visible: true,
             fields: {
@@ -157,6 +164,7 @@ export const homeConfig = {
 
         partners: {
             label: "Đối Tác",
+            component: "PartnerSection",
             collapsed: true,
             visible: true,
             fields: {

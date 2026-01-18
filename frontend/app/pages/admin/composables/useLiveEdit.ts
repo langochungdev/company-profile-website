@@ -2,7 +2,7 @@
  * Composable: Live Edit Mode cho Admin Panel
  */
 
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, toValue, type MaybeRef } from "vue";
 import { getPageConfig, type PageConfig, type FieldConfig } from "../page.config";
 
 export interface EditTarget {
@@ -12,8 +12,8 @@ export interface EditTarget {
     currentValue: unknown;
 }
 
-export const useLiveEdit = (pageKey: string) => {
-    const config = computed(() => getPageConfig(pageKey));
+export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
+    const config = computed(() => getPageConfig(toValue(pageKeyRef)));
     const originalData = ref<Record<string, Record<string, unknown>>>({});
     const editedData = ref<Record<string, Record<string, unknown>>>({});
     const isSaving = ref(false);
