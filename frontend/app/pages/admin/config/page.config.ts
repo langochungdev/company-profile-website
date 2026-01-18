@@ -3,7 +3,7 @@
 import type { CmsConfig, ParsedCmsConfig } from "@/types/cms.type";
 import { SIDEBAR_ORDER } from "@/pages/admin/sidebar.config";
 
-const cmsModules = import.meta.glob("../**/*.cms.ts", { eager: true });
+const cmsModules = import.meta.glob("/pages/**/*.cms.ts", { eager: true });
 
 function parseConfigType(config: any): "page" | "listing" | "detail" {
     if (config.type === "listing") return "listing";

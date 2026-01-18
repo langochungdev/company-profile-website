@@ -1,5 +1,5 @@
 // CMS Config Types - Auto-Discovery Architecture
-import type { FieldConfig } from "@/pages/admin/page.config";
+import type { FieldConfig } from "~/pages/admin/config/page.config";
 
 export interface BaseCmsConfig {
     type: "page" | "listing" | "detail";

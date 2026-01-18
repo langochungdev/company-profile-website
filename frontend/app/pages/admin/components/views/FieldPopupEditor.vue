@@ -41,7 +41,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import Field from '../fields/Field.vue'
-import type { FieldConfig } from '../../page.config'
+import type { FieldConfig } from '../../config/page.config'
 
 const props = defineProps<{
     isOpen: boolean

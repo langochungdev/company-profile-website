@@ -1,6 +1,6 @@
 // Cấu hình chi tiết dịch vụ cho admin CRUD
 
-import type { FieldConfig } from "@/pages/admin/page.config";
+import type { FieldConfig } from "~/pages/admin/config/page.config";
 
 export interface ServiceDetailConfig {
     type: "detail";

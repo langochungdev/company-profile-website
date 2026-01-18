@@ -47,7 +47,7 @@
 import Section from "../shared/Section.vue";
 import Field from "../fields/Field.vue";
 import ArrayField from "../fields/ArrayField.vue";
-import type { SectionConfig, FieldConfig, TableColumn } from "../../page.config";
+import type { SectionConfig, FieldConfig, TableColumn } from "../../config/page.config";
 
 interface DetailConfig {
     itemFields?: Record<string, FieldConfig>;

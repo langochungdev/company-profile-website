@@ -1,6 +1,6 @@
 // Cấu hình trang danh sách bài viết cho admin panel
 
-import type { FieldConfig } from "@/pages/admin/page.config";
+import type { FieldConfig } from "~/pages/admin/config/page.config";
 
 export interface PostListingConfig {
     type: "listing";

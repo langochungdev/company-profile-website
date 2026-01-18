@@ -1,6 +1,6 @@
 // Cấu hình trang danh sách dịch vụ cho admin panel
 
-import type { FieldConfig } from "@/pages/admin/page.config";
+import type { FieldConfig } from "~/pages/admin/config/page.config";
 
 export interface ServiceListingConfig {
     type: "listing";

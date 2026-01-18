@@ -97,7 +97,7 @@ import ItemsList from "./components/collection/ItemsList.vue";
 import ItemEditor from "./components/collection/ItemEditor.vue";
 import LiveEditView from "./components/views/LiveEditView.vue";
 import SettingsView from "./components/views/SettingsView.vue";
-import { PAGE_CONFIGS, getAllPages, getPageConfig, isCollectionPage as checkIsCollection, getListingConfig, getDetailConfig } from "./page.config";
+import { PAGE_CONFIGS, getAllPages, getPageConfig, isCollectionPage as checkIsCollection, getListingConfig, getDetailConfig } from "./config/page.config";
 
 definePageMeta({ layout: false });
 

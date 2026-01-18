@@ -2,7 +2,7 @@ import { ref, type Ref } from "vue";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/config/firebase.config";
 import { getFirestorePath } from "@/utils/firestore";
-import type { PageConfig, SectionConfig, FieldConfig } from "@/pages/admin/page.config";
+import type { PageConfig, SectionConfig, FieldConfig } from "~/pages/admin/config/page.config";
 
 interface PageContentResult {
     data: Ref<Record<string, any> | null>;

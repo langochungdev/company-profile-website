@@ -1,6 +1,6 @@
 // Cấu hình chi tiết bài viết cho admin CRUD
 
-import type { FieldConfig } from "@/pages/admin/page.config";
+import type { FieldConfig } from "~/pages/admin/config/page.config";
 
 export interface PostDetailConfig {
     type: "detail";

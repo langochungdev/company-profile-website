@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import type { TableColumn } from '../../page.config'
+import type { TableColumn } from '../../config/page.config'
 
 interface ItemConfig {
     name: string
