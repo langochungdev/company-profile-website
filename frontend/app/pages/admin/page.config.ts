@@ -1,6 +1,7 @@
 // Admin Page Config Registry - Auto-Discovery Architecture
 
 import type { CmsConfig, ParsedCmsConfig } from "@/types/cms.type";
+import { SIDEBAR_ORDER } from "@/pages/admin/sidebar.config";
 
 const cmsModules = import.meta.glob("../**/*.cms.ts", { eager: true });
 
@@ -79,7 +80,7 @@ export const COLLECTION_PAGES: CollectionPageConfig[] = LISTING_CMS_CONFIGS.map(
     };
 });
 
-export const SIDEBAR_PAGES: Array<{ key: string; config: PageConfig; group?: string; configType: "page" | "listing" }> = [
+const ALL_SIDEBAR_PAGES: Array<{ key: string; config: PageConfig; group?: string; configType: "page" | "listing" }> = [
     ...PAGE_CMS_CONFIGS.map((c) => ({
         key: c.key,
         config: c.config as unknown as PageConfig,
@@ -103,7 +104,9 @@ export const SIDEBAR_PAGES: Array<{ key: string; config: PageConfig; group?: str
         group: cp.group,
         configType: "listing" as const,
     })),
-].sort((a, b) => ((a.config as any).order || 100) - ((b.config as any).order || 100));
+];
+
+export const SIDEBAR_PAGES = SIDEBAR_ORDER.map((key) => ALL_SIDEBAR_PAGES.find((p) => p.key === key)).filter((p): p is NonNullable<typeof p> => p !== undefined);
 
 export interface FieldConfig {
     type: "text" | "textarea" | "number" | "boolean" | "select" | "image" | "video" | "array" | "group" | "richtext" | "date" | "color" | "object";
