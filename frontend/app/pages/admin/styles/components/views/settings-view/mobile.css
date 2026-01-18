@@ -1,0 +1,14 @@
+/* SettingsView - Mobile styles */
+@media (max-width: 768px) {
+    .settings-section {
+        border-radius: 12px;
+    }
+
+    .section-header {
+        padding: 14px 16px;
+    }
+
+    .section-body {
+        padding: 16px;
+    }
+}

@@ -1,0 +1,10 @@
+/* Section - Mobile styles */
+@media (max-width: 768px) {
+    .section-header {
+        padding: 10px 14px;
+    }
+
+    .section-content {
+        padding: 14px;
+    }
+}

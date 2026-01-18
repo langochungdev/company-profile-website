@@ -1,0 +1,21 @@
+/* ItemEditor - Mobile styles */
+@media (max-width: 640px) {
+    .modal-overlay {
+        padding: 0;
+    }
+
+    .modal-container {
+        max-width: 100%;
+        max-height: 100%;
+        border-radius: 0;
+    }
+
+    .modal-header,
+    .modal-footer {
+        padding: 14px 16px;
+    }
+
+    .modal-body {
+        padding: 16px;
+    }
+}

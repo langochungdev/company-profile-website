@@ -1,0 +1,9 @@
+/* Field - Mobile styles */
+@media (max-width: 768px) {
+
+    .field-input,
+    .field-textarea,
+    .field-select {
+        padding: 10px 12px;
+    }
+}

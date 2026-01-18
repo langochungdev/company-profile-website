@@ -1,0 +1,15 @@
+/* EditOverlay - Mobile styles */
+@media (max-width: 768px) {
+    .section-toolbar {
+        top: -36px;
+        padding: 6px 10px;
+    }
+
+    .section-label {
+        font-size: 12px;
+    }
+
+    .edit-hint {
+        display: none;
+    }
+}

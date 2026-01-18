@@ -1,0 +1,10 @@
+/* AdminSidebar - Mobile styles */
+@media (max-width: 768px) {
+    .admin-sidebar {
+        transform: translateX(-100%);
+    }
+
+    .admin-sidebar:not(.sidebar-collapsed) {
+        transform: translateX(0);
+    }
+}

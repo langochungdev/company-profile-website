@@ -1,0 +1,6 @@
+/* LiveEditView - Mobile styles */
+@media (max-width: 768px) {
+    .preview-area {
+        padding: 12px;
+    }
+}

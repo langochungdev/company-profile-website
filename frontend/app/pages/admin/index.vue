@@ -49,7 +49,7 @@
                                 </div>
                             </div>
 
-                            <AdminItemsList :items="filteredItems" :columns="itemColumns" :item-config="itemConfigForList" @add="openAddModal" @edit="openEditModal" @delete="handleDelete" />
+                            <ItemsList :items="filteredItems" :columns="itemColumns" :item-config="itemConfigForList" @add="openAddModal" @edit="openEditModal" @delete="handleDelete" />
 
                             <div v-if="totalPages > 1" class="pagination">
                                 <button :disabled="currentPage === 1" @click="currentPage--">
@@ -63,15 +63,15 @@
                         </div>
 
                         <div v-else class="settings-content">
-                            <AdminSection v-for="(section, sectionKey) in currentConfig.sections" :key="sectionKey" :label="section.label" :is-collapsed="collapsedSections[sectionKey as string] ?? section.collapsed ?? false" @toggle="toggleSection(sectionKey as string)">
+                            <Section v-for="(section, sectionKey) in currentConfig.sections" :key="sectionKey" :label="section.label" :is-collapsed="collapsedSections[sectionKey as string] ?? section.collapsed ?? false" @toggle="toggleSection(sectionKey as string)">
                                 <template v-for="(field, fieldKey) in section.fields" :key="fieldKey">
-                                    <AdminGroupField v-if="field.type === 'group'" :field="field">
-                                        <AdminField v-for="(subField, subKey) in field.fields" :key="subKey" :field="(subField as any)" :model-value="getFieldValue(sectionKey as string, fieldKey as string, subKey as string)" @update:model-value="setFieldValue(sectionKey as string, fieldKey as string, subKey as string, $event)" />
-                                    </AdminGroupField>
-                                    <AdminArrayField v-else-if="field.type === 'array'" :field="field as any" :model-value="(getFieldValue(sectionKey, fieldKey) as any[]) || []" @update:model-value="setFieldValue(sectionKey as string, fieldKey as string, null, $event)" />
-                                    <AdminField v-else :field="(field as any)" :model-value="getFieldValue(sectionKey as string, fieldKey as string)" @update:model-value="setFieldValue(sectionKey as string, fieldKey as string, null, $event)" />
+                                    <GroupField v-if="field.type === 'group'" :field="field">
+                                        <Field v-for="(subField, subKey) in field.fields" :key="subKey" :field="(subField as any)" :model-value="getFieldValue(sectionKey as string, fieldKey as string, subKey as string)" @update:model-value="setFieldValue(sectionKey as string, fieldKey as string, subKey as string, $event)" />
+                                    </GroupField>
+                                    <ArrayField v-else-if="field.type === 'array'" :field="field as any" :model-value="(getFieldValue(sectionKey, fieldKey) as any[]) || []" @update:model-value="setFieldValue(sectionKey as string, fieldKey as string, null, $event)" />
+                                    <Field v-else :field="(field as any)" :model-value="getFieldValue(sectionKey as string, fieldKey as string)" @update:model-value="setFieldValue(sectionKey as string, fieldKey as string, null, $event)" />
                                 </template>
-                            </AdminSection>
+                            </Section>
                         </div>
                     </div>
                 </div>
@@ -82,21 +82,21 @@
             <Icon name="mdi:menu" />
         </button>
 
-        <AdminItemEditor v-if="detailConfig" :is-open="isEditorOpen" :is-new="isNewItem" :item-name="getCollectionName" :config="detailConfig" :initial-data="editingItem" @close="closeEditor" @save="handleSaveItem" />
+        <ItemEditor v-if="detailConfig" :is-open="isEditorOpen" :is-new="isNewItem" :item-name="getCollectionName" :config="detailConfig" :initial-data="editingItem" @close="closeEditor" @save="handleSaveItem" />
     </div>
 </template>
 
 <script setup lang="ts">
-import AdminSidebar from "./layouts/AdminSidebar.vue";
-import AdminHeader from "./layouts/AdminHeader.vue";
-import AdminSection from "./components/AdminSection.vue";
-import AdminField from "./components/AdminField.vue";
-import AdminArrayField from "./components/AdminArrayField.vue";
-import AdminGroupField from "./components/AdminGroupField.vue";
-import AdminItemsList from "./components/AdminItemsList.vue";
-import AdminItemEditor from "./components/AdminItemEditor.vue";
-import LiveEditView from "./components/LiveEditView.vue";
-import SettingsView from "./components/SettingsView.vue";
+import AdminSidebar from "./components/layouts/AdminSidebar.vue";
+import AdminHeader from "./components/layouts/AdminHeader.vue";
+import Section from "./components/shared/Section.vue";
+import Field from "./components/fields/Field.vue";
+import ArrayField from "./components/fields/ArrayField.vue";
+import GroupField from "./components/fields/GroupField.vue";
+import ItemsList from "./components/collection/ItemsList.vue";
+import ItemEditor from "./components/collection/ItemEditor.vue";
+import LiveEditView from "./components/views/LiveEditView.vue";
+import SettingsView from "./components/views/SettingsView.vue";
 import { PAGE_CONFIGS, getAllPages, getPageConfig, isCollectionPage as checkIsCollection, getListingConfig, getDetailConfig } from "./page.config";
 
 definePageMeta({ layout: false });
@@ -363,195 +363,4 @@ onMounted(() => {
 <style scoped>
 @import "./styles/desktop.css";
 @import "./styles/mobile.css";
-
-.loading-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 20px;
-    color: #6b7280;
-}
-
-.spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid #e5e7eb;
-    border-top-color: #3b82f6;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.collection-page {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.page-tabs {
-    display: flex;
-    gap: 8px;
-    background: #ffffff;
-    padding: 8px;
-    border-radius: 10px;
-    border: 1px solid #e5e7eb;
-}
-
-.tab-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    background: transparent;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #6b7280;
-    cursor: pointer;
-    transition: all 0.15s;
-}
-
-.tab-btn:hover {
-    background: #f3f4f6;
-    color: #111827;
-}
-
-.tab-btn.active {
-    background: #3b82f6;
-    color: #ffffff;
-}
-
-.tab-btn svg {
-    width: 18px;
-    height: 18px;
-}
-
-.tab-count {
-    padding: 2px 8px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    font-size: 12px;
-}
-
-.tab-btn:not(.active) .tab-count {
-    background: #e5e7eb;
-}
-
-.items-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 16px;
-    background: #ffffff;
-    border-radius: 10px;
-    border: 1px solid #e5e7eb;
-}
-
-.search-box {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex: 1;
-    max-width: 300px;
-    padding: 8px 12px;
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-}
-
-.search-box svg {
-    width: 18px;
-    height: 18px;
-    color: #9ca3af;
-}
-
-.search-input {
-    flex: 1;
-    border: none;
-    background: transparent;
-    font-size: 14px;
-    outline: none;
-}
-
-.toolbar-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.filter-select {
-    padding: 8px 12px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    font-size: 14px;
-    background: #ffffff;
-    cursor: pointer;
-}
-
-.btn-primary {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 16px;
-    background: #3b82f6;
-    color: #ffffff;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.15s;
-}
-
-.btn-primary:hover {
-    background: #2563eb;
-}
-
-.btn-primary svg {
-    width: 18px;
-    height: 18px;
-}
-
-.pagination {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    padding: 16px;
-}
-
-.pagination button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.15s;
-}
-
-.pagination button:hover:not(:disabled) {
-    background: #f3f4f6;
-}
-
-.pagination button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.pagination span {
-    font-size: 14px;
-    color: #6b7280;
-}
 </style>
