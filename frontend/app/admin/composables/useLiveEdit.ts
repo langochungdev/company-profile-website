@@ -117,23 +117,46 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
 
         const parts = fieldPath.split(".");
         if (parts.length === 1) {
-            editedData.value[sectionId][fieldPath] = value;
-        } else {
-            let target = editedData.value[sectionId] as Record<string, unknown>;
-            for (let i = 0; i < parts.length - 1; i++) {
-                const key = parts[i];
-                if (key && !target[key]) {
-                    target[key] = {};
+            editedData.value[sectionId] = {
+                ...editedData.value[sectionId],
+                [fieldPath]: value,
+            };
+            return;
+        }
+
+        const sectionData = JSON.parse(JSON.stringify(editedData.value[sectionId]));
+        let target: unknown = sectionData;
+
+        for (let i = 0; i < parts.length - 1; i++) {
+            const key = parts[i];
+            if (!key) continue;
+
+            const nextKey = parts[i + 1];
+            const isNextKeyNumeric = nextKey && /^\d+$/.test(nextKey);
+
+            if (typeof target === "object" && target !== null) {
+                const obj = target as Record<string, unknown>;
+                if (obj[key] === undefined || obj[key] === null) {
+                    obj[key] = isNextKeyNumeric ? [] : {};
+                } else if (isNextKeyNumeric && !Array.isArray(obj[key])) {
+                    const existingObj = obj[key] as Record<string, unknown>;
+                    const arr: unknown[] = [];
+                    Object.keys(existingObj).forEach((k) => {
+                        const idx = parseInt(k, 10);
+                        if (!isNaN(idx)) arr[idx] = existingObj[k];
+                    });
+                    obj[key] = arr;
                 }
-                if (key) {
-                    target = target[key] as Record<string, unknown>;
-                }
-            }
-            const lastKey = parts[parts.length - 1];
-            if (lastKey) {
-                target[lastKey] = value;
+                target = obj[key];
             }
         }
+
+        const lastKey = parts[parts.length - 1];
+        if (lastKey && typeof target === "object" && target !== null) {
+            (target as Record<string, unknown>)[lastKey] = value;
+        }
+
+        editedData.value[sectionId] = sectionData;
     };
 
     const openEditor = (sectionId: string, fieldPath: string) => {

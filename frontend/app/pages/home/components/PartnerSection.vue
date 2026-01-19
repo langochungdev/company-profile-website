@@ -68,8 +68,13 @@ const displayData = computed(() => ({
 }))
 
 const displayItems = computed(() => {
-    const items = props.data?.items
-    return items && items.length > 0 ? items : defaultItems
+    const baseItems = defaultItems
+    const editedItems = props.data?.items
+    if (!editedItems || editedItems.length === 0) return baseItems
+    return baseItems.map((base, index) => ({
+        ...base,
+        ...(editedItems[index] || {})
+    }))
 })
 </script>
 

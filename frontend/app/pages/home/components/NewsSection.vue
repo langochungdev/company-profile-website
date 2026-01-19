@@ -103,11 +103,14 @@ const displayData = computed(() => ({
 }))
 
 const displayItems = computed(() => {
-    if (props.data?.items && props.data.items.length > 0) {
-        return props.data.items.slice(0, 3)
-    }
-    const posts = previews.value.slice(0, 3)
-    return posts.length > 0 ? posts : placeholderPosts
+    const posts = previews.value.slice(0, 3) as unknown as NewsItem[]
+    const baseItems = posts.length > 0 ? posts : placeholderPosts
+    const editedItems = props.data?.items
+    if (!editedItems || editedItems.length === 0) return baseItems
+    return baseItems.map((base, index) => ({
+        ...base,
+        ...(editedItems[index] || {})
+    }))
 })
 
 onMounted(() => {

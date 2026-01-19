@@ -97,11 +97,13 @@ const defaultSlides: SlideData[] = [
 ]
 
 const displaySlides = computed(() => {
-    const slides = props.data?.slides
-    if (slides && Array.isArray(slides) && slides.length > 0) {
-        return slides
-    }
-    return defaultSlides
+    const baseSlides = defaultSlides
+    const editedSlides = props.data?.slides
+    if (!editedSlides || editedSlides.length === 0) return baseSlides
+    return baseSlides.map((base, index) => ({
+        ...base,
+        ...(editedSlides[index] || {})
+    }))
 })
 
 const nextSlide = () => {

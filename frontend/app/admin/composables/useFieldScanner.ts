@@ -45,6 +45,8 @@ export const useFieldScanner = (options: FieldScannerOptions) => {
     };
 
     const setupFieldElement = (element: HTMLElement, fieldPath: string) => {
+        if (element.classList.contains("scannable-field")) return;
+
         element.classList.add("scannable-field");
 
         const isImageField = element.dataset.fieldType === "image";
@@ -103,6 +105,8 @@ export const useFieldScanner = (options: FieldScannerOptions) => {
     };
 
     const setupImageField = (element: HTMLElement, fieldPath: string) => {
+        if (element.classList.contains("image-edit-wrapper")) return;
+
         element.classList.add("image-edit-wrapper");
 
         const card = element.closest(".news-card, .project-card, .service-card, .cert-card, .partner-card, [class*='-card']");
@@ -176,8 +180,28 @@ export const useFieldScanner = (options: FieldScannerOptions) => {
     const startObserving = () => {
         if (!containerRef.value) return;
 
-        observer = new MutationObserver(() => {
-            nextTick(() => scanFields());
+        let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+        let isProcessing = false;
+
+        observer = new MutationObserver((mutations) => {
+            const hasRelevantChange = mutations.some((m) => {
+                if (m.type === "attributes") return true;
+                if (m.type === "childList") {
+                    const addedNodes = Array.from(m.addedNodes);
+                    const removedNodes = Array.from(m.removedNodes);
+                    return [...addedNodes, ...removedNodes].some((node) => node instanceof HTMLElement && (node.hasAttribute("data-field") || node.querySelector?.("[data-field]")));
+                }
+                return false;
+            });
+
+            if (!hasRelevantChange || isProcessing) return;
+
+            if (debounceTimer) clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                isProcessing = true;
+                scanFields();
+                isProcessing = false;
+            }, 100);
         });
 
         observer.observe(containerRef.value, {

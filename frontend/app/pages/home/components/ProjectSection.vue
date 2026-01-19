@@ -105,8 +105,13 @@ const displayData = computed(() => ({
 }))
 
 const displayItems = computed(() => {
-    const items = props.data?.items
-    return items && items.length > 0 ? items : defaultData.items
+    const baseItems = defaultData.items
+    const editedItems = props.data?.items
+    if (!editedItems || editedItems.length === 0) return baseItems
+    return baseItems.map((base, index) => ({
+        ...base,
+        ...(editedItems[index] || {})
+    }))
 })
 
 const onMouseEnter = (index: number) => {
