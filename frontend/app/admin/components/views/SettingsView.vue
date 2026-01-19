@@ -1,5 +1,21 @@
 <template>
     <div class="settings-view-wrapper">
+        <section v-if="readonly" class="google-preview-section">
+            <div class="preview-header">
+                <Icon name="mdi:magnify" />
+                <span>Google Preview</span>
+            </div>
+            <div class="google-preview">
+                <div class="preview-title">{{ previewTitle }}</div>
+                <div class="preview-url">{{ previewUrl }}</div>
+                <div class="preview-description">{{ previewDescription }}</div>
+            </div>
+            <div v-if="readonly" class="readonly-badge">
+                <Icon name="mdi:lock" />
+                <span>Chế độ xem - Cấu hình từ CMS</span>
+            </div>
+        </section>
+
         <div class="settings-content">
             <section v-for="(section, sectionKey) in settingsSections" :key="sectionKey" class="settings-section">
                 <button class="section-header" @click="toggleSection(sectionKey)">
@@ -18,26 +34,30 @@
                         </label>
                         <p v-if="(field as any).note" class="field-note">{{ (field as any).note }}</p>
 
-                        <input v-if="field.type === 'text'" v-model="settingsData[sectionKey][fieldKey]" type="text" class="field-input" :placeholder="(field as any).placeholder" :maxlength="(field as any).max" />
+                        <input v-if="field.type === 'text'" v-model="settingsData[sectionKey][fieldKey]" type="text" class="field-input" :class="{ 'input-readonly': readonly }" :placeholder="(field as any).placeholder" :maxlength="(field as any).max" :disabled="readonly" />
 
-                        <textarea v-else-if="field.type === 'textarea'" v-model="settingsData[sectionKey][fieldKey]" class="field-textarea" :placeholder="(field as any).placeholder" :maxlength="(field as any).max" :rows="(field as any).rows || 3" />
+                        <textarea v-else-if="field.type === 'textarea'" v-model="settingsData[sectionKey][fieldKey]" class="field-textarea" :class="{ 'input-readonly': readonly }" :placeholder="(field as any).placeholder" :maxlength="(field as any).max" :rows="(field as any).rows || 3" :disabled="readonly" />
 
-                        <select v-else-if="field.type === 'select'" v-model="settingsData[sectionKey][fieldKey]" class="field-select">
+                        <select v-else-if="field.type === 'select'" v-model="settingsData[sectionKey][fieldKey]" class="field-select" :class="{ 'input-readonly': readonly }" :disabled="readonly">
                             <option v-for="opt in getSelectOptions((field as any).options)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                         </select>
 
                         <div v-else-if="field.type === 'image'" class="image-field">
                             <div v-if="settingsData[sectionKey][fieldKey]" class="image-preview">
                                 <img :src="settingsData[sectionKey][fieldKey]" :alt="field.label" />
-                                <button class="btn-remove" @click="settingsData[sectionKey][fieldKey] = ''">
+                                <button v-if="!readonly" class="btn-remove" @click="settingsData[sectionKey][fieldKey] = ''">
                                     <Icon name="mdi:close" />
                                 </button>
                             </div>
-                            <label v-else class="image-upload">
+                            <label v-else-if="!readonly" class="image-upload">
                                 <Icon name="mdi:cloud-upload" />
                                 <span>Chọn ảnh</span>
                                 <input type="file" accept="image/*" class="hidden" @change="handleImageUpload($event, sectionKey, fieldKey)" />
                             </label>
+                            <div v-else class="image-placeholder">
+                                <Icon name="mdi:image-off" />
+                                <span>Chưa có ảnh</span>
+                            </div>
                             <p v-if="(field as any).size" class="size-hint">Kích thước: {{ (field as any).size }}</p>
                         </div>
 
@@ -67,11 +87,11 @@
                             <label class="field-label">{{ field.label }}</label>
                             <p v-if="field.note" class="field-note">{{ field.note }}</p>
 
-                            <input v-if="field.type === 'text'" v-model="schemaData.config[fieldKey]" type="text" class="field-input" :placeholder="field.default as string" />
+                            <input v-if="field.type === 'text'" v-model="schemaData.config[fieldKey]" type="text" class="field-input" :class="{ 'input-readonly': readonly }" :placeholder="String(field.default || '')" :disabled="readonly" />
 
-                            <textarea v-else-if="field.type === 'textarea'" v-model="schemaData.config[fieldKey]" class="field-textarea" :rows="field.rows || 2" />
+                            <textarea v-else-if="field.type === 'textarea'" v-model="schemaData.config[fieldKey]" class="field-textarea" :class="{ 'input-readonly': readonly }" :rows="field.rows || 2" :disabled="readonly" />
 
-                            <select v-else-if="field.type === 'select'" v-model="schemaData.config[fieldKey]" class="field-select">
+                            <select v-else-if="field.type === 'select'" v-model="schemaData.config[fieldKey]" class="field-select" :class="{ 'input-readonly': readonly }" :disabled="readonly">
                                 <option v-for="opt in getSelectOptions(field.options)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
                             </select>
                         </div>
@@ -82,7 +102,7 @@
                         <p class="subsection-note">Định nghĩa field nào trong data sẽ được dùng cho schema</p>
                         <div v-for="(field, fieldKey) in schemaFieldMappingFields" :key="fieldKey" class="field-group field-inline">
                             <label class="field-label">{{ field.label }}</label>
-                            <input v-model="schemaData.fieldMapping[fieldKey]" type="text" class="field-input" :placeholder="field.default as string" />
+                            <input v-model="schemaData.fieldMapping[fieldKey]" type="text" class="field-input" :class="{ 'input-readonly': readonly }" :placeholder="String(field.default || '')" :disabled="readonly" />
                         </div>
                     </div>
                 </div>
@@ -103,10 +123,26 @@ const props = defineProps<{
     pageName: string;
     configPath: string;
     schemaType?: SchemaPageType;
+    readonly?: boolean;
 }>();
 
-console.log("[SettingsView] Prop schemaType:", props.schemaType);
-console.log("[SettingsView] Prop pageKey:", props.pageKey);
+const runtimeConfig = useRuntimeConfig();
+const SITE_URL = runtimeConfig.public.siteUrl as string;
+
+const previewTitle = computed(() => {
+    return settingsData.seo.title || props.pageName || 'Untitled';
+});
+
+const previewUrl = computed(() => {
+    const baseUrl = SITE_URL || 'https://example.com';
+    return `${baseUrl} > ${props.pageKey}`;
+});
+
+const previewDescription = computed(() => {
+    const desc = settingsData.seo.description || '';
+    return desc.length > 160 ? desc.slice(0, 157) + '...' : desc;
+});
+
 
 const emit = defineEmits<{
     "dirty-change": [isDirty: boolean];
@@ -271,59 +307,4 @@ defineExpose({ handleSave });
 
 <style scoped>
 @import "../../styles/components/views/settings-view/desktop.css";
-
-.schema-type-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
-    background: var(--bg-secondary, #f8f9fa);
-    border-radius: 8px;
-    margin-bottom: 20px;
-    font-size: 14px;
-    color: var(--text-secondary, #666);
-}
-
-.schema-type-info strong {
-    color: var(--primary, #3b82f6);
-}
-
-.schema-subsection {
-    margin-bottom: 24px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border, #e5e7eb);
-}
-
-.schema-subsection:first-of-type {
-    border-top: none;
-    padding-top: 0;
-}
-
-.subsection-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-primary, #1f2937);
-    margin-bottom: 8px;
-}
-
-.subsection-note {
-    font-size: 12px;
-    color: var(--text-secondary, #666);
-    margin-bottom: 16px;
-}
-
-.field-inline {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.field-inline .field-label {
-    min-width: 140px;
-    margin-bottom: 0;
-}
-
-.field-inline .field-input {
-    flex: 1;
-}
 </style>

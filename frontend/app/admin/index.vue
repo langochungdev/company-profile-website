@@ -17,7 +17,7 @@
                 <template v-else-if="!isCollectionPage">
                     <LiveEditView ref="liveEditRef" v-if="activeContentTab === 'live'" :page-key="activePage" @dirty-change="hasChanges = $event" @saving-change="isSaving = $event" />
 
-                    <SettingsView ref="settingsRef" v-else :key="activePage" :page-key="activePage" :page-name="currentPageName" :config-path="currentConfigPath" :schema-type="currentSchemaType" @dirty-change="hasChanges = $event" @saving-change="isSaving = $event" />
+                    <SettingsView ref="settingsRef" v-else :key="activePage" :page-key="activePage" :page-name="currentPageName" :config-path="currentConfigPath" :schema-type="currentSchemaType" :readonly="false" @dirty-change="hasChanges = $event" @saving-change="isSaving = $event" />
                 </template>
 
                 <div v-else-if="currentConfig" class="editor-container">
@@ -62,7 +62,7 @@
                             </div>
                         </div>
 
-                        <SettingsView v-else ref="collectionSettingsRef" :key="activePage" :page-key="activePage" :page-name="currentPageName" :config-path="currentConfigPath" :schema-type="currentSchemaType" @dirty-change="hasChanges = $event" @saving-change="isSaving = $event" />
+                        <SettingsView v-else ref="collectionSettingsRef" :key="activePage" :page-key="activePage" :page-name="currentPageName" :config-path="currentConfigPath" :schema-type="currentSchemaType" :readonly="true" @dirty-change="hasChanges = $event" @saving-change="isSaving = $event" />
                     </div>
                 </div>
             </div>
@@ -174,7 +174,7 @@ const headerTabs = computed<TabItem[]>(() => {
 const currentActiveTab = computed(() => (isCollectionPage.value ? activeTab.value : activeContentTab.value));
 
 const showHeaderSaveButton = computed(() => {
-    if (isCollectionPage.value) return activeTab.value === "settings";
+    if (isCollectionPage.value) return false;
     return true;
 });
 
