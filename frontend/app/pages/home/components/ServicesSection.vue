@@ -42,7 +42,8 @@
             </div>
 
             <div class="services-grid">
-                <NuxtLink v-for="(service, index) in displayItems" :key="index" :to="service.link" :class="['service-card', getGridClass(index)]">
+                <div v-for="(service, index) in displayItems" :key="index" :class="['service-card', getGridClass(index)]">
+                    <NuxtLink :to="service.link" class="service-card-link" />
                     <img :src="service.image" :alt="service.title" loading="lazy" class="service-image" :data-field="`items.${index}.image`" data-field-type="image" />
                     <div class="service-gradient"></div>
                     <div class="service-content">
@@ -55,7 +56,7 @@
                             </p>
                         </div>
                     </div>
-                </NuxtLink>
+                </div>
             </div>
         </div>
     </section>

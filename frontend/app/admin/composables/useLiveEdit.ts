@@ -106,6 +106,16 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
                 ];
             }
 
+            if (editedData.value.news) {
+                editedData.value.news.sectionTitle = "Kiến Thức &";
+                editedData.value.news.highlightText = "Giải Pháp";
+                editedData.value.news.items = [
+                    { title: "Camera AI trong giám sát an ninh", description: "Tìm hiểu công nghệ AI trong hệ thống camera.", thumbnail: "https://placehold.co/800x600/webp?text=800x600", category: "Camera AI", publishedAt: "15/01/2026", link: "/post/camera-ai" },
+                    { title: "Xu hướng hạ tầng mạng 2026", description: "Những xu hướng công nghệ mạng mới nhất.", thumbnail: "https://placehold.co/800x600/webp?text=800x600", category: "Hạ Tầng Mạng", publishedAt: "12/01/2026", link: "/post/ha-tang-mang" },
+                    { title: "WiFi 7 và ứng dụng doanh nghiệp", description: "WiFi 7 mang lại gì cho doanh nghiệp.", thumbnail: "https://placehold.co/800x600/webp?text=800x600", category: "WiFi", publishedAt: "10/01/2026", link: "/post/wifi-7" },
+                ];
+            }
+
             originalData.value = JSON.parse(JSON.stringify(editedData.value));
         } finally {
             isLoading.value = false;

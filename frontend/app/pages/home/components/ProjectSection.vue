@@ -30,7 +30,8 @@
 
         <div class="project-wrapper">
             <div class="project-container">
-                <NuxtLink v-for="(project, index) in displayItems" :key="index" :to="project.link" :style="{ '--aspect-ratio': aspectRatios[index] || 1.5 }" class="project-card" :class="{ 'project-card-hidden': index >= 3 }" @mouseenter="onMouseEnter(index)" @mouseleave="onMouseLeave">
+                <div v-for="(project, index) in displayItems" :key="index" :style="{ '--aspect-ratio': aspectRatios[index] || 1.5 }" class="project-card" :class="{ 'project-card-hidden': index >= 3 }" @mouseenter="onMouseEnter(index)" @mouseleave="onMouseLeave">
+                    <NuxtLink :to="project.link" class="project-card-link" />
                     <div class="project-image-wrapper">
                         <img :src="project.image" :alt="project.title" loading="lazy" class="project-image" :class="{ 'project-image-active': hoveredIndex === index }" :data-field="`items.${index}.image`" data-field-type="image" />
                     </div>
@@ -48,7 +49,7 @@
                             </p>
                         </div>
                     </div>
-                </NuxtLink>
+                </div>
             </div>
         </div>
     </section>

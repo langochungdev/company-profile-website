@@ -28,9 +28,10 @@
             </div>
 
             <div v-else class="news-grid">
-                <NuxtLink v-for="(post, index) in displayItems" :key="post.id || index" :to="`/post/${post.slug || post.link}`" class="news-card">
-                    <div class="card-image-wrapper">
-                        <img :src="post.thumbnail || post.image || 'https://placehold.co/400x300/webp?text=400x300'" :alt="post.title" loading="lazy" class="card-image" :data-field="`items.${index}.thumbnail`" data-field-type="image" />
+                <div v-for="(post, index) in displayItems" :key="post.id || index" class="news-card">
+                    <NuxtLink :to="`/post/${post.slug || post.link}`" class="news-card-link" />
+                    <div class="card-image-wrapper" :data-field="`items.${index}.thumbnail`" data-field-type="image">
+                        <img :src="post.thumbnail || post.image || 'https://placehold.co/400x300/webp?text=400x300'" :alt="post.title" loading="lazy" class="card-image" />
                         <div class="card-gradient" />
                     </div>
                     <div class="card-overlay">
@@ -50,7 +51,7 @@
                             </div>
                         </div>
                     </div>
-                </NuxtLink>
+                </div>
             </div>
         </div>
     </section>

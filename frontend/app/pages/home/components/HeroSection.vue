@@ -11,8 +11,8 @@
                             <span class="badge-dot"></span>
                             {{ slide.badge }}
                         </span>
-                        <component :is="index === 0 ? 'h1' : 'h2'" class="slide-title" :data-field="`slides.${index}.title`">
-                            {{ slide.title }}
+                        <component :is="index === 0 ? 'h1' : 'h2'" class="slide-title">
+                            <span :data-field="`slides.${index}.title`">{{ slide.title }}</span>
                             <span class="title-highlight" :data-field="`slides.${index}.highlight`">{{ slide.highlight }}</span>
                         </component>
                         <p class="slide-desc" :data-field="`slides.${index}.description`">

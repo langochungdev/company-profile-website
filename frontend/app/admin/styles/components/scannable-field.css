@@ -1,15 +1,54 @@
 /* Scannable Field - Global styles cho editable fields */
 
 .scannable-field {
-    position: relative;
     cursor: pointer;
     transition: outline 0.2s ease, background-color 0.2s ease;
+    z-index: 10;
 }
 
 .scannable-field:hover {
     outline: 2px dashed rgba(59, 130, 246, 0.7);
     outline-offset: 4px;
     background-color: rgba(59, 130, 246, 0.05);
+    z-index: 20;
+}
+
+.scannable-field:has(.scannable-field:hover) {
+    outline: none;
+    background-color: transparent;
+}
+
+.image-edit-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border: 2px solid #ffffff;
+    border-radius: 8px;
+    color: #ffffff;
+    cursor: pointer;
+    z-index: 50;
+    opacity: 0.85;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    pointer-events: auto;
+}
+
+.image-edit-button:hover {
+    opacity: 1;
+    transform: scale(1.1);
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.6);
+}
+
+.image-edit-button svg {
+    width: 18px;
+    height: 18px;
 }
 
 .field-edit-indicator {
@@ -44,23 +83,9 @@
     height: 12px;
 }
 
-/* Image fields */
+/* Image fields - no overlay effect, use button instead */
 .scannable-field[data-field-type="image"] {
     display: block;
-}
-
-.scannable-field[data-field-type="image"]:hover::after {
-    content: 'Thay đổi ảnh';
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.6);
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: 500;
-    border-radius: inherit;
 }
 
 /* Array item fields */

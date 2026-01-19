@@ -47,6 +47,13 @@ export const useFieldScanner = (options: FieldScannerOptions) => {
     const setupFieldElement = (element: HTMLElement, fieldPath: string) => {
         element.classList.add("scannable-field");
 
+        const isImageField = element.dataset.fieldType === "image";
+
+        if (isImageField) {
+            setupImageField(element, fieldPath);
+            return;
+        }
+
         const parentLink = element.closest("a");
         if (parentLink && !parentLink.classList.contains("link-disabled-for-edit")) {
             parentLink.classList.add("link-disabled-for-edit");
@@ -61,13 +68,53 @@ export const useFieldScanner = (options: FieldScannerOptions) => {
         }
 
         element.style.pointerEvents = "auto";
-        element.style.position = "relative";
+        const computedPosition = window.getComputedStyle(element).position;
+        if (computedPosition === "static") {
+            element.style.position = "relative";
+            (element as any).__originalPosition = "static";
+        }
         element.style.cursor = "pointer";
 
         const existingHandler = (element as any).__fieldClickHandler;
         if (existingHandler) {
-            element.removeEventListener("click", existingHandler, { capture: true });
+            element.removeEventListener("click", existingHandler);
         }
+
+        const clickHandler = (e: Event) => {
+            const target = e.target as HTMLElement;
+            const closestScannable = target.closest(".scannable-field");
+            if (closestScannable !== element) {
+                return;
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            onFieldClick(sectionId, fieldPath);
+        };
+
+        (element as any).__fieldClickHandler = clickHandler;
+        element.addEventListener("click", clickHandler);
+
+        if (!element.querySelector(".field-edit-indicator")) {
+            const indicator = document.createElement("span");
+            indicator.className = "field-edit-indicator";
+            indicator.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>`;
+            element.appendChild(indicator);
+        }
+    };
+
+    const setupImageField = (element: HTMLElement, fieldPath: string) => {
+        element.classList.add("image-edit-wrapper");
+
+        const card = element.closest(".news-card, .project-card, .service-card, .cert-card, .partner-card, [class*='-card']");
+        const buttonContainer = card || element;
+
+        if (buttonContainer.querySelector(`.image-edit-button[data-for="${fieldPath}"]`)) return;
+
+        const button = document.createElement("button");
+        button.className = "image-edit-button";
+        button.setAttribute("data-for", fieldPath);
+        button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`;
+        button.title = "Thay đổi ảnh";
 
         const clickHandler = (e: Event) => {
             e.preventDefault();
@@ -75,54 +122,42 @@ export const useFieldScanner = (options: FieldScannerOptions) => {
             onFieldClick(sectionId, fieldPath);
         };
 
-        (element as any).__fieldClickHandler = clickHandler;
-        element.addEventListener("click", clickHandler, { capture: true });
+        (button as any).__fieldClickHandler = clickHandler;
+        button.addEventListener("click", clickHandler, { capture: true });
 
-        const isVoidElement = ["IMG", "INPUT", "BR", "HR"].includes(element.tagName);
-
-        if (isVoidElement) {
-            if (!element.parentElement?.querySelector(`.field-edit-indicator[data-for="${fieldPath}"]`)) {
-                const indicator = document.createElement("span");
-                indicator.className = "field-edit-indicator";
-                indicator.setAttribute("data-for", fieldPath);
-                indicator.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>`;
-
-                const wrapper = element.parentElement;
-                if (wrapper) {
-                    wrapper.style.position = "relative";
-                    wrapper.appendChild(indicator);
-                }
-            }
-        } else {
-            if (!element.querySelector(".field-edit-indicator")) {
-                const indicator = document.createElement("span");
-                indicator.className = "field-edit-indicator";
-                indicator.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>`;
-                element.appendChild(indicator);
-            }
-        }
+        buttonContainer.appendChild(button);
+        (element as any).__imageButtonContainer = buttonContainer;
     };
 
     const cleanup = () => {
         scannedFields.value.forEach(({ element, path }) => {
             const handler = (element as any).__fieldClickHandler;
             if (handler) {
-                element.removeEventListener("click", handler, { capture: true });
+                element.removeEventListener("click", handler);
                 delete (element as any).__fieldClickHandler;
             }
             element.classList.remove("scannable-field");
+            element.classList.remove("image-edit-wrapper");
             element.style.pointerEvents = "";
-            element.style.position = "";
+            if ((element as any).__originalPosition === "static") {
+                element.style.position = "";
+                delete (element as any).__originalPosition;
+            }
             element.style.cursor = "";
 
-            const isVoidElement = ["IMG", "INPUT", "BR", "HR"].includes(element.tagName);
-            if (isVoidElement) {
-                const indicator = element.parentElement?.querySelector(`.field-edit-indicator[data-for="${path}"]`);
-                if (indicator) indicator.remove();
-            } else {
-                const indicator = element.querySelector(".field-edit-indicator");
-                if (indicator) indicator.remove();
+            const buttonContainer = (element as any).__imageButtonContainer || element;
+            const imageButton = buttonContainer.querySelector(`.image-edit-button[data-for="${path}"]`);
+            if (imageButton) {
+                const btnHandler = (imageButton as any).__fieldClickHandler;
+                if (btnHandler) {
+                    imageButton.removeEventListener("click", btnHandler, { capture: true });
+                }
+                imageButton.remove();
             }
+            delete (element as any).__imageButtonContainer;
+
+            const indicator = element.querySelector(".field-edit-indicator");
+            if (indicator) indicator.remove();
 
             const parentLink = element.closest("a.link-disabled-for-edit") as HTMLElement | null;
             if (parentLink) {

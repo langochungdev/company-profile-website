@@ -177,6 +177,12 @@
     flex: none;
 }
 
+.project-card-link {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
 .project-card-hidden {
     display: none;
 }
@@ -187,6 +193,7 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
+    z-index: 2;
 }
 
 .project-image {
@@ -196,6 +203,7 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
+    z-index: 21;
 }
 
 .project-overlay {
@@ -209,6 +217,11 @@
     flex-direction: column;
     justify-content: flex-end;
     height: 100%;
+    pointer-events: none;
+}
+
+.project-overlay [data-field] {
+    pointer-events: auto;
 }
 
 .project-category-wrapper {
