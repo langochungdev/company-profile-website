@@ -86,10 +86,8 @@
 <script setup>
 import { useDetailContext } from '@/admin/composables/useDetailContext'
 import { usePreviewContext } from '@/admin/composables/usePreviewContext'
+import { useAutoSeo } from '@/admin/composables/useAutoSeo'
 import { productDetailConfig } from './productDetail.cms'
-import { generateProductSchema, generateBreadcrumbSchema } from '@/admin/utils/schema-generator'
-
-const SITE_URL = 'https://sht.langochung.me'
 
 const route = useRoute()
 const slug = route.params.slug
@@ -120,42 +118,7 @@ const getBadgeClass = (badge) => {
     return 'badge-default'
 }
 
-const productSchema = computed(() => {
-    if (!product.value) return null
-    return generateProductSchema(product.value, SITE_URL)
-})
-
-const breadcrumbSchema = computed(() => {
-    if (!product.value) return null
-    return generateBreadcrumbSchema([
-        { name: 'Trang Chủ', url: SITE_URL },
-        { name: 'Sản Phẩm', url: `${SITE_URL}/product` },
-        { name: product.value.name, url: `${SITE_URL}/product/${product.value.slug}` },
-    ])
-})
-
-useSeoMeta({
-    title: () => product.value ? `${product.value.name} - SHT Security` : 'Sản phẩm không tồn tại',
-    description: () => product.value?.description || '',
-    ogTitle: () => product.value?.name || '',
-    ogDescription: () => product.value?.description || '',
-    ogImage: () => product.value?.image || '',
-    ogType: 'product',
-})
-
-useHead({
-    script: computed(() => {
-        if (!product.value) return []
-        const scripts = []
-        if (productSchema.value) {
-            scripts.push({ type: 'application/ld+json', innerHTML: JSON.stringify(productSchema.value) })
-        }
-        if (breadcrumbSchema.value) {
-            scripts.push({ type: 'application/ld+json', innerHTML: JSON.stringify(breadcrumbSchema.value) })
-        }
-        return scripts
-    }),
-})
+useAutoSeo(productDetailConfig, product)
 </script>
 
 <style scoped>

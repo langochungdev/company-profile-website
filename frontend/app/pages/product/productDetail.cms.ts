@@ -2,6 +2,28 @@
 
 import type { FieldConfig } from "~/admin/config/page.config";
 
+interface SeoMapping {
+    title: string;
+    description: string;
+    image: string;
+}
+
+interface SchemaMapping {
+    name: string;
+    description: string;
+    image: string;
+    gallery?: string;
+    sku: string;
+    price?: string;
+    brand?: string;
+    currency?: string;
+}
+
+interface ListingMeta {
+    title: string;
+    description: string;
+}
+
 export interface ProductDetailConfig {
     type: "detail";
     collection: string;
@@ -10,6 +32,9 @@ export interface ProductDetailConfig {
     icon: string;
     schemaType?: string;
     listingSchemaType?: string;
+    seoMapping?: SeoMapping;
+    schemaMapping?: SchemaMapping;
+    listingMeta?: ListingMeta;
 
     itemFields: Record<string, FieldConfig>;
     tableColumns: Array<{ key: string; label: string; type: "text" | "image" | "badge" | "currency" | "date"; width?: number }>;
@@ -24,6 +49,28 @@ export const productDetailConfig: ProductDetailConfig = {
     icon: "mdi:package-variant",
     schemaType: "product",
     listingSchemaType: "productListing",
+
+    seoMapping: {
+        title: "name",
+        description: "description",
+        image: "image",
+    },
+
+    schemaMapping: {
+        name: "name",
+        description: "description",
+        image: "image",
+        gallery: "gallery",
+        sku: "slug",
+        price: "price",
+        brand: "SHT Security",
+        currency: "VND",
+    },
+
+    listingMeta: {
+        title: "Sản Phẩm & Giải Pháp",
+        description: "Danh mục sản phẩm an ninh, camera AI, thiết bị mạng WiFi doanh nghiệp, switch PoE, báo cháy và access control chính hãng.",
+    },
 
     itemFields: {
         name: { type: "text", label: "Tên sản phẩm", max: 100, required: true, placeholder: "Nhập tên sản phẩm...", isPreview: true },
@@ -55,8 +102,6 @@ export const productDetailConfig: ProductDetailConfig = {
                 caption: { type: "text", label: "Chú thích", max: 100 },
             },
         },
-        metaTitle: { type: "text", label: "Meta Title", max: 60, note: "Mặc định dùng tên sản phẩm" },
-        metaDescription: { type: "textarea", label: "Meta Description", max: 160, rows: 2 },
     },
 
     tableColumns: [

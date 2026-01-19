@@ -103,6 +103,77 @@ export function generateBreadcrumbSchema(items: Array<{ name: string; url?: stri
     };
 }
 
+interface ProductSchemaFullInput {
+    name: string;
+    description: string;
+    images: string[];
+    sku: string;
+    price?: number;
+    brand?: string;
+    currency?: string;
+    url: string;
+    priceValidUntil?: string;
+    availability?: "https://schema.org/InStock" | "https://schema.org/OutOfStock";
+}
+
+export function generateProductSchemaFull(input: ProductSchemaFullInput): object {
+    const currentYear = new Date().getFullYear();
+    const priceValidUntil = input.priceValidUntil || `${currentYear + 1}-12-31`;
+
+    const schema: Record<string, unknown> = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: input.name,
+        description: input.description,
+        image: input.images,
+        sku: input.sku,
+        brand: {
+            "@type": "Brand",
+            name: input.brand || "SHT Security",
+        },
+    };
+
+    if (input.price && input.price > 0) {
+        schema.offers = {
+            "@type": "Offer",
+            url: input.url,
+            priceCurrency: input.currency || "VND",
+            price: input.price,
+            priceValidUntil,
+            availability: input.availability || "https://schema.org/InStock",
+            itemCondition: "https://schema.org/NewCondition",
+        };
+    }
+
+    return schema;
+}
+
+interface CollectionPageInput {
+    name: string;
+    description: string;
+    url: string;
+    breadcrumbItems: Array<{ name: string; url: string }>;
+}
+
+export function generateCollectionPageSchema(input: CollectionPageInput): object {
+    return {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        name: input.name,
+        description: input.description,
+        url: input.url,
+        breadcrumb: {
+            "@type": "BreadcrumbList",
+            itemListElement: input.breadcrumbItems.map((item, index) => ({
+                "@type": "ListItem",
+                position: index + 1,
+                name: item.name,
+                item: item.url,
+            })),
+        },
+    };
+}
+
 export function generateSeoFromProduct(product: ProductData): SeoData {
     return {
         title: `${product.name} - SHT Security`,

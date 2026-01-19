@@ -1,63 +1,43 @@
-// Schema types cho Home Page
+/** Home Page Schema - WebSite và Organization */
 
-import type { BaseSchema, OrganizationSchema, BreadcrumbSchema, ImageSchema } from "../base.schema";
-
-export interface HomePageSchema extends BaseSchema {
-    "@type": "WebPage";
-    "@id"?: string;
-    name: string;
-    description?: string;
-    url: string;
-    isPartOf?: WebSiteSchema;
-    about?: OrganizationSchema;
-    breadcrumb?: BreadcrumbSchema;
-    primaryImageOfPage?: ImageSchema;
-}
-
-export interface WebSiteSchema extends BaseSchema {
-    "@type": "WebSite";
-    "@id"?: string;
-    name: string;
-    url: string;
-    description?: string;
-    publisher?: OrganizationSchema;
-    potentialAction?: SearchActionSchema;
-    inLanguage?: string;
-}
-
-export interface SearchActionSchema {
+export interface SearchAction {
     "@type": "SearchAction";
-    target: {
-        "@type": "EntryPoint";
-        urlTemplate: string;
-    };
+    target: string;
     "query-input": string;
 }
 
-export interface HomeSchemaConfig {
-    includeWebSite?: boolean;
-    includeOrganization?: boolean;
-    includeSearchAction?: boolean;
-    siteName?: string;
-    siteUrl?: string;
-    language?: string;
-}
-
-export const DEFAULT_HOME_SCHEMA_CONFIG: HomeSchemaConfig = {
-    includeWebSite: true,
-    includeOrganization: true,
-    includeSearchAction: true,
-    language: "vi-VN",
-};
-
-export interface HomeSchemaFieldMapping {
+export interface WebSiteSchema {
+    "@context": "https://schema.org";
+    "@type": "WebSite";
     name: string;
-    description?: string;
-    image?: string;
+    url: string;
+    potentialAction: SearchAction;
 }
 
-export const DEFAULT_HOME_FIELD_MAPPING: HomeSchemaFieldMapping = {
-    name: "siteName",
-    description: "siteDescription",
-    image: "ogImage",
-};
+export interface PostalAddress {
+    "@type": "PostalAddress";
+    streetAddress: string;
+    addressLocality: string;
+    addressRegion: string;
+    postalCode: string;
+    addressCountry: string;
+}
+
+export interface ContactPoint {
+    "@type": "ContactPoint";
+    telephone: string;
+    contactType: "customer service";
+    email: string;
+}
+
+export interface OrganizationSchema {
+    "@context": "https://schema.org";
+    "@type": "Organization";
+    name: string;
+    url: string;
+    logo: string;
+    description: string;
+    address: PostalAddress;
+    contactPoint: ContactPoint;
+    sameAs: string[];
+}

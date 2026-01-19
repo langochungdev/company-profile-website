@@ -1,14 +1,10 @@
 // Export tất cả schema types và registry
 
 export * from "./base.schema";
-export * from "./page/home.schema";
-export * from "./page/about.schema";
-export * from "./page/contact.schema";
-export * from "./page/faq.schema";
-export * from "./page/project.schema";
-export * from "./page/product.schema";
-export * from "./page/post.schema";
-export * from "./page/service.schema";
+export type { WebSiteSchema, SearchAction, PostalAddress, ContactPoint } from "./page/home.schema";
+export type { OrganizationSchema as HomeOrganizationSchema } from "./page/home.schema";
+export type { CollectionPageSchema, BreadcrumbList } from "./page/product-list.schema";
+export type { ProductSchema, Brand, Offer, AggregateRating, Review, ReviewRating, ReviewAuthor, BreadcrumbListSchema, AvailabilityType } from "./page/product-detail.schema";
 
 export type SchemaPageType = "home" | "about" | "contact" | "faq" | "project" | "projectListing" | "product" | "productListing" | "post" | "postListing" | "service" | "serviceListing";
 

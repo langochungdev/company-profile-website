@@ -8,8 +8,9 @@ export default defineNuxtConfig({
 
     runtimeConfig: {
         public: {
-            siteName: process.env.SITE_NAME || "default",
-            nodeEnv: process.env.NODE_ENV || "development",
+            siteName: "",
+            siteUrl: "",
+            nodeEnv: process.env.NUXT_PUBLIC_NODE_ENV || "development",
             firebaseApiKey: "",
             firebaseAuthDomain: "",
             firebaseProjectId: "",
