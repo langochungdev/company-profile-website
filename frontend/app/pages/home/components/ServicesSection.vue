@@ -64,59 +64,59 @@
 const activeIndex = ref(0)
 const services = [
     {
-        title: 'Camera An Ninh AI',
-        description: 'Giám sát 24/7, camera IP/Analog/WiFi, AI nhận diện người/xe, hàng rào ảo, Speed Dome PTZ, lưu trữ NAS/Cloud, giám sát đa điểm từ xa.',
+        title: 'Lorem Ipsum Dolor',
+        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
         icon: 'mdi:face-recognition',
-        image: 'https://placehold.co/600x400/1e293b/ffffff/jpg?text=Camera+AI',
+        image: 'https://placehold.co/600x400/webp?text=600x400',
         link: '/product/camera-ai-sht-pro'
     },
     {
-        title: 'Hạ Tầng Mạng',
-        description: 'Thi công mạng LAN, kéo cáp mạng, Switch/Router/Firewall, UPS/PoE, phân VLAN, VPN đa chi nhánh, đảm bảo kết nối ổn định 24/7.',
+        title: 'Consectetur Adipiscing',
+        description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute.',
         icon: 'mdi:lan',
-        image: 'https://placehold.co/600x400/0f766e/ffffff/jpg?text=Ha+Tang+Mang',
+        image: 'https://placehold.co/600x400/webp?text=600x400',
         link: '/product/switch-poe-24-port'
     },
     {
-        title: 'WiFi & Firewall',
-        description: 'WiFi Mesh/Access Point, Firewall bảo mật Anti-DDoS, Switch PoE, Load Balancing, Cloud Controller, tối ưu tốc độ và bảo mật.',
+        title: 'Sed Eiusmod Tempor',
+        description: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint.',
         icon: 'mdi:wifi',
-        image: 'https://placehold.co/600x400/7c3aed/ffffff/jpg?text=WiFi+Firewall',
+        image: 'https://placehold.co/600x400/webp?text=600x400',
         link: '/product/wifi-6-enterprise'
     },
     {
-        title: 'Tủ Rack & Data Center',
-        description: 'Tủ Rack 6U-42U, Patch Panel, quản lý cáp, lắp đặt Switch/Router/NVR/NAS, PDU/UPS, gọn gàng chuẩn chỉnh, dễ bảo trì nâng cấp.',
+        title: 'Ut Labore Dolore',
+        description: 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut.',
         icon: 'mdi:server',
-        image: 'https://placehold.co/600x400/475569/ffffff/jpg?text=Data+Center',
+        image: 'https://placehold.co/600x400/webp?text=600x400',
         link: '/product/router-load-balance'
     },
     {
-        title: 'Access Control',
-        description: 'Kiểm soát ra vào vân tay/khuôn mặt/thẻ từ, khóa điện tử, chấm công nhân viên, phân quyền phòng/cửa, liên kết camera xem lịch sử.',
+        title: 'Magna Aliqua Enim',
+        description: 'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos.',
         icon: 'mdi:fingerprint',
-        image: 'https://placehold.co/600x400/0284c7/ffffff/jpg?text=Access+Control',
+        image: 'https://placehold.co/600x400/webp?text=600x400',
         link: '/product/may-cham-cong-faceid'
     },
     {
-        title: 'Báo Động & Báo Cháy',
-        description: 'Cảm biến cửa/chuyển động, đầu báo khói/nhiệt, trung tâm báo cháy, còi/đèn/nút khẩn, gửi cảnh báo điện thoại, chuẩn an toàn.',
+        title: 'Quis Autem Vel',
+        description: 'Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit sed quia non numquam.',
         icon: 'mdi:alarm-light',
-        image: 'https://placehold.co/600x400/dc2626/ffffff/jpg?text=Bao+Chay',
+        image: 'https://placehold.co/600x400/webp?text=600x400',
         link: '/product/bao-chay-dia-chi-4-loop'
     },
     {
-        title: 'Tổng Đài IP PBX',
-        description: 'Tổng đài VoIP/SIP, máy lẻ nội bộ, chuyển máy tự động, ghi âm cuộc gọi, tổng đài cloud, hotline CSKH chuyên nghiệp.',
+        title: 'Eius Modi Tempora',
+        description: 'Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi.',
         icon: 'mdi:phone-voip',
-        image: 'https://placehold.co/600x400/059669/ffffff/jpg?text=Tong+Dai+IP',
+        image: 'https://placehold.co/600x400/webp?text=600x400',
         link: '/product'
     },
     {
-        title: 'Âm Thanh PA',
-        description: 'Loa trần/treo/cột, loa thông báo văn phòng/siêu thị, phát cảnh báo khẩn cấp, hẹn giờ phân vùng, âm thanh vận hành chuyên nghiệp.',
+        title: 'Incidunt Labore',
+        description: 'Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur vel illum.',
         icon: 'mdi:speaker',
-        image: 'https://placehold.co/600x400/d97706/ffffff/jpg?text=Am+Thanh+PA',
+        image: 'https://placehold.co/600x400/webp?text=600x400',
         link: '/product'
     }
 ]

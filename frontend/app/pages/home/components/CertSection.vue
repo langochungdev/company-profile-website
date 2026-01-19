@@ -14,8 +14,8 @@
                             <div class="certificates-track" :class="{ paused: pauseAnimation }">
                                 <template v-for="set in 2" :key="'cert-set-' + set">
                                     <div v-for="i in 10" :key="'cert-' + set + '-' + i" class="certificate-item">
-                                        <div class="certificate-card" @click="openPopup('https://placehold.co/300x400/jpg?text=300x400')">
-                                            <img src="https://placehold.co/300x400/jpg?text=300x400" :alt="'Giấy chứng nhận SHT ' + i" loading="lazy" class="certificate-img" />
+                                        <div class="certificate-card" @click="openPopup('https://placehold.co/300x400/webp?text=300x400')">
+                                            <img src="https://placehold.co/300x400/webp?text=300x400" :alt="'Giấy chứng nhận SHT ' + i" loading="lazy" class="certificate-img" />
                                         </div>
                                     </div>
                                 </template>

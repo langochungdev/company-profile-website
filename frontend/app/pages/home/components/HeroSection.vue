@@ -32,7 +32,7 @@
                         </div>
                     </div>
                     <div class="slide-visual" :class="{ 'editable-field': editable }" @click="handleEdit(`slides.${index}.image`)">
-                        <img :src="slide.image || 'https://placehold.co/600x600/png?text=600x600'" alt="Ảnh minh họa" class="visual-img" />
+                        <img :src="slide.image || 'https://placehold.co/600x600/webp?text=600x600'" alt="Ảnh minh họa" class="visual-img" />
                         <div v-if="editable" class="image-edit-overlay">
                             <Icon name="mdi:image-edit" />
                             <span>Thay đổi ảnh</span>
@@ -89,25 +89,25 @@ const currentSlide = ref(0)
 
 const defaultSlides: SlideData[] = [
     {
-        badge: 'Giải Pháp An Ninh Toàn Diện',
-        title: 'SHT - Chuyên Gia',
-        highlight: 'Camera & Hạ Tầng Mạng',
-        description: 'Cung cấp giải pháp an ninh thông minh, hạ tầng mạng chuyên nghiệp cho gia đình và doanh nghiệp. Đồng hành cùng bạn bảo vệ tài sản.',
-        image: 'https://placehold.co/1920x1080/jpg?text=1920x1080',
+        badge: 'Lorem ipsum dolor sit amet',
+        title: 'Lorem Ipsum',
+        highlight: 'Dolor Sit Amet',
+        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        image: 'https://placehold.co/1920x1080/webp?text=1920x1080',
     },
     {
-        badge: '8 Lĩnh Vực Cốt Lõi',
-        title: 'Hệ Thống Camera AI',
-        highlight: 'Giám Sát Thông Minh',
-        description: 'Camera nhận diện khuôn mặt, phát hiện xâm nhập, giám sát từ xa 24/7 qua điện thoại. Công nghệ AI tiên tiến nhất.',
-        image: 'https://placehold.co/1920x1080/jpg?text=1920x1080',
+        badge: 'Consectetur adipiscing',
+        title: 'Sed Do Eiusmod',
+        highlight: 'Tempor Incididunt',
+        description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        image: 'https://placehold.co/1920x1080/webp?text=1920x1080',
     },
     {
-        badge: 'Uy Tín - Chất Lượng',
-        title: 'Hạ Tầng Mạng',
-        highlight: 'Ổn Định 24/7',
-        description: 'Thi công mạng LAN, WiFi doanh nghiệp, Firewall bảo mật, VPN kết nối đa chi nhánh. Đảm bảo vận hành liên tục.',
-        image: 'https://placehold.co/1920x1080/jpg?text=1920x1080',
+        badge: 'Ut labore et dolore',
+        title: 'Duis Aute Irure',
+        highlight: 'Dolor Reprehenderit',
+        description: 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+        image: 'https://placehold.co/1920x1080/webp?text=1920x1080',
     }
 ]
 

@@ -10,7 +10,7 @@ export default defineNuxtConfig({
         public: {
             siteName: "",
             siteUrl: "",
-            nodeEnv: process.env.NUXT_PUBLIC_NODE_ENV || "development",
+            nodeEnv: "",
             firebaseApiKey: "",
             firebaseAuthDomain: "",
             firebaseProjectId: "",
@@ -20,6 +20,7 @@ export default defineNuxtConfig({
             firebaseMeasurementId: "",
         },
     },
+
     app: {
         head: {
             title: "Toptech - IT Solution Agency",
