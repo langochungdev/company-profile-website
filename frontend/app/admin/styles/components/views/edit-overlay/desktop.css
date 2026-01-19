@@ -1,6 +1,9 @@
 /* EditOverlay - Desktop styles */
 .edit-overlay-wrapper {
     position: relative;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .edit-overlay-wrapper.is-editable {
@@ -74,6 +77,10 @@
 }
 
 .section-content {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
     transition: opacity 0.3s;
 }
 
