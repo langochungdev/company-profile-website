@@ -72,30 +72,41 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
 
             if (editedData.value.hero) {
                 editedData.value.hero.slides = [
-                    {
-                        badge: "Giải Pháp An Ninh Toàn Diện",
-                        title: "SHT - Chuyên Gia",
-                        highlight: "Camera & Hạ Tầng Mạng",
-                        description: "Cung cấp giải pháp an ninh thông minh, hạ tầng mạng chuyên nghiệp.",
-                        image: "https://placehold.co/1920x1080/jpg?text=1920x1080",
-                    },
-                    {
-                        badge: "8 Lĩnh Vực Cốt Lõi",
-                        title: "Hệ Thống Camera AI",
-                        highlight: "Giám Sát Thông Minh",
-                        description: "Camera nhận diện khuôn mặt, giám sát từ xa 24/7.",
-                        image: "https://placehold.co/1920x1080/jpg?text=1920x1080",
-                    },
-                    {
-                        badge: "Uy Tín - Chất Lượng",
-                        title: "Hạ Tầng Mạng",
-                        highlight: "Ổn Định 24/7",
-                        description: "Thi công mạng LAN, WiFi doanh nghiệp.",
-                        image: "https://placehold.co/1920x1080/jpg?text=1920x1080",
-                    },
+                    { badge: "Giải Pháp An Ninh Toàn Diện", title: "SHT - Chuyên Gia", highlight: "Camera & Hạ Tầng Mạng", description: "Cung cấp giải pháp an ninh thông minh.", image: "https://placehold.co/1920x1080/jpg?text=1920x1080" },
+                    { badge: "8 Lĩnh Vực Cốt Lõi", title: "Hệ Thống Camera AI", highlight: "Giám Sát Thông Minh", description: "Camera nhận diện khuôn mặt, giám sát từ xa 24/7.", image: "https://placehold.co/1920x1080/jpg?text=1920x1080" },
+                    { badge: "Uy Tín - Chất Lượng", title: "Hạ Tầng Mạng", highlight: "Ổn Định 24/7", description: "Thi công mạng LAN, WiFi doanh nghiệp.", image: "https://placehold.co/1920x1080/jpg?text=1920x1080" },
                 ];
-                originalData.value = JSON.parse(JSON.stringify(editedData.value));
             }
+
+            if (editedData.value.services) {
+                editedData.value.services.sectionTitle = "Các Hạng Mục";
+                editedData.value.services.highlightText = "Thi Công";
+                editedData.value.services.items = [
+                    { title: "Camera AI", description: "Hệ thống camera AI nhận diện.", icon: "mdi:face-recognition", image: "https://placehold.co/600x400/webp?text=600x400", link: "/product" },
+                    { title: "Hạ Tầng Mạng", description: "Thiết kế và triển khai mạng LAN.", icon: "mdi:lan", image: "https://placehold.co/600x400/webp?text=600x400", link: "/product" },
+                    { title: "WiFi Enterprise", description: "Giải pháp WiFi cho doanh nghiệp.", icon: "mdi:wifi", image: "https://placehold.co/600x400/webp?text=600x400", link: "/product" },
+                    { title: "Server & NAS", description: "Lưu trữ và xử lý dữ liệu.", icon: "mdi:server", image: "https://placehold.co/600x400/webp?text=600x400", link: "/product" },
+                    { title: "Access Control", description: "Kiểm soát ra vào thông minh.", icon: "mdi:fingerprint", image: "https://placehold.co/600x400/webp?text=600x400", link: "/product" },
+                    { title: "Báo Cháy", description: "Hệ thống báo cháy địa chỉ.", icon: "mdi:alarm-light", image: "https://placehold.co/600x400/webp?text=600x400", link: "/product" },
+                    { title: "VoIP", description: "Tổng đài điện thoại IP.", icon: "mdi:phone-voip", image: "https://placehold.co/600x400/webp?text=600x400", link: "/product" },
+                    { title: "Âm Thanh", description: "Hệ thống âm thanh thông báo.", icon: "mdi:speaker", image: "https://placehold.co/600x400/webp?text=600x400", link: "/product" },
+                ];
+            }
+
+            if (editedData.value.projects) {
+                editedData.value.projects.badge = "Hồ sơ năng lực";
+                editedData.value.projects.sectionTitle = "Dự Án Hạ Tầng Đã làm";
+                editedData.value.projects.description = "Triển khai giải pháp an ninh và hạ tầng mạng.";
+                editedData.value.projects.items = [
+                    { title: "Data Center VNG", category: "DATA CENTER", badgeColor: "bg-cyan-400", description: "Hệ thống data center với 500 server.", image: "https://placehold.co/800x600/webp?text=800x600", link: "/post" },
+                    { title: "Camera AI Vincom", category: "CCTV & AI", badgeColor: "bg-emerald-400", description: "1000+ camera AI nhận diện.", image: "https://placehold.co/800x600/webp?text=800x600", link: "/post" },
+                    { title: "Access Control FPT", category: "ACCESS CONTROL", badgeColor: "bg-purple-400", description: "Kiểm soát 50 điểm ra vào.", image: "https://placehold.co/800x600/webp?text=800x600", link: "/post" },
+                    { title: "WiFi 7 Techcombank", category: "WIFI ENTERPRISE", badgeColor: "bg-orange-400", description: "Triển khai WiFi 7 toàn hệ thống.", image: "https://placehold.co/800x600/webp?text=800x600", link: "/post" },
+                    { title: "Báo Cháy Lotte", category: "FIRE ALARM", badgeColor: "bg-pink-400", description: "Hệ thống báo cháy thông minh.", image: "https://placehold.co/800x600/webp?text=800x600", link: "/post" },
+                ];
+            }
+
+            originalData.value = JSON.parse(JSON.stringify(editedData.value));
         } finally {
             isLoading.value = false;
         }

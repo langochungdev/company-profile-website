@@ -5,17 +5,18 @@
                 <div class="certificates-content">
                     <div class="certificates-header">
                         <h2 class="certificates-title">
-                            Giấy Chứng Nhận & <span class="text-primary">Chứng Chỉ</span>
+                            <span data-field="sectionTitle">{{ displayData.sectionTitle }}</span>
+                            <span class="text-primary" data-field="highlightText"> {{ displayData.highlightText }}</span>
                         </h2>
-                        <p class="certificates-subtitle">Uy tín & Chất lượng được công nhận</p>
+                        <p class="certificates-subtitle" data-field="subtitle">{{ displayData.subtitle }}</p>
                     </div>
                     <div class="certificates-scroll-wrapper">
                         <div class="certificates-scroll" @mouseenter="pauseAnimation = true" @mouseleave="pauseAnimation = false">
                             <div class="certificates-track" :class="{ paused: pauseAnimation }">
                                 <template v-for="set in 2" :key="'cert-set-' + set">
-                                    <div v-for="i in 10" :key="'cert-' + set + '-' + i" class="certificate-item">
-                                        <div class="certificate-card" @click="openPopup('https://placehold.co/300x400/webp?text=300x400')">
-                                            <img src="https://placehold.co/300x400/webp?text=300x400" :alt="'Giấy chứng nhận SHT ' + i" loading="lazy" class="certificate-img" />
+                                    <div v-for="(cert, index) in displayItems" :key="'cert-' + set + '-' + index" class="certificate-item">
+                                        <div class="certificate-card" @click="openPopup(cert.image)">
+                                            <img :src="cert.image" :alt="cert.title || 'Giấy chứng nhận'" loading="lazy" class="certificate-img" :data-field="`items.${index}.image`" data-field-type="image" />
                                         </div>
                                     </div>
                                 </template>
@@ -40,12 +41,49 @@
     </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { ref, computed, onUnmounted } from 'vue'
+
+interface CertItem {
+    image: string
+    title?: string
+}
+
+interface CertData {
+    sectionTitle?: string
+    highlightText?: string
+    subtitle?: string
+    items?: CertItem[]
+}
+
+const props = defineProps<{
+    data?: CertData
+}>()
+
 const pauseAnimation = ref(false)
 const showPopup = ref(false)
 const selectedImage = ref('')
 
-const openPopup = (imageSrc) => {
+const defaultData = {
+    sectionTitle: 'Giấy Chứng Nhận &',
+    highlightText: 'Chứng Chỉ',
+    subtitle: 'Uy tín & Chất lượng được công nhận'
+}
+
+const defaultItems: CertItem[] = Array.from({ length: 10 }, (_, i) => ({
+    image: 'https://placehold.co/300x400/webp?text=300x400',
+    title: `Chứng nhận ${i + 1}`
+}))
+
+const displayData = computed(() => ({
+    sectionTitle: props.data?.sectionTitle || defaultData.sectionTitle,
+    highlightText: props.data?.highlightText || defaultData.highlightText,
+    subtitle: props.data?.subtitle || defaultData.subtitle
+}))
+
+const displayItems = computed(() => props.data?.items || defaultItems)
+
+const openPopup = (imageSrc: string) => {
     selectedImage.value = imageSrc
     showPopup.value = true
     document.body.style.overflow = 'hidden'

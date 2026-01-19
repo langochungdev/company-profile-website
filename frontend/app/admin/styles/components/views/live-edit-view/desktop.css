@@ -135,7 +135,7 @@
     max-width: 100%;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 24px;
+    padding: 16px;
     box-sizing: border-box;
 }
 
@@ -213,4 +213,60 @@
 
 .unsupported-page button:hover {
     background: #2563eb;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    border-radius: 6px;
+}
+
+.section-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.btn-visibility {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 6px;
+    color: #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-visibility:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-visibility svg {
+    width: 16px;
+    height: 16px;
+}
+
+.section-content {
+    transition: opacity 0.3s;
+}
+
+.section-content.is-hidden {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.editable-section-wrapper {
+    margin-bottom: 16px;
+}
+
+.editable-section-wrapper:last-child {
+    margin-bottom: 0;
 }

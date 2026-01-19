@@ -8,9 +8,17 @@
             </div>
 
             <template v-else-if="hasLiveEditSupport">
-                <EditOverlay v-for="(section, sectionId) in enabledSections" :key="sectionId" :label="section.label" :editable="true" :visible="sectionVisibility[sectionId] ?? true" @toggle-visible="toggleSectionVisibility(sectionId)">
-                    <component :is="getSectionComponent(sectionId)" :data="getSectionData(sectionId)" :editable="true" @edit="(fieldPath: string) => openEditor(sectionId, fieldPath)" />
-                </EditOverlay>
+                <EditableSection v-for="(section, sectionId) in enabledSections" :key="sectionId" :section-id="String(sectionId)" :enabled="true" @edit="handleFieldEdit">
+                    <div class="section-header">
+                        <span class="section-label">{{ section.label }}</span>
+                        <button class="btn-visibility" @click="toggleSectionVisibility(String(sectionId))">
+                            <Icon :name="sectionVisibility[sectionId] !== false ? 'mdi:eye' : 'mdi:eye-off'" />
+                        </button>
+                    </div>
+                    <div :class="['section-content', { 'is-hidden': sectionVisibility[sectionId] === false }]">
+                        <component :is="getSectionComponent(String(sectionId))" :data="getSectionData(String(sectionId))" />
+                    </div>
+                </EditableSection>
             </template>
 
             <div v-else class="unsupported-page">
@@ -26,7 +34,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, defineAsyncComponent, computed } from "vue";
-import EditOverlay from "./EditOverlay.vue";
+import EditableSection from "./EditableSection.vue";
 import FieldPopupEditor from "./FieldPopupEditor.vue";
 import { useLiveEdit } from "../../composables/useLiveEdit";
 
@@ -42,6 +50,10 @@ const emit = defineEmits<{
 const { config, isDirty, isSaving, isLoading, editTarget, isPopupOpen, loadData, getSectionData, openEditor, closeEditor, applyEdit, save, discard } = useLiveEdit(props.pageKey);
 
 const sectionVisibility = ref<Record<string, boolean>>({});
+
+const handleFieldEdit = (sectionId: string, fieldPath: string) => {
+    openEditor(sectionId, fieldPath);
+};
 
 const sectionComponents = computed(() => {
     if (!config.value?.sections) return {};

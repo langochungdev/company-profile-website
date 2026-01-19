@@ -93,4 +93,17 @@
     .preview-area {
         padding: 8px;
     }
+
+    .section-header {
+        padding: 6px 10px;
+        margin-bottom: 6px;
+    }
+
+    .section-label {
+        font-size: 12px;
+    }
+
+    .editable-section-wrapper {
+        margin-bottom: 12px;
+    }
 }
