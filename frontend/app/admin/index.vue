@@ -3,10 +3,10 @@
     <div class="admin-layout">
         <div v-if="isMobileMenuOpen" class="sidebar-overlay" @click="isMobileMenuOpen = false" />
 
-        <AdminSidebar :pages="sidebarPages" :active-page="activePage" :is-collapsed="isSidebarCollapsed" @toggle="toggleSidebar" @switch="switchPage" />
+        <AdminSidebar :pages="sidebarPages" :active-page="activePage" :is-collapsed="isSidebarCollapsed" :is-mobile-open="isMobileMenuOpen" @toggle="toggleSidebar" @switch="switchPage" />
 
         <main :class="['admin-main', { 'sidebar-collapsed': isSidebarCollapsed }]">
-            <AdminHeader :page-name="currentPageName" :has-changes="hasChanges" :is-saving="isSaving" :show-save-button="showHeaderSaveButton" :tabs="headerTabs" :active-tab="currentActiveTab" @save="handleGlobalSave" @tab-change="handleTabChange" />
+            <AdminHeader :page-name="currentPageName" :has-changes="hasChanges" :is-saving="isSaving" :show-save-button="showHeaderSaveButton" :tabs="headerTabs" :active-tab="currentActiveTab" @save="handleGlobalSave" @tab-change="handleTabChange" @toggle-menu="toggleSidebar" />
 
             <div class="admin-content">
                 <div v-if="loading" class="loading-state">
@@ -22,55 +22,13 @@
 
                 <div v-else-if="currentConfig" class="editor-container">
                     <div v-if="isCollectionPage" class="collection-page">
-                        <div v-if="activeTab === 'items'" class="items-content">
-                            <div class="items-toolbar">
-                                <div class="search-box">
-                                    <Icon name="mdi:magnify" />
-                                    <input v-model="searchQuery" type="text" placeholder="Tìm kiếm..." class="search-input" />
-                                </div>
-
-                                <div class="toolbar-actions">
-                                    <select v-if="listConfig?.sortOptions" v-model="sortBy" class="filter-select">
-                                        <option value="">Sắp xếp...</option>
-                                        <option v-for="opt in listConfig.sortOptions" :key="opt.field + opt.direction" :value="opt.field + ':' + opt.direction">
-                                            {{ opt.label }}
-                                        </option>
-                                    </select>
-
-                                    <select v-for="filter in listConfig?.filterBy" :key="filter.field" v-model="activeFilters[filter.field]" class="filter-select">
-                                        <option value="">{{ filter.label }}</option>
-                                        <option v-for="opt in filter.options" :key="String(opt)" :value="opt">{{ opt }}</option>
-                                    </select>
-
-                                    <button class="btn-primary" @click="openAddModal">
-                                        <Icon name="mdi:plus" />
-                                        <span>Thêm mới</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <ItemsList :items="filteredItems" :columns="itemColumns" :item-config="itemConfigForList" @add="openAddModal" @edit="openEditModal" @delete="handleDelete" />
-
-                            <div v-if="totalPages > 1" class="pagination">
-                                <button :disabled="currentPage === 1" @click="currentPage--">
-                                    <Icon name="mdi:chevron-left" />
-                                </button>
-                                <span>{{ currentPage }} / {{ totalPages }}</span>
-                                <button :disabled="currentPage === totalPages" @click="currentPage++">
-                                    <Icon name="mdi:chevron-right" />
-                                </button>
-                            </div>
-                        </div>
+                        <ItemsManager v-if="activeTab === 'items'" :items="itemsList" :columns="itemColumns" :item-config="itemConfigForList" :list-config="listConfig || undefined" @add="openAddModal" @edit="openEditModal" @delete="handleDelete" />
 
                         <SettingsView v-else ref="collectionSettingsRef" :key="activePage" :page-key="activePage" :page-name="currentPageName" :config-path="currentConfigPath" :schema-type="currentSchemaType" :readonly="true" @dirty-change="hasChanges = $event" @saving-change="isSaving = $event" />
                     </div>
                 </div>
             </div>
         </main>
-
-        <button class="mobile-menu-btn" @click="isMobileMenuOpen = !isMobileMenuOpen">
-            <Icon name="mdi:menu" />
-        </button>
 
         <ItemEditor v-if="detailConfig" :is-open="isEditorOpen" :is-new="isNewItem" :item-name="getCollectionName" :config="detailConfig" :initial-data="editingItem" @close="closeEditor" @save="handleSaveItem" />
     </div>
@@ -84,6 +42,7 @@ import Field from "./components/fields/Field.vue";
 import ArrayField from "./components/fields/ArrayField.vue";
 import GroupField from "./components/fields/GroupField.vue";
 import ItemsList from "./components/collection/ItemsList.vue";
+import ItemsManager from "./components/collection/ItemsManager.vue";
 import ItemEditor from "./components/collection/ItemEditor.vue";
 import LiveEditView from "./components/views/LiveEditView.vue";
 import SettingsView from "./components/views/SettingsView.vue";
@@ -116,12 +75,6 @@ const collectionSettingsRef = ref<{ handleSave: () => Promise<void> } | null>(nu
 const isEditorOpen = ref(false);
 const isNewItem = ref(true);
 const editingItem = ref<Record<string, unknown>>({});
-
-const searchQuery = ref("");
-const sortBy = ref("");
-const activeFilters = ref<Record<string, string>>({});
-const currentPage = ref(1);
-const itemsPerPage = 10;
 
 const itemsList = ref<Record<string, unknown>[]>([]);
 
@@ -186,53 +139,11 @@ const handleTabChange = (key: string) => {
     }
 };
 
-const filteredItems = computed(() => {
-    let items = [...itemsList.value];
-
-    if (searchQuery.value) {
-        const query = searchQuery.value.toLowerCase();
-        const searchFields = listConfig.value?.searchFields || ["name", "title"];
-        items = items.filter((item) => searchFields.some((field: string) => String(item[field] || "").toLowerCase().includes(query)));
-    }
-
-    for (const [key, val] of Object.entries(activeFilters.value)) {
-        if (val) {
-            items = items.filter((item) => item[key] === val);
-        }
-    }
-
-    if (sortBy.value) {
-        const [field, direction] = sortBy.value.split(":");
-        if (field) {
-            items = [...items].sort((a, b) => {
-                const aVal = a[field];
-                const bVal = b[field];
-                const mult = direction === "desc" ? -1 : 1;
-                if (typeof aVal === "string") return mult * (aVal as string).localeCompare(bVal as string);
-                return mult * ((aVal as number) - (bVal as number));
-            });
-        }
-    }
-
-    return items;
-});
-
-const totalPages = computed(() => Math.ceil(filteredItems.value.length / itemsPerPage) || 1);
-
-const paginatedItems = computed(() => {
-    const start = (currentPage.value - 1) * itemsPerPage;
-    return filteredItems.value.slice(start, start + itemsPerPage);
-});
-
 const switchPage = (pageKey: string) => {
     activePage.value = pageKey;
     activeTab.value = checkIsCollection(pageKey) ? "items" : "settings";
     activeContentTab.value = "live";
     isMobileMenuOpen.value = false;
-    searchQuery.value = "";
-    sortBy.value = "";
-    activeFilters.value = {};
-    currentPage.value = 1;
     loadPageData();
 };
 
@@ -347,10 +258,6 @@ const handleDelete = (item: Record<string, unknown>) => {
         alert("Đã xóa!");
     }
 };
-
-watch([searchQuery, sortBy, activeFilters], () => {
-    currentPage.value = 1;
-});
 
 onMounted(() => {
     loadPageData();

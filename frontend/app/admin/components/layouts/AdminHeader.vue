@@ -2,6 +2,9 @@
 <template>
     <header class="admin-header">
         <div class="header-left">
+            <button class="mobile-menu-toggle" @click="$emit('toggle-menu')">
+                <Icon name="mdi:menu" />
+            </button>
             <div class="breadcrumb">
                 <span class="breadcrumb-item">
                     <Icon name="mdi:home" class="breadcrumb-icon" />
@@ -50,6 +53,7 @@ defineProps<{
 defineEmits<{
     save: []
     'tab-change': [key: string]
+    'toggle-menu': []
 }>()
 </script>
 

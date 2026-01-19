@@ -307,4 +307,5 @@ defineExpose({ handleSave });
 
 <style scoped>
 @import "../../styles/components/views/settings-view/desktop.css";
+@import "../../styles/components/views/settings-view/mobile.css";
 </style>

@@ -1,6 +1,96 @@
 /* LiveEditView - Mobile styles */
 @media (max-width: 768px) {
+    .live-edit-view-wrapper {
+        border-radius: 0;
+    }
+
+    .live-toolbar {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 12px;
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .divider {
+        display: none;
+    }
+
+    .page-label {
+        font-size: 13px;
+    }
+
+    .btn-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .btn-ghost,
+    .btn-primary {
+        padding: 10px 14px;
+        font-size: 14px;
+        flex: 1;
+        justify-content: center;
+    }
+
     .preview-area {
         padding: 12px;
+        overflow-x: hidden;
+    }
+
+    .loading-state {
+        padding: 40px 16px;
+    }
+
+    .loading-state svg {
+        width: 32px;
+        height: 32px;
+    }
+
+    .unsupported-page {
+        padding: 40px 16px;
+    }
+
+    .unsupported-page svg {
+        width: 36px;
+        height: 36px;
+    }
+
+    .unsupported-page h3 {
+        font-size: 16px;
+    }
+
+    .unsupported-page p {
+        font-size: 13px;
+    }
+
+    .unsupported-page button {
+        width: 100%;
+        padding: 12px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .live-toolbar {
+        padding: 10px;
+    }
+
+    .btn-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .btn-ghost,
+    .btn-primary {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    .preview-area {
+        padding: 8px;
     }
 }

@@ -104,11 +104,5 @@ const handleSave = () => {
 
 <style scoped>
 @import "../../styles/components/collection/item-editor/desktop.css";
-
-.editor-fields {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 20px;
-}
+@import "../../styles/components/collection/item-editor/mobile.css";
 </style>

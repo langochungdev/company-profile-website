@@ -128,4 +128,5 @@ const getYouTubeEmbed = (url: string) => {
 
 <style scoped>
 @import "../../styles/components/fields/field/desktop.css";
+@import "../../styles/components/fields/field/mobile.css";
 </style>

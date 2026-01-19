@@ -1,6 +1,6 @@
 <!-- Chức năng: Sidebar navigation cho admin panel -->
 <template>
-    <aside :class="['admin-sidebar', { 'sidebar-collapsed': isCollapsed }]">
+    <aside :class="['admin-sidebar', { 'sidebar-collapsed': isCollapsed, 'is-mobile-open': isMobileOpen }]">
         <div class="sidebar-header">
             <NuxtLink v-if="!isCollapsed" to="/" class="sidebar-logo">
                 <div class="logo-mark">
@@ -13,6 +13,9 @@
             </NuxtLink>
             <button class="sidebar-toggle" :title="isCollapsed ? 'Mở rộng' : 'Thu gọn'" @click="$emit('toggle')">
                 <Icon :name="isCollapsed ? 'mdi:chevron-right' : 'mdi:chevron-left'" />
+            </button>
+            <button class="mobile-close-btn" @click="$emit('toggle')">
+                <Icon name="mdi:close" />
             </button>
         </div>
 
@@ -49,6 +52,7 @@ defineProps<{
     pages: Array<{ key: string; name: string; icon: string; type?: string }>
     activePage: string
     isCollapsed: boolean
+    isMobileOpen?: boolean
 }>()
 
 defineEmits<{

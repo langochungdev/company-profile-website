@@ -27,4 +27,5 @@ defineEmits<{
 
 <style scoped>
 @import "../../styles/components/shared/section/desktop.css";
+@import "../../styles/components/shared/section/mobile.css";
 </style>

@@ -73,4 +73,5 @@ const handleApply = () => {
 
 <style scoped>
 @import "../../styles/components/views/field-popup-editor/desktop.css";
+@import "../../styles/components/views/field-popup-editor/mobile.css";
 </style>

@@ -1,10 +1,31 @@
 /* Section - Mobile styles */
-@media (max-width: 768px) {
+@media (max-width: 640px) {
+    .section-container {
+        border-radius: 12px;
+        margin-bottom: 16px;
+    }
+
     .section-header {
-        padding: 10px 14px;
+        padding: 12px 14px;
+        min-height: 44px;
+    }
+
+    .section-title {
+        font-size: 14px;
+        gap: 8px;
+    }
+
+    .section-title svg {
+        width: 18px;
+        height: 18px;
     }
 
     .section-content {
         padding: 14px;
+        gap: 12px;
+    }
+
+    .is-collapsed .section-header {
+        border-bottom: none;
     }
 }

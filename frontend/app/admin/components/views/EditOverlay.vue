@@ -45,4 +45,5 @@ const isHovered = ref(false)
 
 <style scoped>
 @import "../../styles/components/views/edit-overlay/desktop.css";
+@import "../../styles/components/views/edit-overlay/mobile.css";
 </style>

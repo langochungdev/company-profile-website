@@ -137,6 +137,12 @@ export interface TableColumn {
     width?: number;
 }
 
+export interface ListingConfig {
+    searchFields?: string[];
+    filterBy?: Array<{ field: string; label: string; options: string[] }>;
+    sortOptions?: Array<{ field: string; label: string; direction: "asc" | "desc" }>;
+}
+
 export interface PageConfig {
     page: string;
     pageName: string;
@@ -148,7 +154,7 @@ export interface PageConfig {
     componentBase?: string;
     schemaType?: string;
     sections: Record<string, SectionConfig>;
-    listConfig?: any;
+    listConfig?: ListingConfig;
     detailConfig?: any;
 }
 
