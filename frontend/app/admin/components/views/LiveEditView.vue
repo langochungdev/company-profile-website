@@ -16,7 +16,7 @@
                         </button>
                     </div>
                     <div :class="['section-content', { 'is-hidden': sectionVisibility[sectionId] === false }]">
-                        <component :is="getSectionComponent(String(sectionId))" :data="getSectionData(String(sectionId))" />
+                        <component :is="getSectionComponent(String(sectionId))" :data="getSectionData(String(sectionId))" :edit-mode="true" />
                     </div>
                 </EditableSection>
             </template>

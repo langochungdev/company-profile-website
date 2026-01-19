@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 
 interface SlideData {
     badge: string
@@ -65,11 +65,10 @@ interface HeroData {
     slides: SlideData[]
 }
 
-interface Props {
+const props = defineProps<{
     data?: HeroData
-}
-
-const props = defineProps<Props>()
+    editMode?: boolean
+}>()
 
 const currentSlide = ref(0)
 
@@ -115,14 +114,38 @@ const prevSlide = () => {
 
 let autoPlayInterval: ReturnType<typeof setInterval> | null = null
 
+const startAutoPlay = () => {
+    if (autoPlayInterval) clearInterval(autoPlayInterval)
+    if (!props.editMode) {
+        autoPlayInterval = setInterval(nextSlide, 5000)
+    }
+}
+
+const stopAutoPlay = () => {
+    if (autoPlayInterval) {
+        clearInterval(autoPlayInterval)
+        autoPlayInterval = null
+    }
+}
+
+watch(() => props.editMode, (isEdit) => {
+    if (import.meta.client) {
+        if (isEdit) {
+            stopAutoPlay()
+        } else {
+            startAutoPlay()
+        }
+    }
+})
+
 onMounted(() => {
-    autoPlayInterval = setInterval(nextSlide, 5000)
+    if (!props.editMode) {
+        startAutoPlay()
+    }
 })
 
 onUnmounted(() => {
-    if (autoPlayInterval) {
-        clearInterval(autoPlayInterval)
-    }
+    stopAutoPlay()
 })
 </script>
 

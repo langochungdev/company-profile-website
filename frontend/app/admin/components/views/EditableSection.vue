@@ -43,5 +43,6 @@ defineExpose({ rescan, scannedFields })
 </style>
 
 <style>
-@import "../../styles/components/scannable-field.css";
+@import "../../styles/components/scannable-field/desktop.css";
+@import "../../styles/components/scannable-field/mobile.css";
 </style>

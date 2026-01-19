@@ -67,7 +67,10 @@ const displayData = computed(() => ({
     subtitle: props.data?.subtitle || defaultData.subtitle
 }))
 
-const displayItems = computed(() => props.data?.items || defaultItems)
+const displayItems = computed(() => {
+    const items = props.data?.items
+    return items && items.length > 0 ? items : defaultItems
+})
 </script>
 
 <style scoped>

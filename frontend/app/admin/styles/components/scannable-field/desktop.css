@@ -95,12 +95,10 @@
     height: 12px;
 }
 
-/* Image fields - no overlay effect, use button instead */
 .scannable-field[data-field-type="image"] {
     display: block;
 }
 
-/* Array item fields */
 .scannable-field[data-field*="."] .field-edit-indicator {
     top: 2px;
     right: 2px;
@@ -111,22 +109,4 @@
 .scannable-field[data-field*="."] .field-edit-indicator svg {
     width: 10px;
     height: 10px;
-}
-
-@media (max-width: 768px) {
-    .scannable-field:hover {
-        outline-offset: 2px;
-    }
-
-    .field-edit-indicator {
-        top: 2px;
-        right: 2px;
-        width: 22px;
-        height: 22px;
-    }
-
-    .field-edit-indicator svg {
-        width: 10px;
-        height: 10px;
-    }
 }

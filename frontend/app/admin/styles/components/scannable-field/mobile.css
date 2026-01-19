@@ -1,0 +1,31 @@
+/* Scannable Field - Mobile styles */
+
+@media (max-width: 768px) {
+    .scannable-field:hover {
+        outline-offset: 2px;
+    }
+
+    .field-edit-indicator {
+        top: 2px;
+        right: 2px;
+        width: 22px;
+        height: 22px;
+    }
+
+    .field-edit-indicator svg {
+        width: 10px;
+        height: 10px;
+    }
+
+    .image-edit-button {
+        width: 32px;
+        height: 32px;
+        top: 6px;
+        right: 6px;
+    }
+
+    .image-edit-button svg {
+        width: 16px;
+        height: 16px;
+    }
+}

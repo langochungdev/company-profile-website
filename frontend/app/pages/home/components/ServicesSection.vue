@@ -105,7 +105,10 @@ const displayData = computed(() => ({
     highlightText: props.data?.highlightText || defaultData.highlightText
 }))
 
-const displayItems = computed(() => props.data?.items || defaultData.items)
+const displayItems = computed(() => {
+    const items = props.data?.items
+    return items && items.length > 0 ? items : defaultData.items
+})
 
 function getGridClass(index: number) {
     const classes = ['card-0', 'card-1', 'card-2', 'card-3', 'card-4', 'card-5', 'card-6', 'card-7']

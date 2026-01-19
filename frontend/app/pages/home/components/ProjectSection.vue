@@ -104,7 +104,10 @@ const displayData = computed(() => ({
     description: props.data?.description || defaultData.description
 }))
 
-const displayItems = computed(() => props.data?.items || defaultData.items)
+const displayItems = computed(() => {
+    const items = props.data?.items
+    return items && items.length > 0 ? items : defaultData.items
+})
 
 const onMouseEnter = (index: number) => {
     if (!isMobile.value) {

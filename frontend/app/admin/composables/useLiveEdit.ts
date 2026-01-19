@@ -65,61 +65,30 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
         }
     };
 
-    const loadData = async () => {
+    const loadData = async (externalData?: Record<string, Record<string, unknown>>) => {
         isLoading.value = true;
         try {
             initializeData();
 
-            if (editedData.value.hero) {
-                editedData.value.hero.slides = [
-                    { badge: "Giải Pháp An Ninh Toàn Diện", title: "SHT - Chuyên Gia", highlight: "Camera & Hạ Tầng Mạng", description: "Cung cấp giải pháp an ninh thông minh.", image: "https://placehold.co/1920x1080/jpg?text=1920x1080" },
-                    { badge: "8 Lĩnh Vực Cốt Lõi", title: "Hệ Thống Camera AI", highlight: "Giám Sát Thông Minh", description: "Camera nhận diện khuôn mặt, giám sát từ xa 24/7.", image: "https://placehold.co/1920x1080/jpg?text=1920x1080" },
-                    { badge: "Uy Tín - Chất Lượng", title: "Hạ Tầng Mạng", highlight: "Ổn Định 24/7", description: "Thi công mạng LAN, WiFi doanh nghiệp.", image: "https://placehold.co/1920x1080/jpg?text=1920x1080" },
-                ];
-            }
-
-            if (editedData.value.services) {
-                editedData.value.services.sectionTitle = "Các Hạng Mục";
-                editedData.value.services.highlightText = "Thi Công";
-                editedData.value.services.items = [
-                    { title: "Camera AI", description: "Hệ thống camera AI nhận diện.", icon: "mdi:face-recognition", image: "https://placehold.co/600x400/webp?text=600x400", link: "/product" },
-                    { title: "Hạ Tầng Mạng", description: "Thiết kế và triển khai mạng LAN.", icon: "mdi:lan", image: "https://placehold.co/600x400/webp?text=600x400", link: "/product" },
-                    { title: "WiFi Enterprise", description: "Giải pháp WiFi cho doanh nghiệp.", icon: "mdi:wifi", image: "https://placehold.co/600x400/webp?text=600x400", link: "/product" },
-                    { title: "Server & NAS", description: "Lưu trữ và xử lý dữ liệu.", icon: "mdi:server", image: "https://placehold.co/600x400/webp?text=600x400", link: "/product" },
-                    { title: "Access Control", description: "Kiểm soát ra vào thông minh.", icon: "mdi:fingerprint", image: "https://placehold.co/600x400/webp?text=600x400", link: "/product" },
-                    { title: "Báo Cháy", description: "Hệ thống báo cháy địa chỉ.", icon: "mdi:alarm-light", image: "https://placehold.co/600x400/webp?text=600x400", link: "/product" },
-                    { title: "VoIP", description: "Tổng đài điện thoại IP.", icon: "mdi:phone-voip", image: "https://placehold.co/600x400/webp?text=600x400", link: "/product" },
-                    { title: "Âm Thanh", description: "Hệ thống âm thanh thông báo.", icon: "mdi:speaker", image: "https://placehold.co/600x400/webp?text=600x400", link: "/product" },
-                ];
-            }
-
-            if (editedData.value.projects) {
-                editedData.value.projects.badge = "Hồ sơ năng lực";
-                editedData.value.projects.sectionTitle = "Dự Án Hạ Tầng Đã làm";
-                editedData.value.projects.description = "Triển khai giải pháp an ninh và hạ tầng mạng.";
-                editedData.value.projects.items = [
-                    { title: "Data Center VNG", category: "DATA CENTER", badgeColor: "bg-cyan-400", description: "Hệ thống data center với 500 server.", image: "https://placehold.co/800x600/webp?text=800x600", link: "/post" },
-                    { title: "Camera AI Vincom", category: "CCTV & AI", badgeColor: "bg-emerald-400", description: "1000+ camera AI nhận diện.", image: "https://placehold.co/800x600/webp?text=800x600", link: "/post" },
-                    { title: "Access Control FPT", category: "ACCESS CONTROL", badgeColor: "bg-purple-400", description: "Kiểm soát 50 điểm ra vào.", image: "https://placehold.co/800x600/webp?text=800x600", link: "/post" },
-                    { title: "WiFi 7 Techcombank", category: "WIFI ENTERPRISE", badgeColor: "bg-orange-400", description: "Triển khai WiFi 7 toàn hệ thống.", image: "https://placehold.co/800x600/webp?text=800x600", link: "/post" },
-                    { title: "Báo Cháy Lotte", category: "FIRE ALARM", badgeColor: "bg-pink-400", description: "Hệ thống báo cháy thông minh.", image: "https://placehold.co/800x600/webp?text=800x600", link: "/post" },
-                ];
-            }
-
-            if (editedData.value.news) {
-                editedData.value.news.sectionTitle = "Kiến Thức &";
-                editedData.value.news.highlightText = "Giải Pháp";
-                editedData.value.news.items = [
-                    { title: "Camera AI trong giám sát an ninh", description: "Tìm hiểu công nghệ AI trong hệ thống camera.", thumbnail: "https://placehold.co/800x600/webp?text=800x600", category: "Camera AI", publishedAt: "15/01/2026", link: "/post/camera-ai" },
-                    { title: "Xu hướng hạ tầng mạng 2026", description: "Những xu hướng công nghệ mạng mới nhất.", thumbnail: "https://placehold.co/800x600/webp?text=800x600", category: "Hạ Tầng Mạng", publishedAt: "12/01/2026", link: "/post/ha-tang-mang" },
-                    { title: "WiFi 7 và ứng dụng doanh nghiệp", description: "WiFi 7 mang lại gì cho doanh nghiệp.", thumbnail: "https://placehold.co/800x600/webp?text=800x600", category: "WiFi", publishedAt: "10/01/2026", link: "/post/wifi-7" },
-                ];
+            if (externalData) {
+                Object.entries(externalData).forEach(([sectionId, sectionData]) => {
+                    if (editedData.value[sectionId]) {
+                        editedData.value[sectionId] = { ...editedData.value[sectionId], ...sectionData };
+                    } else {
+                        editedData.value[sectionId] = sectionData;
+                    }
+                });
             }
 
             originalData.value = JSON.parse(JSON.stringify(editedData.value));
         } finally {
             isLoading.value = false;
         }
+    };
+
+    const setData = (sectionId: string, data: Record<string, unknown>) => {
+        editedData.value[sectionId] = { ...editedData.value[sectionId], ...data };
+        originalData.value[sectionId] = JSON.parse(JSON.stringify(editedData.value[sectionId]));
     };
 
     const getSectionData = (sectionId: string) => {
@@ -241,6 +210,7 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
         editTarget,
         isPopupOpen,
         loadData,
+        setData,
         getSectionData,
         getFieldValue,
         updateField,
