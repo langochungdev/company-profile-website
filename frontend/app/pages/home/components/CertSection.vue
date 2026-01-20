@@ -16,7 +16,7 @@
                                 <template v-for="set in 2" :key="'cert-set-' + set">
                                     <div v-for="(cert, index) in displayItems" :key="'cert-' + set + '-' + index" class="certificate-item">
                                         <div class="certificate-card" @click="openPopup(cert.image)">
-                                            <img :src="cert.image" :alt="cert.title || 'Giấy chứng nhận'" loading="lazy" class="certificate-img" :data-field="`items.${index}.image`" data-field-type="image" />
+                                            <img :src="getImageSrc(cert.image)" :alt="cert.title || 'Giấy chứng nhận'" loading="lazy" class="certificate-img" :data-field="`items.${index}.image`" data-field-type="image" />
                                         </div>
                                     </div>
                                 </template>
@@ -43,9 +43,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
+import { getImageSrc, type ImageValue } from '@/admin/utils/imageHelper'
 
 interface CertItem {
-    image: string
+    image: ImageValue
     title?: string
 }
 
@@ -91,8 +92,8 @@ const displayItems = computed(() => {
     }))
 })
 
-const openPopup = (imageSrc: string) => {
-    selectedImage.value = imageSrc
+const openPopup = (imageSrc: ImageValue) => {
+    selectedImage.value = getImageSrc(imageSrc)
     showPopup.value = true
     document.body.style.overflow = 'hidden'
 }

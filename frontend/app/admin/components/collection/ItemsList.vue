@@ -33,7 +33,7 @@
                 <tbody>
                     <tr v-for="(item, index) in items" :key="getItemId(item, index)" class="item-row" @click="$emit('edit', item)">
                         <td v-for="col in columns" :key="col.key" :data-label="col.label">
-                            <img v-if="col.type === 'image'" :src="String(getItemValue(item, col.key) || '')" class="item-image" />
+                            <img v-if="col.type === 'image'" :src="getImageSrc(getItemValue(item, col.key))" class="item-image" />
                             <span v-else-if="col.type === 'badge'" class="item-badge">{{ getItemValue(item, col.key) }}</span>
                             <span v-else-if="col.type === 'currency'" class="item-price">{{ formatPrice(getItemValue(item, col.key)) }}</span>
                             <span v-else class="item-text">{{ getItemValue(item, col.key) }}</span>
@@ -55,6 +55,7 @@
 
 <script setup lang="ts">
 import type { TableColumn } from '../../config/page.config'
+import { getImageSrc } from '@/admin/utils/imageHelper'
 
 interface ItemConfig {
     name: string

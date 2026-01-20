@@ -4,6 +4,7 @@ import { ref, type Ref } from "vue";
 import type { Firestore } from "firebase/firestore";
 import { getFirestorePath } from "@/admin/utils/firestore";
 import { PageService } from "@/admin/services/page.service";
+import { usePendingUploads, isPendingImage } from "@/admin/composables/usePendingUploads";
 import type { PageConfig, SectionConfig, FieldConfig } from "@/admin/config/page.config";
 
 interface PageContentResult {
@@ -168,6 +169,18 @@ export function usePageContext(config: PageConfig): PageContentResult {
         error.value = null;
 
         try {
+            const { hasPending, uploadAllPending } = usePendingUploads();
+
+            if (hasPending.value) {
+                const uploadResults = await uploadAllPending();
+
+                uploadResults.forEach((result, fieldPath) => {
+                    updateField(fieldPath, result.secure_url);
+                });
+            }
+
+            replacePendingWithUrls(data.value);
+
             const db = getDb();
             const firestorePath = getFirestorePath(config.path);
             await PageService.save(db, firestorePath, data.value);
@@ -176,6 +189,17 @@ export function usePageContext(config: PageConfig): PageContentResult {
             throw e;
         } finally {
             loading.value = false;
+        }
+    };
+
+    const replacePendingWithUrls = (obj: Record<string, any>) => {
+        for (const key in obj) {
+            const value = obj[key];
+            if (isPendingImage(value)) {
+                obj[key] = "";
+            } else if (typeof value === "object" && value !== null) {
+                replacePendingWithUrls(value);
+            }
         }
     };
 

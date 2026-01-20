@@ -2,7 +2,7 @@
     <section class="hero" aria-label="Banner giới thiệu công ty SHT">
         <div class="hero-slides">
             <div v-for="(slide, index) in displaySlides" :key="index" class="hero-slide" :class="{ active: currentSlide === index }">
-                <div class="slide-bg" :style="{ backgroundImage: `url(${slide.image})` }">
+                <div class="slide-bg" :style="{ backgroundImage: `url(${getImageSrc(slide.image)})` }">
                     <div class="slide-overlay"></div>
                 </div>
                 <div class="container slide-content">
@@ -29,7 +29,7 @@
                         </div>
                     </div>
                     <div class="slide-visual" :data-field="`slides.${index}.image`" data-field-type="image">
-                        <img :src="slide.image || 'https://placehold.co/600x600/webp?text=600x600'" alt="Ảnh minh họa" class="visual-img" />
+                        <img :src="getImageSrc(slide.image) || 'https://placehold.co/600x600/webp?text=600x600'" alt="Ảnh minh họa" class="visual-img" />
                     </div>
                 </div>
             </div>
@@ -52,13 +52,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { getImageSrc, type ImageValue } from '@/admin/utils/imageHelper'
 
 interface SlideData {
     badge: string
     title: string
     highlight: string
     description: string
-    image: string
+    image: ImageValue
 }
 
 interface HeroData {

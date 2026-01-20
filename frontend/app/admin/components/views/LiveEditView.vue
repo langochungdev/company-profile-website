@@ -28,7 +28,7 @@
             </div>
         </div>
 
-        <FieldPopupEditor :is-open="isPopupOpen" :field-config="editTarget?.fieldConfig || null" :initial-value="editTarget?.currentValue" @close="closeEditor" @apply="applyEdit" />
+        <FieldPopupEditor :is-open="isPopupOpen" :field-config="editTarget?.fieldConfig || null" :initial-value="editTarget?.currentValue" :field-path="fullFieldPath" @close="closeEditor" @apply="applyEdit" />
     </div>
 </template>
 
@@ -50,6 +50,11 @@ const emit = defineEmits<{
 const { config, isDirty, isSaving, isLoading, editTarget, isPopupOpen, loadData, getSectionData, openEditor, closeEditor, applyEdit, save, discard } = useLiveEdit(props.pageKey);
 
 const sectionVisibility = ref<Record<string, boolean>>({});
+
+const fullFieldPath = computed(() => {
+    if (!editTarget.value) return undefined;
+    return `${editTarget.value.sectionId}.${editTarget.value.fieldPath}`;
+});
 
 const handleFieldEdit = (sectionId: string, fieldPath: string) => {
     openEditor(sectionId, fieldPath);

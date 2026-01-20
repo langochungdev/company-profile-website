@@ -2,24 +2,23 @@
     <NuxtLayout name="main">
         <PageLoader />
         <main>
-            <HeroSection />
+            <HeroSection :data="(pageData?.hero as any)" />
 
-            <ServicesSection />
+            <ServicesSection :data="(pageData?.services as any)" />
 
-            <ProjectSection />
+            <ProjectSection :data="(pageData?.projects as any)" />
 
-            <NewsSection />
+            <NewsSection :data="(pageData?.news as any)" />
 
-            <!-- <BlogSection /> -->
+            <CertSection :data="(pageData?.certificates as any)" />
 
-            <CertSection />
-
-            <PartnerSection />
+            <PartnerSection :data="(pageData?.partners as any)" />
         </main>
     </NuxtLayout>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { onMounted } from 'vue'
 import PageLoader from '@/components/PageLoader.vue'
 import HeroSection from './components/HeroSection.vue'
 import ServicesSection from './components/ServicesSection.vue'
@@ -27,5 +26,13 @@ import ProjectSection from './components/ProjectSection.vue'
 import NewsSection from './components/NewsSection.vue'
 import CertSection from './components/CertSection.vue'
 import PartnerSection from './components/PartnerSection.vue'
-// import BlogSection from './components/BlogSection.vue'
+import { usePageData } from '@/composables/usePageData'
+
+type HomePageData = Record<string, Record<string, unknown>>
+
+const { data: pageData, loadData } = usePageData<HomePageData>('pages/home')
+
+onMounted(() => {
+    loadData()
+})
 </script>

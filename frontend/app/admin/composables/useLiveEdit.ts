@@ -4,6 +4,11 @@
 
 import { ref, computed, watch, toValue, type MaybeRef } from "vue";
 import { getPageConfig, type PageConfig, type FieldConfig } from "../config/page.config";
+import { usePendingUploads } from "./usePendingUploads";
+import { normalizeImageData } from "@/admin/utils/normalizeData";
+import { PageService } from "@/admin/services/page.service";
+import { getFirestorePath } from "@/admin/utils/firestore";
+import type { Firestore } from "firebase/firestore";
 
 export interface EditTarget {
     sectionId: string;
@@ -70,6 +75,23 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
         try {
             initializeData();
 
+            const pageConfig = config.value;
+            if (pageConfig?.path) {
+                const { $db } = useNuxtApp();
+                const firestorePath = getFirestorePath(pageConfig.path);
+                const firestoreData = await PageService.get<Record<string, Record<string, unknown>>>($db as Firestore, firestorePath);
+
+                if (firestoreData) {
+                    Object.entries(firestoreData).forEach(([sectionId, sectionData]) => {
+                        if (editedData.value[sectionId]) {
+                            editedData.value[sectionId] = { ...editedData.value[sectionId], ...sectionData };
+                        } else {
+                            editedData.value[sectionId] = sectionData;
+                        }
+                    });
+                }
+            }
+
             if (externalData) {
                 Object.entries(externalData).forEach(([sectionId, sectionData]) => {
                     if (editedData.value[sectionId]) {
@@ -81,6 +103,8 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
             }
 
             originalData.value = JSON.parse(JSON.stringify(editedData.value));
+        } catch (error) {
+            console.error("[useLiveEdit] Load data failed:", error);
         } finally {
             isLoading.value = false;
         }
@@ -210,9 +234,33 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
     const save = async () => {
         isSaving.value = true;
         try {
-            console.log("Saving data:", editedData.value);
-            await new Promise((resolve) => setTimeout(resolve, 500));
-            originalData.value = JSON.parse(JSON.stringify(editedData.value));
+            const { hasPending, uploadAllPending, clearAll } = usePendingUploads();
+
+            let normalizedData = JSON.parse(JSON.stringify(editedData.value));
+
+            if (hasPending.value) {
+                const uploadResults = await uploadAllPending();
+
+                normalizedData = {};
+                for (const [sectionId, sectionData] of Object.entries(editedData.value)) {
+                    normalizedData[sectionId] = normalizeImageData(sectionData as Record<string, unknown>, uploadResults, sectionId);
+                }
+            }
+
+            const pageConfig = config.value;
+            if (!pageConfig?.path) {
+                throw new Error("Page config path not found");
+            }
+
+            const { $db } = useNuxtApp();
+            const firestorePath = getFirestorePath(pageConfig.path);
+            await PageService.save($db as Firestore, firestorePath, normalizedData);
+
+            originalData.value = JSON.parse(JSON.stringify(normalizedData));
+            editedData.value = JSON.parse(JSON.stringify(normalizedData));
+        } catch (error) {
+            console.error("[useLiveEdit] Save failed:", error);
+            throw error;
         } finally {
             isSaving.value = false;
         }

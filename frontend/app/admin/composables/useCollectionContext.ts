@@ -5,6 +5,7 @@ import type { Firestore, DocumentData, QueryDocumentSnapshot } from "firebase/fi
 import { getFirestorePath } from "@/admin/utils/firestore";
 import { extractPreview } from "@/admin/utils/preview-extractor";
 import { CollectionService, type CollectionQueryOptions } from "@/admin/services/collection.service";
+import { usePendingUploads, isPendingImage } from "@/admin/composables/usePendingUploads";
 import type { FieldConfig } from "@/admin/config/page.config";
 
 interface CollectionConfig {
@@ -63,6 +64,50 @@ export function useCollectionContext(config: CollectionConfig): CollectionConten
             throw new Error("Firebase not initialized");
         }
         return $db as Firestore;
+    };
+
+    const processAndUploadPendingImages = async (data: Record<string, unknown>): Promise<Record<string, unknown>> => {
+        const { hasPending, uploadAllPending } = usePendingUploads();
+
+        if (hasPending.value) {
+            const uploadResults = await uploadAllPending();
+
+            uploadResults.forEach((result, fieldPath) => {
+                setNestedValue(data, fieldPath, result.secure_url);
+            });
+        }
+
+        replacePendingWithEmpty(data);
+        return data;
+    };
+
+    const setNestedValue = (obj: Record<string, unknown>, path: string, value: unknown) => {
+        const keys = path.split(".");
+        let current: Record<string, unknown> = obj;
+        for (let i = 0; i < keys.length - 1; i++) {
+            const key = keys[i];
+            if (key && !(key in current)) {
+                current[key] = {};
+            }
+            if (key) {
+                current = current[key] as Record<string, unknown>;
+            }
+        }
+        const lastKey = keys[keys.length - 1];
+        if (lastKey) {
+            current[lastKey] = value;
+        }
+    };
+
+    const replacePendingWithEmpty = (obj: Record<string, unknown>) => {
+        for (const key in obj) {
+            const value = obj[key];
+            if (isPendingImage(value)) {
+                obj[key] = "";
+            } else if (typeof value === "object" && value !== null) {
+                replacePendingWithEmpty(value as Record<string, unknown>);
+            }
+        }
     };
 
     const loadItems = async (options: LoadOptions = {}) => {
@@ -124,6 +169,9 @@ export function useCollectionContext(config: CollectionConfig): CollectionConten
             const collectionPath = getCollectionPath();
             const previewsPath = getPreviewsPath();
 
+            // Upload pending images first
+            await processAndUploadPendingImages(itemData as Record<string, unknown>);
+
             let previewData: Record<string, unknown> | undefined;
             if (config.itemFields) {
                 previewData = extractPreview(itemData as Record<string, unknown>, config.itemFields);
@@ -166,6 +214,9 @@ export function useCollectionContext(config: CollectionConfig): CollectionConten
             const db = getDb();
             const collectionPath = getCollectionPath();
             const previewsPath = getPreviewsPath();
+
+            // Upload pending images first
+            await processAndUploadPendingImages(data as Record<string, unknown>);
 
             const existingItem = items.value.find((item) => item.id === id);
             const fullItem = { ...existingItem, ...data, id };

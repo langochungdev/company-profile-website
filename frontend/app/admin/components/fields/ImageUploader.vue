@@ -1,23 +1,15 @@
-<!-- Chức năng: Component upload ảnh lên Cloudinary với progress bar -->
+<!-- Chức năng: Component upload ảnh với local preview, deferred upload -->
 <template>
-    <div class="image-uploader-wrapper" :class="{ 'drag-over': dragOver, 'has-error': !!error }">
-        <div v-if="uploading" class="upload-progress">
-            <div class="progress-bar">
-                <div class="progress-fill" :style="{ width: `${progress}%` }" />
-            </div>
-            <span class="progress-text">{{ progress }}%</span>
-            <p class="progress-label">Đang upload...</p>
-        </div>
-
-        <div v-else-if="modelValue" class="image-preview">
-            <img :src="modelValue" alt="Preview" />
-            <button type="button" class="remove-btn" :disabled="deleting" @click="handleRemove">
-                <Icon v-if="deleting" name="mdi:loading" class="spin" />
-                <Icon v-else name="mdi:close" />
+    <div class="image-uploader-wrapper" :class="{ 'drag-over': dragOver, 'has-error': !!error, 'is-pending': isPending }">
+        <div v-if="hasPreview" class="image-preview">
+            <img :src="previewSrc" alt="Preview" />
+            <span v-if="isPending" class="pending-badge">Chưa lưu</span>
+            <button type="button" class="remove-btn" @click="handleRemove">
+                <Icon name="mdi:close" />
             </button>
         </div>
 
-        <div v-else-if="!modelValue" class="upload-zone" @click="triggerFileInput" @dragover.prevent="dragOver = true" @dragleave.prevent="dragOver = false" @drop.prevent="handleDrop">
+        <div v-else class="upload-zone" @click="triggerFileInput" @dragover.prevent="dragOver = true" @dragleave.prevent="dragOver = false" @drop.prevent="handleDrop">
             <Icon name="mdi:cloud-upload" class="upload-icon" />
             <p class="upload-text">Click hoặc kéo thả ảnh vào</p>
         </div>
@@ -32,13 +24,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { useCloudinaryUpload } from "@/admin/composables/useCloudinaryUpload";
-import { extractPublicId, isCloudinaryUrl } from "@/admin/utils/cloudinary";
+import { ref, computed } from "vue";
+import { usePendingUploads, isPendingImage, type PendingImageValue } from "@/admin/composables/usePendingUploads";
 
 const props = withDefaults(
     defineProps<{
-        modelValue: string;
+        modelValue: string | PendingImageValue;
+        fieldPath: string;
         folder?: string;
         accept?: string;
     }>(),
@@ -48,55 +40,40 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-    (e: "update:modelValue", value: string): void;
+    (e: "update:modelValue", value: string | PendingImageValue): void;
 }>();
 
-const { uploading, progress, error: uploadError, upload, deleteAsset } = useCloudinaryUpload();
+const { addPending, removePending } = usePendingUploads();
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const dragOver = ref(false);
-const deleting = ref(false);
 const error = ref<string | null>(null);
+
+const isPending = computed(() => isPendingImage(props.modelValue));
+
+const hasPreview = computed(() => {
+    if (isPendingImage(props.modelValue)) {
+        return !!props.modelValue.previewUrl;
+    }
+    return !!props.modelValue;
+});
+
+const previewSrc = computed(() => {
+    if (isPendingImage(props.modelValue)) {
+        return props.modelValue.previewUrl;
+    }
+    return props.modelValue;
+});
 
 const triggerFileInput = () => {
     fileInput.value?.click();
-};
-
-const deleteOldImage = async (oldUrl: string) => {
-    if (!oldUrl || !isCloudinaryUrl(oldUrl)) return;
-
-    const publicId = extractPublicId(oldUrl);
-    if (!publicId) return;
-
-    try {
-        await deleteAsset(publicId);
-    } catch (e) {
-        console.warn("[ImageUploader] Failed to delete old image:", e);
-    }
-};
-
-const handleUpload = async (file: File) => {
-    error.value = null;
-
-    const oldUrl = props.modelValue;
-
-    try {
-        const result = await upload(file, { folder: props.folder });
-        emit("update:modelValue", result.secure_url);
-
-        if (oldUrl) {
-            await deleteOldImage(oldUrl);
-        }
-    } catch (e) {
-        error.value = (e as Error).message || "Upload thất bại";
-    }
 };
 
 const handleFileSelect = (e: Event) => {
     const target = e.target as HTMLInputElement;
     const file = target.files?.[0];
     if (file) {
-        handleUpload(file);
+        handleFile(file);
     }
     target.value = "";
 };
@@ -105,29 +82,29 @@ const handleDrop = (e: DragEvent) => {
     dragOver.value = false;
     const file = e.dataTransfer?.files?.[0];
     if (file && file.type.startsWith("image/")) {
-        handleUpload(file);
+        handleFile(file);
     }
 };
 
-const handleRemove = async () => {
+const handleFile = (file: File) => {
     error.value = null;
-    deleting.value = true;
 
-    try {
-        await deleteOldImage(props.modelValue);
-        emit("update:modelValue", "");
-    } catch (e) {
-        error.value = (e as Error).message || "Xóa thất bại";
-    } finally {
-        deleting.value = false;
-    }
+    const oldUrl = typeof props.modelValue === "string" ? props.modelValue : props.modelValue?.oldUrl;
+
+    const previewUrl = addPending(props.fieldPath, file, oldUrl, props.folder);
+
+    emit("update:modelValue", {
+        pending: true,
+        file,
+        previewUrl,
+        oldUrl,
+    });
 };
 
-watch(uploadError, (newError) => {
-    if (newError) {
-        error.value = newError.message;
-    }
-});
+const handleRemove = () => {
+    removePending(props.fieldPath);
+    emit("update:modelValue", "");
+};
 </script>
 
 <style scoped>

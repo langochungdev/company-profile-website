@@ -33,7 +33,7 @@
                 <div v-for="(project, index) in displayItems" :key="index" :style="{ '--aspect-ratio': aspectRatios[index] || 1.5 }" class="project-card" :class="{ 'project-card-hidden': index >= 3 }" @mouseenter="onMouseEnter(index)" @mouseleave="onMouseLeave">
                     <NuxtLink :to="project.link" class="project-card-link" />
                     <div class="project-image-wrapper">
-                        <img :src="project.image" :alt="project.title" loading="lazy" class="project-image" :class="{ 'project-image-active': hoveredIndex === index }" :data-field="`items.${index}.image`" data-field-type="image" />
+                        <img :src="getImageSrc(project.image)" :alt="project.title" loading="lazy" class="project-image" :class="{ 'project-image-active': hoveredIndex === index }" :data-field="`items.${index}.image`" data-field-type="image" />
                     </div>
 
                     <div class="project-overlay">
@@ -57,6 +57,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { getImageSrc, type ImageValue } from '@/admin/utils/imageHelper'
 
 interface ProjectItem {
     title: string
@@ -66,7 +67,7 @@ interface ProjectItem {
     location?: string
     year?: string
     description: string
-    image: string
+    image: ImageValue
     link: string
 }
 
@@ -143,7 +144,7 @@ onMounted(() => {
         img.onload = () => {
             aspectRatios.value[index] = img.width / img.height
         }
-        img.src = project.image
+        img.src = getImageSrc(project.image)
     })
 
     onUnmounted(() => {

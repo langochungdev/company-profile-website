@@ -44,7 +44,7 @@
 
                         <div v-else-if="field.type === 'image'" class="image-field">
                             <div v-if="settingsData[sectionKey][fieldKey]" class="image-preview">
-                                <img :src="settingsData[sectionKey][fieldKey]" :alt="field.label" />
+                                <img :src="getImageSrc(settingsData[sectionKey][fieldKey])" :alt="field.label" />
                                 <button v-if="!readonly" class="btn-remove" @click="settingsData[sectionKey][fieldKey] = ''">
                                     <Icon name="mdi:close" />
                                 </button>
@@ -117,6 +117,7 @@ import { useSettingsContext } from "@/admin/composables/useSettingsContext";
 import { SCHEMA_TYPE_MAP, type SchemaPageType } from "@/admin/types/schema";
 import { generateDefaultSchema } from "@/admin/utils/schema-generator";
 import { getSchemaConfigFields, getSchemaFieldMappingFields } from "@/admin/config/schema-settings.config";
+import { getImageSrc } from "@/admin/utils/imageHelper";
 
 const props = defineProps<{
     pageKey: string;

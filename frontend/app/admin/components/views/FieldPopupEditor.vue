@@ -15,7 +15,7 @@
                     </header>
 
                     <div class="popup-content">
-                        <Field v-if="fieldConfig" :field="(fieldConfig as any)" :model-value="localValue" @update:model-value="localValue = $event" />
+                        <Field v-if="fieldConfig" :field="(fieldConfig as any)" :model-value="localValue" :field-path="fieldPath" @update:model-value="localValue = $event" />
                         <p v-if="fieldConfig?.note" class="field-note">
                             <Icon name="mdi:information-outline" />
                             {{ fieldConfig.note }}
@@ -47,6 +47,7 @@ const props = defineProps<{
     isOpen: boolean
     fieldConfig: FieldConfig | null
     initialValue: unknown
+    fieldPath?: string
 }>()
 
 const emit = defineEmits<{

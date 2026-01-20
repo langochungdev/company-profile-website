@@ -39,7 +39,7 @@
         </template>
 
         <template v-else-if="field.type === 'image'">
-            <ImageUploader :model-value="String(modelValue || '')" :folder="field.folder" @update:model-value="emit('update:modelValue', $event)" />
+            <ImageUploader :model-value="modelValue as any" :folder="field.folder" :field-path="fieldPath || field.label" @update:model-value="emit('update:modelValue', $event)" />
         </template>
 
         <template v-else-if="field.type === 'video'">
@@ -78,6 +78,7 @@ interface FieldConfig {
 const props = defineProps<{
     field: FieldConfig
     modelValue: unknown
+    fieldPath?: string
 }>()
 
 const emit = defineEmits<{
