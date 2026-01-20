@@ -15,9 +15,11 @@
                 </div>
 
                 <template v-else-if="!isCollectionPage">
-                    <LiveEditView ref="liveEditRef" v-if="activeContentTab === 'live'" :page-key="activePage" @dirty-change="hasChanges = $event" @saving-change="isSaving = $event" />
+                    <ClientOnly v-if="activeContentTab === 'live'">
+                        <LiveEditView ref="liveEditRef" :page-key="activePage" @dirty-change="hasChanges = $event" @saving-change="isSaving = $event" />
+                    </ClientOnly>
 
-                    <SettingsView ref="settingsRef" v-else :key="activePage" :page-key="activePage" :page-name="currentPageName" :config-path="currentConfigPath" :schema-type="currentSchemaType" :readonly="false" @dirty-change="hasChanges = $event" @saving-change="isSaving = $event" />
+                    <SettingsView v-else ref="settingsRef" :key="activePage" :page-key="activePage" :page-name="currentPageName" :config-path="currentConfigPath" :schema-type="currentSchemaType" :readonly="false" @dirty-change="hasChanges = $event" @saving-change="isSaving = $event" />
                 </template>
 
                 <div v-else-if="currentConfig" class="editor-container">

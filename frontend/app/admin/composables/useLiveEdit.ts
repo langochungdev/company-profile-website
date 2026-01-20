@@ -79,6 +79,11 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
             const pageConfig = config.value;
             if (pageConfig?.path) {
                 const { $db } = useNuxtApp();
+
+                if (!$db) {
+                    return;
+                }
+
                 const firestorePath = getFirestorePath(pageConfig.path);
                 const firestoreData = await PageService.get<Record<string, Record<string, unknown>>>($db as Firestore, firestorePath);
 
