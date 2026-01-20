@@ -13,8 +13,8 @@
     }
 
     .admin-content {
-        padding: 16px;
-        padding-bottom: 24px;
+        padding: 12px;
+        /* padding-bottom: 24px; */
     }
 
     .editor-container {
@@ -77,8 +77,8 @@
 
 @media (max-width: 480px) {
     .admin-content {
-        padding: 12px;
-        padding-bottom: 72px;
+        /* padding: 12px; */
+        /* padding-bottom: 72px; */
     }
 
     .mobile-menu-btn {

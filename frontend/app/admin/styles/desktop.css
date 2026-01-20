@@ -20,8 +20,8 @@
     transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
-    overflow-x: hidden;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .admin-main.sidebar-collapsed {
@@ -31,7 +31,7 @@
 .admin-content {
     flex: 1;
     min-width: 0;
-    padding: 28px;
+    /* padding: 28px; */
     overflow-y: auto;
     overflow-x: hidden;
 }
