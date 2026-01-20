@@ -24,8 +24,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { usePendingUploads, isPendingImage, type PendingImageValue } from "@/admin/composables/usePendingUploads";
+import { useDeleteQueue } from "@/admin/composables/useDeleteQueue";
 
 const props = withDefaults(
     defineProps<{
@@ -44,10 +45,22 @@ const emit = defineEmits<{
 }>();
 
 const { addPending, removePending } = usePendingUploads();
+const { addToDeleteQueue } = useDeleteQueue();
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const dragOver = ref(false);
 const error = ref<string | null>(null);
+const lastKnownUrl = ref<string>("");
+
+watch(
+    () => props.modelValue,
+    (newVal) => {
+        if (typeof newVal === "string" && newVal && newVal.includes("cloudinary")) {
+            lastKnownUrl.value = newVal;
+        }
+    },
+    { immediate: true }
+);
 
 const isPending = computed(() => isPendingImage(props.modelValue));
 
@@ -89,20 +102,26 @@ const handleDrop = (e: DragEvent) => {
 const handleFile = (file: File) => {
     error.value = null;
 
-    const oldUrl = typeof props.modelValue === "string" ? props.modelValue : props.modelValue?.oldUrl;
+    if (lastKnownUrl.value) {
+        addToDeleteQueue(lastKnownUrl.value);
+        console.log("[ImageUploader] Added to delete queue:", lastKnownUrl.value);
+    }
 
-    const previewUrl = addPending(props.fieldPath, file, oldUrl, props.folder);
+    const previewUrl = addPending(props.fieldPath, file, undefined, props.folder);
 
     emit("update:modelValue", {
         pending: true,
         file,
         previewUrl,
-        oldUrl,
     });
 };
 
 const handleRemove = () => {
+    if (lastKnownUrl.value) {
+        addToDeleteQueue(lastKnownUrl.value);
+    }
     removePending(props.fieldPath);
+    lastKnownUrl.value = "";
     emit("update:modelValue", "");
 };
 </script>

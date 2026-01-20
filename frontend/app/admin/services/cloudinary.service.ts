@@ -47,8 +47,6 @@ export const CloudinaryService = {
 
         const folder = options.folder ? `${envFolder}/${options.folder}` : envFolder;
 
-        console.log("[CloudinaryService] Upload config:", { envFolder, optionsFolder: options.folder, finalFolder: folder });
-
         return new Promise((resolve, reject) => {
             const formData = new FormData();
             formData.append("file", file);

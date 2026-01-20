@@ -15,7 +15,7 @@
                     </header>
 
                     <div class="popup-content">
-                        <Field v-if="fieldConfig" :field="(fieldConfig as any)" :model-value="localValue" :field-path="fieldPath" @update:model-value="localValue = $event" />
+                        <Field v-if="fieldConfig && isReady" :field="(fieldConfig as any)" :model-value="localValue" :field-path="fieldPath" @update:model-value="localValue = $event" />
                         <p v-if="fieldConfig?.note" class="field-note">
                             <Icon name="mdi:information-outline" />
                             {{ fieldConfig.note }}
@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 import Field from '../fields/Field.vue'
 import type { FieldConfig } from '../../config/page.config'
 
@@ -56,14 +56,22 @@ const emit = defineEmits<{
 }>()
 
 const localValue = ref<unknown>(props.initialValue)
+const isReady = ref(false)
 
 watch(() => props.initialValue, (newVal) => {
     localValue.value = newVal
 }, { immediate: true })
 
-watch(() => props.isOpen, (isOpen) => {
+watch(() => props.isOpen, async (isOpen) => {
     if (isOpen) {
+        isReady.value = false
+        await nextTick()
         localValue.value = props.initialValue
+
+        await nextTick()
+        isReady.value = true
+    } else {
+        isReady.value = false
     }
 })
 

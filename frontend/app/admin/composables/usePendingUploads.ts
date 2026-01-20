@@ -29,10 +29,15 @@ export function usePendingUploads() {
 
     const addPending = (fieldPath: string, file: File, oldUrl?: string, folder?: string) => {
         const existingIndex = pendingUploads.value.findIndex((p) => p.fieldPath === fieldPath);
+        let preservedOldUrl = oldUrl;
+
         if (existingIndex >= 0) {
             const existing = pendingUploads.value[existingIndex];
             if (existing) {
                 URL.revokeObjectURL(existing.previewUrl);
+                if (!preservedOldUrl && existing.oldUrl) {
+                    preservedOldUrl = existing.oldUrl;
+                }
             }
             pendingUploads.value.splice(existingIndex, 1);
         }
@@ -42,7 +47,7 @@ export function usePendingUploads() {
             fieldPath,
             file,
             previewUrl,
-            oldUrl,
+            oldUrl: preservedOldUrl,
             folder,
         });
 
@@ -84,18 +89,6 @@ export function usePendingUploads() {
                 results.set(pending.fieldPath, result);
                 current++;
                 onProgress?.(current, total);
-
-                if (pending.oldUrl) {
-                    const { extractPublicId, isCloudinaryUrl } = await import("@/admin/utils/cloudinary");
-                    if (isCloudinaryUrl(pending.oldUrl)) {
-                        const publicId = extractPublicId(pending.oldUrl);
-                        if (publicId) {
-                            await CloudinaryService.deleteAsset(publicId).catch((e) => {
-                                console.warn("[usePendingUploads] Failed to delete old image:", e);
-                            });
-                        }
-                    }
-                }
             } catch (e) {
                 console.error(`[usePendingUploads] Failed to upload ${pending.fieldPath}:`, e);
                 throw e;

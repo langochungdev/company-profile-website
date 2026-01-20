@@ -5,6 +5,7 @@
 import { ref, computed, watch, toValue, type MaybeRef } from "vue";
 import { getPageConfig, type PageConfig, type FieldConfig } from "../config/page.config";
 import { usePendingUploads } from "./usePendingUploads";
+import { useDeleteQueue } from "./useDeleteQueue";
 import { normalizeImageData } from "@/admin/utils/normalizeData";
 import { PageService } from "@/admin/services/page.service";
 import { getFirestorePath } from "@/admin/utils/firestore";
@@ -210,11 +211,13 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
 
         if (!fieldConfig) return;
 
+        const currentValue = getFieldValue(sectionId, fieldPath);
+
         editTarget.value = {
             sectionId,
             fieldPath,
             fieldConfig,
-            currentValue: getFieldValue(sectionId, fieldPath),
+            currentValue,
         };
         isPopupOpen.value = true;
     };
@@ -234,7 +237,12 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
     const save = async () => {
         isSaving.value = true;
         try {
-            const { hasPending, uploadAllPending, clearAll } = usePendingUploads();
+            const { hasPending, uploadAllPending } = usePendingUploads();
+            const { hasUrlsToDelete, processDeleteQueue } = useDeleteQueue();
+
+            if (hasUrlsToDelete.value) {
+                await processDeleteQueue();
+            }
 
             let normalizedData = JSON.parse(JSON.stringify(editedData.value));
 
