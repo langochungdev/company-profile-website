@@ -13,7 +13,7 @@
                     <div class="certificates-scroll-wrapper">
                         <div class="certificates-scroll" @mouseenter="pauseAnimation = true" @mouseleave="pauseAnimation = false">
                             <div class="certificates-track" :class="{ paused: pauseAnimation }">
-                                <template v-for="set in 2" :key="'cert-set-' + set">
+                                <template v-for="set in duplicateCount" :key="'cert-set-' + set">
                                     <div v-for="(cert, index) in displayItems" :key="'cert-' + set + '-' + index" class="certificate-item">
                                         <div class="certificate-card" @click="openPopup(cert.image)">
                                             <img :src="getImageSrc(cert.image)" :alt="cert.title || 'Giấy chứng nhận'" loading="lazy" class="certificate-img" :data-field="`items.${index}.image`" data-field-type="image" />
@@ -59,6 +59,7 @@ interface CertData {
 
 const props = defineProps<{
     data?: CertData
+    editMode?: boolean
 }>()
 
 const pauseAnimation = ref(false)
@@ -71,7 +72,7 @@ const defaultData = {
     subtitle: 'Uy tín & Chất lượng được công nhận'
 }
 
-const defaultItems: CertItem[] = Array.from({ length: 10 }, (_, i) => ({
+const defaultItems: CertItem[] = Array.from({ length: 5 }, (_, i) => ({
     image: 'https://placehold.co/300x400/webp?text=300x400',
     title: `Chứng nhận ${i + 1}`
 }))
@@ -83,13 +84,16 @@ const displayData = computed(() => ({
 }))
 
 const displayItems = computed(() => {
-    const baseItems = defaultItems
-    const editedItems = props.data?.items
-    if (!editedItems || editedItems.length === 0) return baseItems
-    return baseItems.map((base, index) => ({
-        ...base,
-        ...(editedItems[index] || {})
-    }))
+    const items = props.data?.items
+    if (!items || items.length === 0) return defaultItems
+    return items
+})
+
+const duplicateCount = computed(() => {
+    const itemCount = displayItems.value.length
+    if (itemCount >= 6) return 2
+    if (itemCount >= 3) return 3
+    return Math.ceil(12 / Math.max(itemCount, 1))
 })
 
 const openPopup = (imageSrc: ImageValue) => {

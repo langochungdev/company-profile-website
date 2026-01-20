@@ -159,7 +159,9 @@ export const homeConfig = {
                 items: {
                     type: "array",
                     label: "Danh sách chứng nhận",
-                    exact: 10,
+                    editMode: "collection",
+                    minItems: 1,
+                    maxItems: 20,
                     sortable: true,
                     schema: {
                         image: { type: "image", label: "Ảnh chứng nhận", note: "Ảnh giấy chứng nhận/chứng chỉ", required: true },
@@ -182,7 +184,9 @@ export const homeConfig = {
                 items: {
                     type: "array",
                     label: "Danh sách đối tác",
-                    exact: 10,
+                    editMode: "collection",
+                    minItems: 1,
+                    maxItems: 20,
                     sortable: true,
                     schema: {
                         logo: { type: "image", label: "Logo đối tác", note: "Logo thương hiệu, nền trong suốt", required: true },

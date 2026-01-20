@@ -14,7 +14,7 @@
                     <div class="partners-scroll-wrapper">
                         <div class="partners-scroll" @mouseenter="pausePartners = true" @mouseleave="pausePartners = false">
                             <div class="partners-track" :class="{ paused: pausePartners }">
-                                <template v-for="set in 2" :key="'partner-set-' + set">
+                                <template v-for="set in duplicateCount" :key="'partner-set-' + set">
                                     <a v-for="(partner, index) in displayItems" :key="'partner-' + set + '-' + index" :href="partner.link || '#'" target="_blank" rel="noopener" class="partner-item">
                                         <img :src="getImageSrc(partner.logo)" :alt="partner.name || 'Đối tác'" loading="lazy" class="partner-logo" :data-field="`items.${index}.logo`" data-field-type="image" />
                                     </a>
@@ -47,6 +47,7 @@ interface PartnerData {
 
 const props = defineProps<{
     data?: PartnerData
+    editMode?: boolean
 }>()
 
 const pausePartners = ref(false)
@@ -57,7 +58,7 @@ const defaultData = {
     subtitle: 'Hợp tác cùng các thương hiệu hàng đầu'
 }
 
-const defaultItems: PartnerItem[] = Array.from({ length: 10 }, (_, i) => ({
+const defaultItems: PartnerItem[] = Array.from({ length: 5 }, (_, i) => ({
     logo: 'https://placehold.co/200x100/webp?text=200x100',
     name: `Partner ${i + 1}`
 }))
@@ -69,13 +70,16 @@ const displayData = computed(() => ({
 }))
 
 const displayItems = computed(() => {
-    const baseItems = defaultItems
-    const editedItems = props.data?.items
-    if (!editedItems || editedItems.length === 0) return baseItems
-    return baseItems.map((base, index) => ({
-        ...base,
-        ...(editedItems[index] || {})
-    }))
+    const items = props.data?.items
+    if (!items || items.length === 0) return defaultItems
+    return items
+})
+
+const duplicateCount = computed(() => {
+    const itemCount = displayItems.value.length
+    if (itemCount >= 6) return 2
+    if (itemCount >= 3) return 3
+    return Math.ceil(12 / Math.max(itemCount, 1))
 })
 </script>
 

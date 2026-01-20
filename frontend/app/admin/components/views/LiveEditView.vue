@@ -11,9 +11,14 @@
                 <EditableSection v-for="(section, sectionId) in enabledSections" :key="sectionId" :section-id="String(sectionId)" :enabled="true" @edit="handleFieldEdit">
                     <div class="section-header">
                         <span class="section-label">{{ section.label }}</span>
-                        <button class="btn-visibility" @click="toggleSectionVisibility(String(sectionId))">
-                            <Icon :name="sectionVisibility[sectionId] !== false ? 'mdi:eye' : 'mdi:eye-off'" />
-                        </button>
+                        <div class="section-header-actions">
+                            <button v-if="hasCollectionField(String(sectionId))" class="btn-collection" @click="openCollectionEditor(String(sectionId))">
+                                <Icon name="mdi:image-multiple" />
+                            </button>
+                            <button class="btn-visibility" @click="toggleSectionVisibility(String(sectionId))">
+                                <Icon :name="sectionVisibility[sectionId] !== false ? 'mdi:eye' : 'mdi:eye-off'" />
+                            </button>
+                        </div>
                     </div>
                     <div :class="['section-content', { 'is-hidden': sectionVisibility[sectionId] === false }]">
                         <component :is="getSectionComponent(String(sectionId))" :data="getSectionData(String(sectionId))" :edit-mode="true" />
@@ -28,7 +33,9 @@
             </div>
         </div>
 
-        <FieldPopupEditor :is-open="isPopupOpen" :field-config="editTarget?.fieldConfig || null" :initial-value="editTarget?.currentValue" :field-path="fullFieldPath" @close="closeEditor" @apply="applyEdit" />
+        <FieldPopupEditor :is-open="isPopupOpen && !isCollectionMode" :field-config="editTarget?.fieldConfig || null" :initial-value="editTarget?.currentValue" :field-path="fullFieldPath" @close="closeEditor" @apply="applyEdit" />
+
+        <FieldPopupEditor :is-open="isCollectionOpen" :field-config="activeCollectionConfig" :initial-value="activeCollectionItems" :field-path="activeCollectionFieldPath" mode="collection" :image-field="activeCollectionImageField" :min-items="activeCollectionMinItems" :max-items="activeCollectionMaxItems" @close="closeCollectionEditor" @apply="handleCollectionApply" />
     </div>
 </template>
 
@@ -47,14 +54,101 @@ const emit = defineEmits<{
     "saving-change": [isSaving: boolean];
 }>();
 
-const { config, isDirty, isSaving, isLoading, editTarget, isPopupOpen, loadData, getSectionData, openEditor, closeEditor, applyEdit, save, discard } = useLiveEdit(props.pageKey);
+const { config, isDirty, isSaving, isLoading, editTarget, isPopupOpen, loadData, getSectionData, getFieldValue, updateField, openEditor, closeEditor, applyEdit, save, discard } = useLiveEdit(props.pageKey);
 
 const sectionVisibility = ref<Record<string, boolean>>({});
+const isCollectionOpen = ref(false);
+const activeCollectionSectionId = ref<string | null>(null);
+const activeCollectionFieldKey = ref<string | null>(null);
+
+const isCollectionMode = computed(() => isCollectionOpen.value);
 
 const fullFieldPath = computed(() => {
     if (!editTarget.value) return undefined;
     return `${editTarget.value.sectionId}.${editTarget.value.fieldPath}`;
 });
+
+const activeCollectionConfig = computed(() => {
+    if (!activeCollectionSectionId.value || !activeCollectionFieldKey.value) return null;
+    const section = config.value?.sections[activeCollectionSectionId.value];
+    return section?.fields?.[activeCollectionFieldKey.value] || null;
+});
+
+const activeCollectionItems = computed(() => {
+    if (!activeCollectionSectionId.value || !activeCollectionFieldKey.value) return [];
+    const data = getSectionData(activeCollectionSectionId.value);
+    return (data[activeCollectionFieldKey.value] as unknown[]) || [];
+});
+
+const activeCollectionFieldPath = computed(() => {
+    if (!activeCollectionSectionId.value || !activeCollectionFieldKey.value) return undefined;
+    return `${activeCollectionSectionId.value}.${activeCollectionFieldKey.value}`;
+});
+
+const activeCollectionImageField = computed(() => {
+    if (!activeCollectionSectionId.value || !activeCollectionFieldKey.value) return "image";
+    const section = config.value?.sections[activeCollectionSectionId.value];
+    const field = section?.fields?.[activeCollectionFieldKey.value];
+    const schema = field?.schema;
+    if (schema) {
+        const imageKey = Object.keys(schema).find(k => schema[k]?.type === "image");
+        return imageKey || "image";
+    }
+    return "image";
+});
+
+const activeCollectionMinItems = computed(() => {
+    if (!activeCollectionSectionId.value || !activeCollectionFieldKey.value) return 1;
+    const section = config.value?.sections[activeCollectionSectionId.value];
+    const field = section?.fields?.[activeCollectionFieldKey.value] as { minItems?: number } | undefined;
+    return field?.minItems ?? 1;
+});
+
+const activeCollectionMaxItems = computed(() => {
+    if (!activeCollectionSectionId.value || !activeCollectionFieldKey.value) return 20;
+    const section = config.value?.sections[activeCollectionSectionId.value];
+    const field = section?.fields?.[activeCollectionFieldKey.value] as { maxItems?: number } | undefined;
+    return field?.maxItems ?? 20;
+});
+
+const hasCollectionField = (sectionId: string): boolean => {
+    const section = config.value?.sections[sectionId];
+    if (!section?.fields) return false;
+    return Object.values(section.fields).some((field) => {
+        const f = field as { editMode?: string };
+        return f.editMode === "collection";
+    });
+};
+
+const getCollectionFieldKey = (sectionId: string): string | null => {
+    const section = config.value?.sections[sectionId];
+    if (!section?.fields) return null;
+    const entry = Object.entries(section.fields).find(([, field]) => {
+        const f = field as { editMode?: string };
+        return f.editMode === "collection";
+    });
+    return entry ? entry[0] : null;
+};
+
+const openCollectionEditor = (sectionId: string) => {
+    const fieldKey = getCollectionFieldKey(sectionId);
+    if (!fieldKey) return;
+    activeCollectionSectionId.value = sectionId;
+    activeCollectionFieldKey.value = fieldKey;
+    isCollectionOpen.value = true;
+};
+
+const closeCollectionEditor = () => {
+    isCollectionOpen.value = false;
+    activeCollectionSectionId.value = null;
+    activeCollectionFieldKey.value = null;
+};
+
+const handleCollectionApply = (items: unknown) => {
+    if (!activeCollectionSectionId.value || !activeCollectionFieldKey.value) return;
+    updateField(activeCollectionSectionId.value, activeCollectionFieldKey.value, items);
+    closeCollectionEditor();
+};
 
 const handleFieldEdit = (sectionId: string, fieldPath: string) => {
     openEditor(sectionId, fieldPath);
@@ -63,18 +157,25 @@ const handleFieldEdit = (sectionId: string, fieldPath: string) => {
 const sectionComponents = computed(() => {
     if (!config.value?.sections) return {};
 
-    const componentBase = (config.value as any).componentBase || "components";
+    const cfg = config.value as { componentBase?: string; sections: Record<string, { component?: string }> };
+    const componentBase = cfg.componentBase || "components";
     const pageKey = props.pageKey;
 
     return Object.fromEntries(
         Object.entries(config.value.sections)
-            .filter(([, section]) => (section as any).component)
-            .map(([key, section]) => [
-                key,
-                defineAsyncComponent(() =>
-                    import(`@/pages/${pageKey}/${componentBase}/${(section as any).component}.vue`)
-                )
-            ])
+            .filter(([, section]) => {
+                const s = section as { component?: string };
+                return !!s.component;
+            })
+            .map(([key, section]) => {
+                const s = section as { component?: string };
+                return [
+                    key,
+                    defineAsyncComponent(() =>
+                        import(`@/pages/${pageKey}/${componentBase}/${s.component}.vue`)
+                    )
+                ];
+            })
     );
 });
 
@@ -85,7 +186,10 @@ const hasLiveEditSupport = computed(() => {
 const enabledSections = computed(() => {
     if (!config.value?.sections) return {};
     return Object.fromEntries(
-        Object.entries(config.value.sections).filter(([, section]) => (section as any).enabled !== false)
+        Object.entries(config.value.sections).filter(([, section]) => {
+            const s = section as { enabled?: boolean };
+            return s.enabled !== false;
+        })
     );
 });
 

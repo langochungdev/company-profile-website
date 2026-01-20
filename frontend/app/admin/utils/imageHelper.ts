@@ -14,3 +14,13 @@ export function getImageSrc(value: ImageValue | unknown | undefined | null): str
     }
     return "";
 }
+
+export async function createPendingImage(file: File, oldUrl?: string): Promise<PendingImageValue> {
+    const previewUrl = URL.createObjectURL(file);
+    return {
+        pending: true,
+        file,
+        previewUrl,
+        oldUrl,
+    };
+}

@@ -225,10 +225,40 @@
     border-radius: 6px;
 }
 
+.section-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
 .section-label {
     font-size: 13px;
     font-weight: 600;
     color: #ffffff;
+}
+
+.btn-collection {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(59, 130, 246, 0.8);
+    border: none;
+    border-radius: 6px;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-collection:hover {
+    background: rgba(59, 130, 246, 1);
+    transform: scale(1.05);
+}
+
+.btn-collection svg {
+    width: 16px;
+    height: 16px;
 }
 
 .btn-visibility {
