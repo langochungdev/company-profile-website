@@ -7,10 +7,14 @@ export default defineNuxtConfig({
     css: ["~/assets/css/reset.css"],
 
     runtimeConfig: {
+        cloudinaryApiKey: "",
+        cloudinaryApiSecret: "",
         public: {
             siteName: "",
             siteUrl: "",
-            nodeEnv: "",
+            envIsProd: false,
+            cloudinaryCloudName: "",
+            cloudinaryUploadPreset: "",
             firebaseApiKey: "",
             firebaseAuthDomain: "",
             firebaseProjectId: "",

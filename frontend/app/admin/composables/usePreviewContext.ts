@@ -1,8 +1,9 @@
 // Composable load preview collection cho listing pages
 
 import { ref, type Ref } from "vue";
-import { collection, getDocs, query, orderBy, limit, startAfter, where, type Firestore, type DocumentData, type QueryDocumentSnapshot, type QueryConstraint } from "firebase/firestore";
+import type { Firestore, DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 import { getFirestorePath } from "@/admin/utils/firestore";
+import { PreviewService, type PreviewQueryOptions } from "@/admin/services/preview.service";
 
 interface PreviewItem {
     id: string;
@@ -63,51 +64,33 @@ export function usePreviewContext(collectionPath: string): PreviewContextResult 
         try {
             const db = getDb();
             const previewsPath = getPreviewsPath();
-            const colRef = collection(db, previewsPath);
-
-            const constraints: QueryConstraint[] = [];
 
             if (options.category) {
                 currentCategory = options.category;
-                constraints.push(where("category", "==", options.category));
             }
 
             currentOrderBy = options.orderByField || "updatedAt";
             currentDirection = options.orderDirection || "desc";
-            constraints.push(orderBy(currentOrderBy, currentDirection));
 
-            const limitCount = options.limitCount || DEFAULT_LIMIT;
-            constraints.push(limit(limitCount));
+            const queryOptions: PreviewQueryOptions = {
+                orderByField: currentOrderBy,
+                orderDirection: currentDirection,
+                limitCount: options.limitCount || DEFAULT_LIMIT,
+                lastDoc: options.lastDoc,
+                category: options.category,
+            };
 
-            if (options.lastDoc) {
-                constraints.push(startAfter(options.lastDoc));
-            }
-
-            const q = query(colRef, ...constraints);
-            const snapshot = await getDocs(q);
-
-            const loadedPreviews: PreviewItem[] = [];
-            snapshot.forEach((docSnap) => {
-                loadedPreviews.push({
-                    id: docSnap.id,
-                    ...docSnap.data(),
-                });
-            });
+            const result = await PreviewService.getAll<PreviewItem>(db, previewsPath, queryOptions);
 
             if (options.lastDoc) {
-                previews.value = [...previews.value, ...loadedPreviews];
+                previews.value = [...previews.value, ...result.items];
             } else {
-                previews.value = loadedPreviews;
+                previews.value = result.items;
             }
 
             totalPreviews.value = previews.value.length;
-            hasMore.value = loadedPreviews.length >= limitCount;
-
-            if (snapshot.docs.length > 0) {
-                lastVisibleDoc = snapshot.docs[snapshot.docs.length - 1] ?? null;
-            } else {
-                hasMore.value = false;
-            }
+            hasMore.value = result.hasMore;
+            lastVisibleDoc = result.lastDoc;
         } catch (e) {
             error.value = e as Error;
             console.error("[usePreviewContext] loadPreviews error:", e);

@@ -1,7 +1,9 @@
+// Composable quản lý single page document
+
 import { ref, type Ref } from "vue";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "@/admin/config/firebase.config";
+import type { Firestore } from "firebase/firestore";
 import { getFirestorePath } from "@/admin/utils/firestore";
+import { PageService } from "@/admin/services/page.service";
 import type { PageConfig, SectionConfig, FieldConfig } from "@/admin/config/page.config";
 
 interface PageContentResult {
@@ -104,17 +106,25 @@ export function usePageContext(config: PageConfig): PageContentResult {
     const error = ref<Error | null>(null);
     const defaults = generateDefaults(config);
 
+    const getDb = (): Firestore => {
+        const { $db } = useNuxtApp();
+        if (!$db) {
+            throw new Error("Firebase not initialized");
+        }
+        return $db as Firestore;
+    };
+
     const loadData = async () => {
         loading.value = true;
         error.value = null;
 
         try {
+            const db = getDb();
             const firestorePath = getFirestorePath(config.path);
-            const docRef = doc(db, firestorePath);
-            const docSnap = await getDoc(docRef);
+            const result = await PageService.get<Record<string, any>>(db, firestorePath);
 
-            if (docSnap.exists()) {
-                data.value = docSnap.data() as Record<string, any>;
+            if (result) {
+                data.value = result;
             } else {
                 data.value = { ...defaults };
             }
@@ -158,9 +168,9 @@ export function usePageContext(config: PageConfig): PageContentResult {
         error.value = null;
 
         try {
+            const db = getDb();
             const firestorePath = getFirestorePath(config.path);
-            const docRef = doc(db, firestorePath);
-            await setDoc(docRef, data.value);
+            await PageService.save(db, firestorePath, data.value);
         } catch (e) {
             error.value = e as Error;
             throw e;

@@ -39,19 +39,7 @@
         </template>
 
         <template v-else-if="field.type === 'image'">
-            <div class="image-upload">
-                <div v-if="modelValue" class="image-preview">
-                    <img :src="String(modelValue)" alt="Preview" />
-                    <button class="remove-image" @click="$emit('update:modelValue', '')">
-                        <Icon name="mdi:close" />
-                    </button>
-                </div>
-                <div v-else class="upload-placeholder">
-                    <Icon name="mdi:cloud-upload" class="upload-icon" />
-                    <span>Click để upload ảnh</span>
-                    <input type="file" accept="image/*" class="file-input" @change="handleImageUpload" />
-                </div>
-            </div>
+            <ImageUploader :model-value="String(modelValue || '')" :folder="field.folder" @update:model-value="emit('update:modelValue', $event)" />
         </template>
 
         <template v-else-if="field.type === 'video'">
@@ -71,6 +59,7 @@
 
 <script setup lang="ts">
 import RichTextEditor from './RichTextEditor.vue'
+import ImageUploader from './ImageUploader.vue'
 
 interface FieldConfig {
     type: string
@@ -83,6 +72,7 @@ interface FieldConfig {
     note?: string
     placeholder?: string
     default?: unknown
+    folder?: string
 }
 
 const props = defineProps<{
@@ -107,17 +97,6 @@ const handleNumberInput = (e: Event) => {
 const handleCheckbox = (e: Event) => {
     const target = e.target as HTMLInputElement
     emit('update:modelValue', target.checked)
-}
-
-const handleImageUpload = (e: Event) => {
-    const file = (e.target as HTMLInputElement).files?.[0]
-    if (file) {
-        const reader = new FileReader()
-        reader.onload = () => {
-            emit('update:modelValue', reader.result as string)
-        }
-        reader.readAsDataURL(file)
-    }
 }
 
 const getYouTubeEmbed = (url: string) => {

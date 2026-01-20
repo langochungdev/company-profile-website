@@ -84,7 +84,7 @@
 </template>
 
 <script setup>
-import { useDetailContext } from '@/admin/composables/useDetailContext'
+import { useCollectionContext } from '@/admin/composables/useCollectionContext'
 import { usePreviewContext } from '@/admin/composables/usePreviewContext'
 import { useAutoSeo } from '@/admin/composables/useAutoSeo'
 import { productDetailConfig } from './productDetail.cms'
@@ -92,7 +92,7 @@ import { productDetailConfig } from './productDetail.cms'
 const route = useRoute()
 const slug = route.params.slug
 
-const { items, loading, loadItems } = useDetailContext(productDetailConfig)
+const { items, loading, loadItems } = useCollectionContext(productDetailConfig)
 const { previews, loadPreviews } = usePreviewContext('collections/products/items')
 
 const product = ref(null)

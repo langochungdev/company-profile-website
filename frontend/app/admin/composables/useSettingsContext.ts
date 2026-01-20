@@ -1,8 +1,9 @@
 // Composable quản lý Settings (SEO, OpenGraph, Schema) cho admin panel
 
 import { ref, type Ref } from "vue";
-import { doc, getDoc, setDoc, type Firestore } from "firebase/firestore";
+import type { Firestore } from "firebase/firestore";
 import { getFirestorePath } from "@/admin/utils/firestore";
+import { SettingsService } from "@/admin/services/settings.service";
 import { DEFAULT_SETTINGS, type SettingsData } from "@/admin/config/settings.config";
 
 interface SettingsContextResult {
@@ -55,22 +56,18 @@ export function useSettingsContext(configPath: string): SettingsContextResult {
         try {
             const db = getDb();
             const settingsPath = getSettingsPath();
-            const docRef = doc(db, settingsPath);
-            const docSnap = await getDoc(docRef);
+            const data = await SettingsService.get<SettingsData>(db, settingsPath);
 
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                if (data._settings) {
-                    settings.value = {
-                        seo: { ...DEFAULT_SETTINGS.seo, ...data._settings.seo },
-                        openGraph: { ...DEFAULT_SETTINGS.openGraph, ...data._settings.openGraph },
-                        schema: {
-                            config: { ...DEFAULT_SETTINGS.schema.config, ...(data._settings.schema?.config || {}) },
-                            fieldMapping: { ...DEFAULT_SETTINGS.schema.fieldMapping, ...(data._settings.schema?.fieldMapping || {}) },
-                        },
-                    };
-                    originalSettings.value = structuredClone(settings.value);
-                }
+            if (data) {
+                settings.value = {
+                    seo: { ...DEFAULT_SETTINGS.seo, ...data.seo },
+                    openGraph: { ...DEFAULT_SETTINGS.openGraph, ...data.openGraph },
+                    schema: {
+                        config: { ...DEFAULT_SETTINGS.schema.config, ...(data.schema?.config || {}) },
+                        fieldMapping: { ...DEFAULT_SETTINGS.schema.fieldMapping, ...(data.schema?.fieldMapping || {}) },
+                    },
+                };
+                originalSettings.value = structuredClone(settings.value);
             }
         } catch (e) {
             error.value = e as Error;
@@ -89,9 +86,7 @@ export function useSettingsContext(configPath: string): SettingsContextResult {
         try {
             const db = getDb();
             const settingsPath = getSettingsPath();
-            const docRef = doc(db, settingsPath);
-
-            await setDoc(docRef, { _settings: settings.value }, { merge: true });
+            await SettingsService.save(db, settingsPath, settings.value);
             originalSettings.value = structuredClone(settings.value);
         } catch (e) {
             error.value = e as Error;
