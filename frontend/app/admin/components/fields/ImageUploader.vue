@@ -1,6 +1,29 @@
 <!-- Chức năng: Component upload ảnh với local preview, deferred upload - hỗ trợ single và collection mode -->
 <template>
     <div class="image-uploader-wrapper" :class="wrapperClasses">
+        <div v-if="showQualityOption" class="quality-options">
+            <label class="quality-option" :class="{ active: selectedQuality === 'default', disabled: !isQualityEnabled }">
+                <input type="radio" value="default" v-model="selectedQuality" :disabled="!isQualityEnabled" />
+                <Icon name="mdi:image-filter-center-focus" class="option-icon" />
+                <div class="option-content">
+                    <span class="option-label">Mặc định</span>
+                    <span class="option-desc">Tối ưu dung lượng</span>
+                </div>
+            </label>
+            <label class="quality-option" :class="{ active: selectedQuality === 'high', disabled: !isQualityEnabled }">
+                <input type="radio" value="high" v-model="selectedQuality" :disabled="!isQualityEnabled" />
+                <Icon name="mdi:high-definition" class="option-icon" />
+                <div class="option-content">
+                    <span class="option-label">Nét</span>
+                    <span class="option-desc">Chất lượng cao</span>
+                </div>
+            </label>
+        </div>
+        <div v-if="isProcessing" class="processing-message">
+            <Icon name="mdi:loading" class="spin" />
+            <span>Đang xử lý ảnh...</span>
+        </div>
+
         <template v-if="isCollectionMode">
             <div v-if="collectionItems.length === 0" class="collection-empty">
                 <div class="empty-icon">
@@ -59,6 +82,7 @@ import { ref, computed, watch } from "vue";
 import { usePendingUploads, isPendingImage, type PendingImageValue } from "@/admin/composables/usePendingUploads";
 import { useDeleteQueue } from "@/admin/composables/useDeleteQueue";
 import { getImageSrc, type ImageValue } from "@/admin/utils/imageHelper";
+import { resizeImage, type ImageQuality } from "@/admin/utils/imageResizer";
 
 interface CollectionItem {
     [key: string]: ImageValue | string | undefined
@@ -74,6 +98,7 @@ const props = withDefaults(
         imageField?: string;
         minItems?: number;
         maxItems?: number;
+        showQualityOption?: boolean;
     }>(),
     {
         accept: "image/*",
@@ -81,6 +106,7 @@ const props = withDefaults(
         imageField: "image",
         minItems: 1,
         maxItems: 20,
+        showQualityOption: true,
     }
 );
 
@@ -97,6 +123,10 @@ const error = ref<string | null>(null);
 const lastKnownUrl = ref<string>("");
 const dragIndex = ref<number | null>(null);
 const dragOverIndex = ref<number | null>(null);
+const selectedQuality = ref<ImageQuality>("default");
+const originalFile = ref<File | null>(null);
+const originalPreview = ref<string>("");
+const isProcessing = ref(false);
 
 const isCollectionMode = computed(() => props.mode === "collection");
 
@@ -142,39 +172,75 @@ const previewSrc = computed(() => {
     return val as string;
 });
 
+const isQualityEnabled = computed(() => {
+    if (isCollectionMode.value) {
+        return collectionItems.value.length === 0;
+    }
+    return !!originalFile.value && !isProcessing.value;
+});
+
+watch(selectedQuality, async (newQuality) => {
+    if (!originalFile.value || isProcessing.value) return;
+    isProcessing.value = true;
+    try {
+        await processOriginalFile(newQuality);
+    } finally {
+        isProcessing.value = false;
+    }
+});
+
 const triggerFileInput = () => {
     fileInput.value?.click();
 };
 
-const handleFileSelect = (e: Event) => {
+const handleFileSelect = async (e: Event) => {
     const target = e.target as HTMLInputElement;
     const file = target.files?.[0];
     if (file) {
-        handleFile(file);
+        await handleFile(file);
     }
     target.value = "";
 };
 
-const handleDrop = (e: DragEvent) => {
+const handleDrop = async (e: DragEvent) => {
     dragOver.value = false;
     const file = e.dataTransfer?.files?.[0];
     if (file && file.type.startsWith("image/")) {
-        handleFile(file);
+        await handleFile(file);
     }
 };
 
-const handleFile = (file: File) => {
+const handleFile = async (file: File) => {
     error.value = null;
+
+    originalFile.value = file;
+    if (originalPreview.value) {
+        URL.revokeObjectURL(originalPreview.value);
+    }
+    originalPreview.value = URL.createObjectURL(file);
 
     if (lastKnownUrl.value) {
         addToDeleteQueue(lastKnownUrl.value);
     }
 
-    const previewUrl = addPending(props.fieldPath, file, undefined, props.folder);
-
     emit("update:modelValue", {
         pending: true,
         file,
+        previewUrl: originalPreview.value,
+    });
+
+    await processOriginalFile(selectedQuality.value);
+};
+
+const processOriginalFile = async (quality: ImageQuality) => {
+    if (!originalFile.value) return;
+
+    const resizedFile = await resizeImage(originalFile.value, quality);
+    const previewUrl = addPending(props.fieldPath, resizedFile, undefined, props.folder);
+
+    emit("update:modelValue", {
+        pending: true,
+        file: resizedFile,
         previewUrl,
     });
 };
@@ -184,6 +250,11 @@ const handleRemove = () => {
         addToDeleteQueue(lastKnownUrl.value);
     }
     removePending(props.fieldPath);
+    if (originalPreview.value) {
+        URL.revokeObjectURL(originalPreview.value);
+    }
+    originalFile.value = null;
+    originalPreview.value = "";
     lastKnownUrl.value = "";
     emit("update:modelValue", "");
 };
@@ -225,21 +296,22 @@ const handleCollectionFileSelect = async (event: Event) => {
 
 const processFiles = async (files: File[]) => {
     const remainingSlots = props.maxItems - collectionItems.value.length;
-    const filesToAdd = files.filter(f => f.type.startsWith("image/")).slice(0, remainingSlots);
+    const imageFiles = files.filter(f => f.type.startsWith("image/")).slice(0, remainingSlots);
 
     const newItems: CollectionItem[] = [];
     const currentLength = collectionItems.value.length;
 
-    for (let i = 0; i < filesToAdd.length; i++) {
-        const file = filesToAdd[i];
+    for (let i = 0; i < imageFiles.length; i++) {
+        const file = imageFiles[i];
         if (!file) continue;
 
+        const resizedFile = await resizeImage(file, selectedQuality.value);
         const fieldPath = `${props.fieldPath}.${currentLength + i}.${props.imageField}`;
-        const previewUrl = addPending(fieldPath, file);
+        const previewUrl = addPending(fieldPath, resizedFile);
 
         const pendingImage: PendingImageValue = {
             pending: true,
-            file,
+            file: resizedFile,
             previewUrl,
         };
         newItems.push({ [props.imageField]: pendingImage });
