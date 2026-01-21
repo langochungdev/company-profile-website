@@ -6,7 +6,7 @@
         <AdminSidebar :pages="sidebarPages" :active-page="activePage" :is-collapsed="isSidebarCollapsed" :is-mobile-open="isMobileMenuOpen" @toggle="toggleSidebar" @switch="switchPage" />
 
         <main :class="['admin-main', { 'sidebar-collapsed': isSidebarCollapsed }]">
-            <AdminHeader :page-name="currentPageName" :has-changes="hasChanges" :is-saving="isSaving" :show-save-button="showHeaderSaveButton" :tabs="headerTabs" :active-tab="currentActiveTab" @save="handleGlobalSave" @tab-change="handleTabChange" @toggle-menu="toggleSidebar" />
+            <AdminHeader :page-name="currentPageName" :has-changes="hasChanges" :is-saving="isSaving" :show-save-button="showHeaderSaveButton" :show-discard-button="showHeaderDiscardButton" :tabs="headerTabs" :active-tab="currentActiveTab" @save="handleGlobalSave" @discard="handleGlobalDiscard" @tab-change="handleTabChange" @toggle-menu="toggleSidebar" />
 
             <div class="admin-content">
                 <div v-if="loading" class="loading-state">
@@ -16,17 +16,17 @@
 
                 <template v-else-if="!isCollectionPage">
                     <ClientOnly v-if="activeContentTab === 'live'">
-                        <LiveEditView ref="liveEditRef" :page-key="activePage" @dirty-change="hasChanges = $event" @saving-change="isSaving = $event" />
+                        <LiveEditView ref="liveEditRef" :page-key="activePage" @dirty-change="liveEditDirty = $event" @saving-change="isSaving = $event" />
                     </ClientOnly>
 
-                    <SettingsView v-else ref="settingsRef" :key="activePage" :page-key="activePage" :page-name="currentPageName" :config-path="currentConfigPath" :schema-type="currentSchemaType" :readonly="false" @dirty-change="hasChanges = $event" @saving-change="isSaving = $event" />
+                    <SettingsView v-else ref="settingsRef" :key="activePage" :page-key="activePage" :page-name="currentPageName" :config-path="currentConfigPath" :schema-type="currentSchemaType" :readonly="false" @dirty-change="settingsDirty = $event" @saving-change="isSaving = $event" />
                 </template>
 
                 <div v-else-if="currentConfig" class="editor-container">
                     <div v-if="isCollectionPage" class="collection-page">
                         <ItemsManager v-if="activeTab === 'items'" :items="itemsList" :columns="itemColumns" :item-config="itemConfigForList" :list-config="listConfig || undefined" @add="openAddModal" @edit="openEditModal" @delete="handleDelete" />
 
-                        <SettingsView v-else ref="collectionSettingsRef" :key="activePage" :page-key="activePage" :page-name="currentPageName" :config-path="currentConfigPath" :schema-type="currentSchemaType" :readonly="true" @dirty-change="hasChanges = $event" @saving-change="isSaving = $event" />
+                        <SettingsView v-else ref="collectionSettingsRef" :key="activePage" :page-key="activePage" :page-name="currentPageName" :config-path="currentConfigPath" :schema-type="currentSchemaType" :readonly="true" @dirty-change="settingsDirty = $event" @saving-change="isSaving = $event" />
                     </div>
                 </div>
             </div>
@@ -66,13 +66,19 @@ const formData = ref<Record<string, Record<string, Record<string, unknown>>>>({}
 const collapsedSections = ref<Record<string, boolean>>({});
 const isSidebarCollapsed = ref(false);
 const isMobileMenuOpen = ref(false);
-const hasChanges = ref(false);
+const liveEditDirty = ref(false);
+const settingsDirty = ref(false);
 const isSaving = ref(false);
 const loading = ref(false);
 
-const liveEditRef = ref<{ handleSave: () => Promise<void> } | null>(null);
-const settingsRef = ref<{ handleSave: () => Promise<void> } | null>(null);
-const collectionSettingsRef = ref<{ handleSave: () => Promise<void> } | null>(null);
+const hasChanges = computed(() => {
+    if (isCollectionPage.value) return false;
+    return activeContentTab.value === 'live' ? liveEditDirty.value : settingsDirty.value;
+});
+
+const liveEditRef = ref<{ handleSave: () => Promise<void>; handleDiscard: () => void } | null>(null);
+const settingsRef = ref<{ handleSave: () => Promise<void>; handleDiscard: () => Promise<void> } | null>(null);
+const collectionSettingsRef = ref<{ handleSave: () => Promise<void>; handleDiscard: () => Promise<void> } | null>(null);
 
 const isEditorOpen = ref(false);
 const isNewItem = ref(true);
@@ -133,15 +139,61 @@ const showHeaderSaveButton = computed(() => {
     return true;
 });
 
+const showHeaderDiscardButton = computed(() => {
+    if (isCollectionPage.value) return false;
+    return true;
+});
+
 const handleTabChange = (key: string) => {
     if (isCollectionPage.value) {
         activeTab.value = key as "items" | "settings";
+        return;
+    }
+
+    const currentDirty = activeContentTab.value === 'live' ? liveEditDirty.value : settingsDirty.value;
+
+    if (currentDirty) {
+        const confirmed = window.confirm('Bạn có thay đổi chưa lưu. Bạn có muốn hủy không?');
+        if (!confirmed) return;
+
+        if (activeContentTab.value === 'live') {
+            liveEditRef.value?.handleDiscard();
+            liveEditDirty.value = false;
+        } else {
+            settingsRef.value?.handleDiscard();
+            settingsDirty.value = false;
+        }
+    }
+
+    activeContentTab.value = key as "live" | "settings";
+};
+
+const handleGlobalDiscard = async () => {
+    if (activeContentTab.value === 'live') {
+        liveEditRef.value?.handleDiscard();
+        liveEditDirty.value = false;
     } else {
-        activeContentTab.value = key as "live" | "settings";
+        await settingsRef.value?.handleDiscard();
+        settingsDirty.value = false;
     }
 };
 
 const switchPage = (pageKey: string) => {
+    const currentDirty = activeContentTab.value === 'live' ? liveEditDirty.value : settingsDirty.value;
+
+    if (currentDirty && !isCollectionPage.value) {
+        const confirmed = window.confirm('Bạn có thay đổi chưa lưu. Bạn có muốn hủy không?');
+        if (!confirmed) return;
+
+        if (activeContentTab.value === 'live') {
+            liveEditRef.value?.handleDiscard();
+            liveEditDirty.value = false;
+        } else {
+            settingsRef.value?.handleDiscard();
+            settingsDirty.value = false;
+        }
+    }
+
     activePage.value = pageKey;
     activeTab.value = checkIsCollection(pageKey) ? "items" : "settings";
     activeContentTab.value = "live";
@@ -153,17 +205,18 @@ const handleGlobalSave = async () => {
     if (isCollectionPage.value) {
         if (activeTab.value === "settings") {
             await collectionSettingsRef.value?.handleSave();
+            settingsDirty.value = false;
         }
-        hasChanges.value = false;
         return;
     }
 
     if (activeContentTab.value === "live") {
         await liveEditRef.value?.handleSave();
+        liveEditDirty.value = false;
     } else {
         await settingsRef.value?.handleSave();
+        settingsDirty.value = false;
     }
-    hasChanges.value = false;
 };
 
 const loadPageData = async () => {
@@ -213,12 +266,12 @@ const setFieldValue = (sectionKey: string, fieldKey: string, subKey: string | nu
     } else {
         formData.value[page]![sectionKey]![fieldKey] = value;
     }
-    hasChanges.value = true;
+    liveEditDirty.value = true;
 };
 
 const saveForm = () => {
     console.log("Saving form data:", formData.value);
-    hasChanges.value = false;
+    liveEditDirty.value = false;
     alert("Đã lưu thành công!");
 };
 

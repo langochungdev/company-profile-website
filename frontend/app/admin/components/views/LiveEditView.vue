@@ -234,7 +234,11 @@ onMounted(() => {
     }
 });
 
-defineExpose({ handleSave });
+const handleDiscard = () => {
+    discard();
+};
+
+defineExpose({ handleSave, handleDiscard });
 </script>
 
 <style scoped>

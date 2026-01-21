@@ -24,6 +24,12 @@
 
         <div class="header-right">
             <Transition name="fade">
+                <button v-if="showDiscardButton && hasChanges" class="discard-btn" @click="$emit('discard')">
+                    <Icon name="mdi:undo" />
+                    <span class="btn-text">Hủy</span>
+                </button>
+            </Transition>
+            <Transition name="fade">
                 <button v-if="showSaveButton" :class="['save-btn', { 'has-changes': hasChanges, disabled: isSaving }]" :disabled="!hasChanges || isSaving" @click="$emit('save')">
                     <Icon :name="isSaving ? 'mdi:loading' : 'mdi:content-save'" :class="{ spin: isSaving }" />
                     <span class="save-text">{{ isSaving ? 'Đang lưu...' : 'Lưu thay đổi' }}</span>
@@ -46,12 +52,14 @@ defineProps<{
     hasChanges?: boolean
     isSaving?: boolean
     showSaveButton?: boolean
+    showDiscardButton?: boolean
     tabs?: TabItem[]
     activeTab?: string
 }>()
 
 defineEmits<{
     save: []
+    discard: []
     'tab-change': [key: string]
     'toggle-menu': []
 }>()

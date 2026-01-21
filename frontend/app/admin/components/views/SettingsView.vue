@@ -112,7 +112,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch, onMounted } from "vue";
+import { ref, reactive, computed, watch, onMounted, nextTick } from "vue";
 import { useSettingsContext } from "@/admin/composables/useSettingsContext";
 import { SCHEMA_TYPE_MAP, type SchemaPageType } from "@/admin/types/schema";
 import { generateDefaultSchema } from "@/admin/utils/schema-generator";
@@ -234,6 +234,8 @@ const collapsedSections = ref<Record<string, boolean>>({
     schema: true,
 });
 
+const isSyncing = ref(false);
+
 const getSelectOptions = (options: any) => {
     if (!options) return [];
     return options;
@@ -295,15 +297,27 @@ watch(loading, (val) => {
 });
 
 watch([settingsData, schemaData], () => {
+    if (isSyncing.value) return;
     syncToContext();
 }, { deep: true });
 
 onMounted(async () => {
     await loadSettings();
+    isSyncing.value = true;
     syncFromContext();
+    await nextTick();
+    isSyncing.value = false;
 });
 
-defineExpose({ handleSave });
+const handleDiscard = async () => {
+    await loadSettings();
+    isSyncing.value = true;
+    syncFromContext();
+    await nextTick();
+    isSyncing.value = false;
+};
+
+defineExpose({ handleSave, handleDiscard });
 </script>
 
 <style scoped>
