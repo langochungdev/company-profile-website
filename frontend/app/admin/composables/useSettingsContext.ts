@@ -21,8 +21,8 @@ interface SettingsContextResult {
 }
 
 export function useSettingsContext(configPath: string): SettingsContextResult {
-    const settings = ref<SettingsData>(structuredClone(DEFAULT_SETTINGS));
-    const originalSettings = ref<SettingsData>(structuredClone(DEFAULT_SETTINGS));
+    const settings = ref<SettingsData>(JSON.parse(JSON.stringify(DEFAULT_SETTINGS)));
+    const originalSettings = ref<SettingsData>(JSON.parse(JSON.stringify(DEFAULT_SETTINGS)));
     const loading = ref(false);
     const error = ref<Error | null>(null);
 
@@ -67,7 +67,7 @@ export function useSettingsContext(configPath: string): SettingsContextResult {
                         fieldMapping: { ...DEFAULT_SETTINGS.schema.fieldMapping, ...(data.schema?.fieldMapping || {}) },
                     },
                 };
-                originalSettings.value = structuredClone(settings.value);
+                originalSettings.value = JSON.parse(JSON.stringify(settings.value));
             }
         } catch (e) {
             error.value = e as Error;
@@ -87,7 +87,7 @@ export function useSettingsContext(configPath: string): SettingsContextResult {
             const db = getDb();
             const settingsPath = getSettingsPath();
             await SettingsService.save(db, settingsPath, settings.value);
-            originalSettings.value = structuredClone(settings.value);
+            originalSettings.value = JSON.parse(JSON.stringify(settings.value));
         } catch (e) {
             error.value = e as Error;
             console.error("[useSettingsContext] saveSettings error:", e);
@@ -114,7 +114,7 @@ export function useSettingsContext(configPath: string): SettingsContextResult {
     };
 
     const resetToDefaults = () => {
-        settings.value = structuredClone(DEFAULT_SETTINGS);
+        settings.value = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
     };
 
     return {
