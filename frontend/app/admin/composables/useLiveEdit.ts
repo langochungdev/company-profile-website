@@ -6,7 +6,7 @@ import { ref, computed, watch, toValue, type MaybeRef } from "vue";
 import { getPageConfig, type PageConfig, type FieldConfig } from "../config/page.config";
 import { usePendingUploads } from "./usePendingUploads";
 import { useDeleteQueue } from "./useDeleteQueue";
-import { normalizeImageData } from "@/admin/utils/normalizeData";
+import { normalizeImageData, removeUndefinedValues } from "@/admin/utils/normalizeData";
 import { PageService } from "@/admin/services/page.service";
 import { getFirestorePath } from "@/admin/utils/firestore";
 import type { Firestore } from "firebase/firestore";
@@ -145,12 +145,19 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
             editedData.value[sectionId] = {};
         }
 
+        const shouldDelete = value === "" || value === undefined || value === null;
         const parts = fieldPath.split(".");
+
         if (parts.length === 1) {
-            editedData.value[sectionId] = {
-                ...editedData.value[sectionId],
-                [fieldPath]: value,
-            };
+            if (shouldDelete) {
+                const { [fieldPath]: _, ...rest } = editedData.value[sectionId];
+                editedData.value[sectionId] = rest;
+            } else {
+                editedData.value[sectionId] = {
+                    ...editedData.value[sectionId],
+                    [fieldPath]: value,
+                };
+            }
             return;
         }
 
@@ -183,7 +190,11 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
 
         const lastKey = parts[parts.length - 1];
         if (lastKey && typeof target === "object" && target !== null) {
-            (target as Record<string, unknown>)[lastKey] = value;
+            if (shouldDelete) {
+                delete (target as Record<string, unknown>)[lastKey];
+            } else {
+                (target as Record<string, unknown>)[lastKey] = value;
+            }
         }
 
         editedData.value[sectionId] = sectionData;
@@ -267,7 +278,8 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
 
             const { $db } = useNuxtApp();
             const firestorePath = getFirestorePath(pageConfig.path);
-            await PageService.save($db as Firestore, firestorePath, normalizedData);
+            const cleanedData = removeUndefinedValues(normalizedData) as Record<string, Record<string, unknown>>;
+            await PageService.save($db as Firestore, firestorePath, cleanedData);
 
             originalData.value = JSON.parse(JSON.stringify(normalizedData));
             editedData.value = JSON.parse(JSON.stringify(normalizedData));

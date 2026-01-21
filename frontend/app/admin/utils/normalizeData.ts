@@ -37,3 +37,28 @@ export function normalizeImageData(data: Record<string, unknown>, uploadResults:
 
     return result;
 }
+
+export function removeUndefinedValues(data: Record<string, unknown>): Record<string, unknown> {
+    const result: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(data)) {
+        if (value === undefined) continue;
+
+        if (Array.isArray(value)) {
+            result[key] = value
+                .filter((item) => item !== undefined)
+                .map((item) => {
+                    if (typeof item === "object" && item !== null) {
+                        return removeUndefinedValues(item as Record<string, unknown>);
+                    }
+                    return item;
+                });
+        } else if (typeof value === "object" && value !== null) {
+            result[key] = removeUndefinedValues(value as Record<string, unknown>);
+        } else {
+            result[key] = value;
+        }
+    }
+
+    return result;
+}

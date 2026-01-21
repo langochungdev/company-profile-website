@@ -36,10 +36,14 @@
             <div v-else class="collection-grid">
                 <div v-for="(item, index) in collectionItems" :key="index" class="collection-item" :class="{ dragging: dragIndex === index }" draggable="true" @dragstart="handleDragStart(index)" @dragover.prevent="handleDragOver(index)" @dragend="handleDragEnd">
                     <span class="item-index">{{ index + 1 }}</span>
-                    <img :src="getImageSrc(item[imageField])" :alt="`Ảnh ${index + 1}`" />
+                    <img :src="getImageSrc(item[imageField])" :alt="`Ảnh ${index + 1}`" @error="handleImageError($event)" />
+                    <div class="image-error-placeholder" v-if="imageErrors.has(index)">
+                        <Icon name="mdi:image-off-outline" />
+                        <span>Không tải được</span>
+                    </div>
                     <div class="item-overlay" />
                     <div class="item-actions">
-                        <button type="button" class="btn-item-action delete" @click="removeItem(index)" :disabled="collectionItems.length <= minItems" title="Xóa">
+                        <button type="button" class="btn-item-action delete" @click="removeItem(index)" title="Xóa">
                             <Icon name="mdi:trash-can-outline" />
                         </button>
                     </div>
@@ -55,7 +59,11 @@
 
         <template v-else>
             <div v-if="hasPreview" class="image-preview">
-                <img :src="previewSrc" alt="Preview" />
+                <img :src="previewSrc" alt="Preview" @error="handleSingleImageError" />
+                <div class="image-error-placeholder" v-if="singleImageError">
+                    <Icon name="mdi:image-off-outline" />
+                    <span>Không tải được</span>
+                </div>
                 <span v-if="isPending" class="pending-badge">Chưa lưu</span>
                 <button type="button" class="remove-btn" @click="handleRemove">
                     <Icon name="mdi:close" />
@@ -104,7 +112,7 @@ const props = withDefaults(
         accept: "image/*",
         mode: "single",
         imageField: "image",
-        minItems: 1,
+        minItems: 0,
         maxItems: 20,
         showQualityOption: true,
     }
@@ -127,6 +135,8 @@ const selectedQuality = ref<ImageQuality>("default");
 const originalFile = ref<File | null>(null);
 const originalPreview = ref<string>("");
 const isProcessing = ref(false);
+const imageErrors = ref<Set<number>>(new Set());
+const singleImageError = ref(false);
 
 const isCollectionMode = computed(() => props.mode === "collection");
 
@@ -145,8 +155,20 @@ const collectionItems = computed({
 watch(
     () => props.modelValue,
     (newVal) => {
-        if (!isCollectionMode.value && typeof newVal === "string" && newVal && newVal.includes("cloudinary")) {
-            lastKnownUrl.value = newVal;
+        if (isCollectionMode.value) return;
+        
+        if (typeof newVal === "string") {
+            if (newVal && newVal.includes("cloudinary")) {
+                lastKnownUrl.value = newVal;
+            } else if (newVal === "") {
+                lastKnownUrl.value = "";
+                singleImageError.value = false;
+                originalFile.value = null;
+                if (originalPreview.value) {
+                    URL.revokeObjectURL(originalPreview.value);
+                }
+                originalPreview.value = "";
+            }
         }
     },
     { immediate: true }
@@ -174,7 +196,7 @@ const previewSrc = computed(() => {
 
 const isQualityEnabled = computed(() => {
     if (isCollectionMode.value) {
-        return collectionItems.value.length === 0;
+        return !isProcessing.value;
     }
     return !!originalFile.value && !isProcessing.value;
 });
@@ -212,6 +234,7 @@ const handleDrop = async (e: DragEvent) => {
 
 const handleFile = async (file: File) => {
     error.value = null;
+    singleImageError.value = false;
 
     originalFile.value = file;
     if (originalPreview.value) {
@@ -246,7 +269,7 @@ const processOriginalFile = async (quality: ImageQuality) => {
 };
 
 const handleRemove = () => {
-    if (lastKnownUrl.value) {
+    if (lastKnownUrl.value && !singleImageError.value) {
         addToDeleteQueue(lastKnownUrl.value);
     }
     removePending(props.fieldPath);
@@ -256,6 +279,7 @@ const handleRemove = () => {
     originalFile.value = null;
     originalPreview.value = "";
     lastKnownUrl.value = "";
+    singleImageError.value = false;
     emit("update:modelValue", "");
 };
 
@@ -321,8 +345,31 @@ const processFiles = async (files: File[]) => {
 };
 
 const removeItem = (index: number) => {
-    if (collectionItems.value.length <= props.minItems) return;
+    const item = collectionItems.value[index];
+    if (item) {
+        const imageValue = item[props.imageField];
+        const hasImageError = imageErrors.value.has(index);
+
+        if (typeof imageValue === 'string' && imageValue.includes('cloudinary') && !hasImageError) {
+            addToDeleteQueue(imageValue);
+        }
+    }
+
+    imageErrors.value.delete(index);
     collectionItems.value = collectionItems.value.filter((_, i) => i !== index);
+};
+
+const handleImageError = (event: Event) => {
+    const img = event.target as HTMLImageElement;
+    const index = parseInt(img.closest('.collection-item')?.querySelector('.item-index')?.textContent || '0') - 1;
+    imageErrors.value.add(index);
+    img.style.opacity = '0';
+};
+
+const handleSingleImageError = (event: Event) => {
+    singleImageError.value = true;
+    const img = event.target as HTMLImageElement;
+    img.style.opacity = '0';
 };
 </script>
 

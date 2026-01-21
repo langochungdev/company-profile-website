@@ -6,13 +6,20 @@ import { isPendingImage, type PendingImageValue } from "@/admin/composables/useP
 
 export type ImageValue = string | PendingImageValue;
 
-export function getImageSrc(value: ImageValue | unknown | undefined | null): string {
-    if (!value) return "";
+const PLACEHOLDER_URL = "https://placehold.co/400x300/1a1a2e/666?text=No+Image";
+
+export function getImageSrc(value: ImageValue | unknown | undefined | null, placeholder?: string): string {
+    const fallback = placeholder || PLACEHOLDER_URL;
+
+    if (!value) return fallback;
+
     if (typeof value === "string") return value;
+
     if (isPendingImage(value)) {
-        return value.previewUrl;
+        return value.previewUrl || fallback;
     }
-    return "";
+
+    return fallback;
 }
 
 export async function createPendingImage(file: File, oldUrl?: string): Promise<PendingImageValue> {

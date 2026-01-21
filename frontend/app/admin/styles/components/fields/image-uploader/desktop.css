@@ -197,6 +197,33 @@
     border-radius: 8px;
     overflow: hidden;
     background: #1e1e2e;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-error-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #2a2a3a;
+    color: #a0a0b0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.image-error-placeholder svg {
+    font-size: 2.5rem;
+    opacity: 0.5;
+}
+
+.image-error-placeholder span {
+    font-size: 0.85rem;
 }
 
 .image-uploader-wrapper.is-pending .image-preview {
@@ -213,6 +240,7 @@
     font-size: 0.75rem;
     font-weight: 600;
     border-radius: 4px;
+    z-index: 5;
 }
 
 .image-preview img {
@@ -237,6 +265,7 @@
     color: #fff;
     cursor: pointer;
     transition: background 0.2s ease;
+    z-index: 5;
 }
 
 .remove-btn:hover {
@@ -338,6 +367,9 @@
     border: 2px solid #e2e8f0;
     cursor: grab;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .collection-item:hover {
@@ -397,6 +429,7 @@
     opacity: 0;
     transform: translateY(4px);
     transition: all 0.2s;
+    z-index: 2;
 }
 
 .collection-item:hover .item-actions {
