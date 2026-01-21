@@ -1,6 +1,8 @@
 <template>
     <NuxtLayout name="main">
-        <PageLoader />
+        <ClientOnly>
+            <PageLoader />
+        </ClientOnly>
         <main>
             <HeroSection :data="(pageData?.hero as any)" />
 
@@ -19,7 +21,7 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import PageLoader from '@/components/PageLoader.vue'
+import PageLoader from './components/PageLoader.vue'
 import HeroSection from './components/HeroSection.vue'
 import ServicesSection from './components/ServicesSection.vue'
 import ProjectSection from './components/ProjectSection.vue'
