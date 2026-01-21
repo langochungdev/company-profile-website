@@ -7,34 +7,34 @@
             </div>
         </main>
 
-        <main v-else-if="product" class="product-detail-wrapper">
+        <main v-else class="product-detail-wrapper" :class="{ 'is-placeholder': displayProduct.isPlaceholder }">
             <section class="product-detail-content">
                 <div class="container">
                     <div class="detail-grid">
                         <div class="product-gallery">
                             <div class="main-image">
-                                <img :src="product.image" :alt="product.name" />
-                                <span v-if="product.badge" class="badge" :class="getBadgeClass(product.badge)">
-                                    {{ product.badge }}
+                                <img :src="displayProduct.image" :alt="displayProduct.name" />
+                                <span v-if="displayProduct.badge" class="badge" :class="getBadgeClass(displayProduct.badge)">
+                                    {{ displayProduct.badge }}
                                 </span>
                             </div>
                         </div>
 
                         <div class="product-info">
-                            <span class="category">{{ product.category }}</span>
-                            <h1 class="product-name">{{ product.name }}</h1>
-                            <p class="product-desc">{{ product.description }}</p>
+                            <span class="category">{{ displayProduct.category }}</span>
+                            <h1 class="product-name">{{ displayProduct.name }}</h1>
+                            <p class="product-desc">{{ displayProduct.description }}</p>
 
                             <div class="price-box">
                                 <span class="price-label">Giá tham khảo:</span>
-                                <span class="price-value" v-if="product.price">{{ formatPrice(product.price) }}</span>
+                                <span class="price-value" v-if="displayProduct.price">{{ formatPrice(displayProduct.price) }}</span>
                                 <span class="price-contact" v-else>Liên hệ để được báo giá</span>
                             </div>
 
-                            <div class="features-section" v-if="product.features?.length">
+                            <div class="features-section" v-if="displayProduct.features?.length">
                                 <h3 class="features-title">Tính năng nổi bật</h3>
                                 <ul class="features-list">
-                                    <li v-for="(feature, index) in product.features" :key="index">
+                                    <li v-for="(feature, index) in displayProduct.features" :key="index">
                                         <Icon name="mdi:check-circle" class="check-icon" />
                                         {{ feature.text || feature }}
                                     </li>
@@ -71,15 +71,6 @@
                 </div>
             </section>
         </main>
-
-        <main v-else class="not-found">
-            <div class="container">
-                <Icon name="mdi:alert-circle-outline" class="not-found-icon" />
-                <h1>Không tìm thấy sản phẩm</h1>
-                <p>Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
-                <NuxtLink to="/product" class="back-btn">Quay lại trang sản phẩm</NuxtLink>
-            </div>
-        </main>
     </NuxtLayout>
 </template>
 
@@ -88,6 +79,7 @@ import { useCollectionContext } from '@/admin/composables/useCollectionContext'
 import { usePreviewContext } from '@/admin/composables/usePreviewContext'
 import { useAutoSeo } from '@/admin/composables/useAutoSeo'
 import { productDetailConfig } from './productDetail.cms'
+import { PLACEHOLDER_PRODUCT_DETAIL } from '@/constants/placeholders'
 
 const route = useRoute()
 const slug = route.params.slug
@@ -97,6 +89,13 @@ const { previews, loadPreviews } = usePreviewContext('collections/products/items
 
 const product = ref(null)
 const relatedProducts = ref([])
+
+const displayProduct = computed(() => {
+    if (product.value) {
+        return product.value
+    }
+    return PLACEHOLDER_PRODUCT_DETAIL
+})
 
 onMounted(async () => {
     await loadItems()
@@ -124,4 +123,8 @@ useAutoSeo(productDetailConfig, product)
 <style scoped>
 @import "@/styles/product/slug/desktop.css";
 @import "@/styles/product/slug/mobile.css";
+
+.is-placeholder {
+    opacity: 0.7;
+}
 </style>

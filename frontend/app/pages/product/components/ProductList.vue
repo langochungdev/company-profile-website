@@ -16,18 +16,10 @@
             </div>
 
             <div v-else class="product-grid">
-                <ProductItem v-for="product in previews" :key="product.id" :product="product" />
+                <ProductItem v-for="product in displayProducts" :key="product.id" :product="product" :class="{ 'is-placeholder': product.isPlaceholder }" />
             </div>
 
-            <div v-if="!loading && previews.length === 0" class="empty-state">
-                <div class="empty-icon">
-                    <Icon name="mdi:package-variant-closed-remove" />
-                </div>
-                <h3>Không tìm thấy sản phẩm</h3>
-                <p>Vui lòng thử chọn danh mục khác</p>
-            </div>
-
-            <div v-if="hasMore && !loading" class="load-more-wrapper">
+            <div v-if="hasMore && !loading && previews.length > 0" class="load-more-wrapper">
                 <button class="load-more-btn" @click="loadMore">
                     <Icon name="mdi:plus" />
                     Xem thêm sản phẩm
@@ -40,6 +32,7 @@
 <script setup>
 import ProductItem from './ProductItem.vue'
 import { usePreviewContext } from '@/admin/composables/usePreviewContext'
+import { PLACEHOLDER_PRODUCTS } from '@/constants/placeholders'
 
 const LISTING_CONFIG = {
     gridColumns: 3,
@@ -54,6 +47,13 @@ const categories = CATEGORIES
 const currentCategory = ref('Tất cả')
 
 const { previews, loading, hasMore, loadPreviews, loadMore: loadMorePreviews, filterByCategory } = usePreviewContext('collections/products/items')
+
+const displayProducts = computed(() => {
+    if (previews.value.length === 0 && !loading.value) {
+        return PLACEHOLDER_PRODUCTS
+    }
+    return previews.value
+})
 
 onMounted(() => {
     loadPreviews({ limitCount: LISTING_CONFIG.itemsPerPage })
@@ -76,4 +76,9 @@ const loadMore = () => {
 <style scoped>
 @import "@/styles/product/product-list/desktop.css";
 @import "@/styles/product/product-list/mobile.css";
+
+.is-placeholder {
+    opacity: 0.6;
+}
 </style>
+

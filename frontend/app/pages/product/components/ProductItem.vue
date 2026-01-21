@@ -14,10 +14,10 @@
             <div class="category">{{ product.category }}</div>
             <h3 class="product-name">{{ product.name }}</h3>
 
-            <div class="features-list">
+            <div class="features-list" v-if="product.features?.length">
                 <div v-for="(feature, index) in product.features.slice(0, 3)" :key="index" class="feature-item">
                     <Icon name="mdi:check-circle" class="check-icon" />
-                    <span>{{ feature }}</span>
+                    <span>{{ feature.text || feature }}</span>
                 </div>
             </div>
 

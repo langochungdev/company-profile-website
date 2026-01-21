@@ -1,9 +1,13 @@
 /* Desktop Styles for Product List */
 
-.product-list-section {
-    padding: 60px 0 100px;
+.product-list-wrapper {
+    padding-top: var(--header-offset, 120px);
     background-color: #f8fafc;
-    min-height: 800px;
+    min-height: 100vh;
+}
+
+.product-list-section {
+    padding: 40px 0 100px;
 }
 
 .container {

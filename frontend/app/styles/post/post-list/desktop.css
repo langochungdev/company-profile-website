@@ -1,10 +1,13 @@
 /* Desktop Styles for Post List */
 
-.post-list-section {
-    padding: 80px 0;
+.post-list-wrapper {
+    padding-top: var(--header-offset, 120px);
     background-color: #f8fafc;
-    /* Slate 50 */
-    min-height: 600px;
+    min-height: 100vh;
+}
+
+.post-list-section {
+    padding: 40px 0 80px;
 }
 
 .container {

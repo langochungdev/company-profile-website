@@ -7,39 +7,39 @@
             </div>
         </main>
 
-        <main v-else-if="service" class="service-detail-wrapper">
+        <main v-else class="service-detail-wrapper" :class="{ 'is-placeholder': displayService.isPlaceholder }">
             <article class="service-detail-content">
                 <div class="container">
                     <div class="service-grid">
                         <div class="service-main">
                             <div class="service-meta">
-                                <span class="meta-category">{{ service.category }}</span>
+                                <span class="meta-category">{{ displayService.category }}</span>
                                 <span class="meta-price">
                                     <Icon name="mdi:currency-usd" />
-                                    {{ service.price }}
+                                    {{ displayService.price }}
                                 </span>
                             </div>
 
-                            <h1 class="service-title">{{ service.title || service.name }}</h1>
+                            <h1 class="service-title">{{ displayService.title || displayService.name }}</h1>
 
                             <div class="service-thumbnail">
-                                <img :src="service.thumbnail || service.image" :alt="service.title || service.name" />
+                                <img :src="displayService.thumbnail || displayService.image" :alt="displayService.title || displayService.name" />
                             </div>
 
                             <div class="service-body">
-                                <p class="lead">{{ service.description }}</p>
+                                <p class="lead">{{ displayService.description }}</p>
 
-                                <div v-if="service.features?.length">
+                                <div v-if="displayService.features?.length">
                                     <h2>Tính Năng Nổi Bật</h2>
                                     <div class="features-grid">
-                                        <div v-for="(feature, index) in service.features" :key="index" class="feature-box">
+                                        <div v-for="(feature, index) in displayService.features" :key="index" class="feature-box">
                                             <Icon name="mdi:check-decagram" class="feature-icon" />
                                             <span>{{ feature.text || feature }}</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div v-if="service.content" v-html="service.content"></div>
+                                <div v-if="displayService.content" v-html="displayService.content"></div>
 
                                 <template v-else>
                                     <h2>Giới Thiệu Dịch Vụ</h2>
@@ -73,14 +73,14 @@
                                     <Icon name="mdi:tag" />
                                     <div>
                                         <span class="info-label">Danh mục:</span>
-                                        <span class="info-value">{{ service.category }}</span>
+                                        <span class="info-value">{{ displayService.category }}</span>
                                     </div>
                                 </div>
                                 <div class="info-item">
                                     <Icon name="mdi:cash" />
                                     <div>
                                         <span class="info-label">Giá:</span>
-                                        <span class="info-value">{{ service.price }}</span>
+                                        <span class="info-value">{{ displayService.price }}</span>
                                     </div>
                                 </div>
                                 <div class="info-item">
@@ -122,21 +122,13 @@
                 </div>
             </article>
         </main>
-
-        <main v-else class="not-found">
-            <div class="container">
-                <Icon name="mdi:file-search-outline" class="not-found-icon" />
-                <h1>Không tìm thấy dịch vụ</h1>
-                <p>Dịch vụ bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
-                <NuxtLink to="/service" class="back-btn">Quay lại trang dịch vụ</NuxtLink>
-            </div>
-        </main>
     </NuxtLayout>
 </template>
 
 <script setup>
 import { usePreviewContext } from '@/admin/composables/usePreviewContext'
 import { generateBreadcrumbSchema } from '@/admin/utils/schema-generator'
+import { PLACEHOLDER_SERVICE_DETAIL } from '@/constants/placeholders'
 
 const SITE_URL = 'https://sht.langochung.me'
 
@@ -147,6 +139,13 @@ const { previews, loading, loadPreviews } = usePreviewContext('collections/servi
 
 const service = ref(null)
 const relatedServices = ref([])
+
+const displayService = computed(() => {
+    if (service.value) {
+        return service.value
+    }
+    return PLACEHOLDER_SERVICE_DETAIL
+})
 
 onMounted(async () => {
     await loadPreviews({ limitCount: 50 })
@@ -207,4 +206,8 @@ useHead({
 <style scoped>
 @import "@/styles/service/slug/desktop.css";
 @import "@/styles/service/slug/mobile.css";
+
+.is-placeholder {
+    opacity: 0.7;
+}
 </style>

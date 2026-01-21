@@ -7,33 +7,33 @@
             </div>
         </main>
 
-        <main v-else-if="post" class="post-detail-wrapper">
+        <main v-else class="post-detail-wrapper" :class="{ 'is-placeholder': displayPost.isPlaceholder }">
             <article class="post-detail-content">
                 <div class="container">
                     <div class="post-grid">
                         <div class="post-main">
                             <div class="post-meta">
-                                <span class="meta-category">{{ post.category }}</span>
+                                <span class="meta-category">{{ displayPost.category }}</span>
                                 <span class="meta-date">
                                     <Icon name="mdi:calendar-blank" />
-                                    {{ post.publishedAt }}
+                                    {{ displayPost.publishedAt || displayPost.date }}
                                 </span>
                                 <span class="meta-author">
                                     <Icon name="mdi:account" />
-                                    {{ post.author }}
+                                    {{ displayPost.author }}
                                 </span>
                             </div>
 
-                            <h1 class="post-title">{{ post.title }}</h1>
+                            <h1 class="post-title">{{ displayPost.title }}</h1>
 
                             <div class="post-thumbnail">
-                                <img :src="post.thumbnail || post.image" :alt="post.title" />
+                                <img :src="displayPost.thumbnail || displayPost.image" :alt="displayPost.title" />
                             </div>
 
-                            <div class="post-body" v-html="post.content || defaultContent"></div>
+                            <div class="post-body" v-html="displayPost.content || defaultContent"></div>
 
                             <div class="post-tags">
-                                <span class="tag">{{ post.category }}</span>
+                                <span class="tag">{{ displayPost.category }}</span>
                                 <span class="tag">SHT Security</span>
                                 <span class="tag">Giải pháp</span>
                             </div>
@@ -79,21 +79,13 @@
                 </div>
             </article>
         </main>
-
-        <main v-else class="not-found">
-            <div class="container">
-                <Icon name="mdi:file-search-outline" class="not-found-icon" />
-                <h1>Không tìm thấy bài viết</h1>
-                <p>Bài viết bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
-                <NuxtLink to="/post" class="back-btn">Quay lại trang tin tức</NuxtLink>
-            </div>
-        </main>
     </NuxtLayout>
 </template>
 
 <script setup>
 import { usePreviewContext } from '@/admin/composables/usePreviewContext'
 import { generatePostSchema, generateBreadcrumbSchema } from '@/admin/utils/schema-generator'
+import { PLACEHOLDER_POST_DETAIL } from '@/constants/placeholders'
 
 const SITE_URL = 'https://sht.langochung.me'
 
@@ -104,6 +96,13 @@ const { previews, loading, loadPreviews } = usePreviewContext('collections/posts
 
 const post = ref(null)
 const relatedPosts = ref([])
+
+const displayPost = computed(() => {
+    if (post.value) {
+        return post.value
+    }
+    return PLACEHOLDER_POST_DETAIL
+})
 
 const defaultContent = `
     <p class="lead">Bài viết đang được cập nhật nội dung...</p>
@@ -161,4 +160,8 @@ useHead({
 <style scoped>
 @import "@/styles/post/slug/desktop.css";
 @import "@/styles/post/slug/mobile.css";
+
+.is-placeholder {
+    opacity: 0.7;
+}
 </style>

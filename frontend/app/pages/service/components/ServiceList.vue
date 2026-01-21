@@ -13,18 +13,10 @@
             </div>
 
             <transition-group v-else name="fade" tag="div" class="service-grid">
-                <ServiceItem v-for="service in previews" :key="service.id" :service="service" />
+                <ServiceItem v-for="service in displayServices" :key="service.id" :service="service" :class="{ 'is-placeholder': service.isPlaceholder }" />
             </transition-group>
 
-            <div v-if="!loading && previews.length === 0" class="empty-state">
-                <div class="empty-icon">
-                    <Icon name="mdi:file-search-outline" />
-                </div>
-                <h3>Không tìm thấy dịch vụ</h3>
-                <p>Vui lòng thử chọn danh mục khác</p>
-            </div>
-
-            <div v-if="hasMore && !loading" class="load-more-wrapper">
+            <div v-if="hasMore && !loading && previews.length > 0" class="load-more-wrapper">
                 <button class="load-more-btn" @click="loadMore">
                     <Icon name="mdi:plus" />
                     Xem thêm dịch vụ
@@ -37,6 +29,7 @@
 <script setup>
 import ServiceItem from './ServiceItem.vue'
 import { usePreviewContext } from '@/admin/composables/usePreviewContext'
+import { PLACEHOLDER_SERVICES } from '@/constants/placeholders'
 
 const SERVICE_CATEGORIES = ['Tất cả', 'Camera', 'Mạng WiFi', 'Tổng đài', 'Báo cháy', 'Access Control']
 
@@ -44,6 +37,13 @@ const categories = SERVICE_CATEGORIES
 const currentCategory = ref('Tất cả')
 
 const { previews, loading, hasMore, loadPreviews, loadMore: loadMorePreviews, filterByCategory } = usePreviewContext('collections/services/items')
+
+const displayServices = computed(() => {
+    if (previews.value.length === 0 && !loading.value) {
+        return PLACEHOLDER_SERVICES
+    }
+    return previews.value
+})
 
 onMounted(() => {
     loadPreviews({ limitCount: 12 })
@@ -66,4 +66,9 @@ const loadMore = () => {
 <style scoped>
 @import "@/styles/service/service-list/desktop.css";
 @import "@/styles/service/service-list/mobile.css";
+
+.is-placeholder {
+    opacity: 0.6;
+}
 </style>
+

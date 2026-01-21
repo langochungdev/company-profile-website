@@ -1,0 +1,148 @@
+/* Placeholder Data cho các Category Pages */
+
+export const PLACEHOLDER_PRODUCTS = [
+    {
+        id: "placeholder-1",
+        name: "Sản phẩm mẫu",
+        slug: "placeholder-product-1",
+        category: "Danh mục mẫu",
+        description: "Mô tả sản phẩm mẫu. Đây là dữ liệu placeholder được hiển thị khi chưa có sản phẩm thực.",
+        image: "https://placehold.co/400x400/e2e8f0/94a3b8?text=Sản+phẩm",
+        price: null,
+        badge: null,
+        features: ["Tính năng mẫu 1", "Tính năng mẫu 2", "Tính năng mẫu 3"],
+        isPlaceholder: true,
+    },
+    {
+        id: "placeholder-2",
+        name: "Sản phẩm mẫu 2",
+        slug: "placeholder-product-2",
+        category: "Danh mục mẫu",
+        description: "Mô tả sản phẩm mẫu. Đây là dữ liệu placeholder được hiển thị khi chưa có sản phẩm thực.",
+        image: "https://placehold.co/400x400/e2e8f0/94a3b8?text=Sản+phẩm",
+        price: null,
+        badge: null,
+        features: ["Tính năng mẫu 1", "Tính năng mẫu 2", "Tính năng mẫu 3"],
+        isPlaceholder: true,
+    },
+    {
+        id: "placeholder-3",
+        name: "Sản phẩm mẫu 3",
+        slug: "placeholder-product-3",
+        category: "Danh mục mẫu",
+        description: "Mô tả sản phẩm mẫu. Đây là dữ liệu placeholder được hiển thị khi chưa có sản phẩm thực.",
+        image: "https://placehold.co/400x400/e2e8f0/94a3b8?text=Sản+phẩm",
+        price: null,
+        badge: null,
+        features: ["Tính năng mẫu 1", "Tính năng mẫu 2", "Tính năng mẫu 3"],
+        isPlaceholder: true,
+    },
+];
+
+export const PLACEHOLDER_SERVICES = [
+    {
+        id: "placeholder-1",
+        name: "Dịch vụ mẫu",
+        slug: "placeholder-service-1",
+        category: "Danh mục mẫu",
+        description: "Mô tả dịch vụ mẫu. Đây là dữ liệu placeholder được hiển thị khi chưa có dịch vụ thực.",
+        image: "https://placehold.co/400x300/e2e8f0/94a3b8?text=Dịch+vụ",
+        price: "Liên hệ",
+        isPlaceholder: true,
+    },
+    {
+        id: "placeholder-2",
+        name: "Dịch vụ mẫu 2",
+        slug: "placeholder-service-2",
+        category: "Danh mục mẫu",
+        description: "Mô tả dịch vụ mẫu. Đây là dữ liệu placeholder được hiển thị khi chưa có dịch vụ thực.",
+        image: "https://placehold.co/400x300/e2e8f0/94a3b8?text=Dịch+vụ",
+        price: "Liên hệ",
+        isPlaceholder: true,
+    },
+    {
+        id: "placeholder-3",
+        name: "Dịch vụ mẫu 3",
+        slug: "placeholder-service-3",
+        category: "Danh mục mẫu",
+        description: "Mô tả dịch vụ mẫu. Đây là dữ liệu placeholder được hiển thị khi chưa có dịch vụ thực.",
+        image: "https://placehold.co/400x300/e2e8f0/94a3b8?text=Dịch+vụ",
+        price: "Liên hệ",
+        isPlaceholder: true,
+    },
+];
+
+export const PLACEHOLDER_POSTS = [
+    {
+        id: "placeholder-1",
+        title: "Bài viết mẫu",
+        slug: "placeholder-post-1",
+        category: "Danh mục mẫu",
+        excerpt: "Tóm tắt bài viết mẫu. Đây là dữ liệu placeholder được hiển thị khi chưa có bài viết thực.",
+        image: "https://placehold.co/600x400/e2e8f0/94a3b8?text=Bài+viết",
+        date: new Date().toISOString(),
+        author: "Tác giả",
+        isPlaceholder: true,
+    },
+    {
+        id: "placeholder-2",
+        title: "Bài viết mẫu 2",
+        slug: "placeholder-post-2",
+        category: "Danh mục mẫu",
+        excerpt: "Tóm tắt bài viết mẫu. Đây là dữ liệu placeholder được hiển thị khi chưa có bài viết thực.",
+        image: "https://placehold.co/600x400/e2e8f0/94a3b8?text=Bài+viết",
+        date: new Date().toISOString(),
+        author: "Tác giả",
+        isPlaceholder: true,
+    },
+    {
+        id: "placeholder-3",
+        title: "Bài viết mẫu 3",
+        slug: "placeholder-post-3",
+        category: "Danh mục mẫu",
+        excerpt: "Tóm tắt bài viết mẫu. Đây là dữ liệu placeholder được hiển thị khi chưa có bài viết thực.",
+        image: "https://placehold.co/600x400/e2e8f0/94a3b8?text=Bài+viết",
+        date: new Date().toISOString(),
+        author: "Tác giả",
+        isPlaceholder: true,
+    },
+];
+
+export const PLACEHOLDER_PRODUCT_DETAIL = {
+    id: "placeholder",
+    name: "Sản phẩm mẫu",
+    slug: "placeholder",
+    category: "Danh mục mẫu",
+    description: "Mô tả chi tiết sản phẩm mẫu. Đây là dữ liệu placeholder được hiển thị khi chưa có dữ liệu thực hoặc đang tải.",
+    image: "https://placehold.co/600x600/e2e8f0/94a3b8?text=Sản+phẩm",
+    price: null,
+    badge: null,
+    features: [{ text: "Tính năng mẫu 1" }, { text: "Tính năng mẫu 2" }, { text: "Tính năng mẫu 3" }],
+    isPlaceholder: true,
+};
+
+export const PLACEHOLDER_SERVICE_DETAIL = {
+    id: "placeholder",
+    name: "Dịch vụ mẫu",
+    slug: "placeholder",
+    category: "Danh mục mẫu",
+    description: "Mô tả chi tiết dịch vụ mẫu. Đây là dữ liệu placeholder được hiển thị khi chưa có dữ liệu thực hoặc đang tải.",
+    image: "https://placehold.co/800x400/e2e8f0/94a3b8?text=Dịch+vụ",
+    price: "Liên hệ",
+    content: "<p>Nội dung dịch vụ mẫu. Đây là dữ liệu placeholder.</p>",
+    features: ["Tính năng 1", "Tính năng 2", "Tính năng 3"],
+    isPlaceholder: true,
+};
+
+export const PLACEHOLDER_POST_DETAIL = {
+    id: "placeholder",
+    title: "Bài viết mẫu",
+    slug: "placeholder",
+    category: "Danh mục mẫu",
+    content: "<p>Nội dung bài viết mẫu. Đây là dữ liệu placeholder được hiển thị khi chưa có dữ liệu thực hoặc đang tải.</p>",
+    image: "https://placehold.co/1200x600/e2e8f0/94a3b8?text=Bài+viết",
+    date: new Date().toISOString(),
+    author: "Tác giả",
+    tags: ["Tag 1", "Tag 2"],
+    isPlaceholder: true,
+};

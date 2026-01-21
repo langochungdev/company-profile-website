@@ -5,9 +5,28 @@
         <header :class="['header', scrolled ? 'header-scrolled' : 'header-transparent', navVisible ? 'header-visible' : 'header-hidden']">
             <div class="header-container">
                 <div class="header-content">
-                    <NuxtLink to="/" class="logo" aria-label="Trang chủ SHT Security">
-                        <img src="/images/logo.png" alt="SHT Security Logo" class="logo-img" />
-                    </NuxtLink>
+                    <div class="header-left">
+                        <NuxtLink to="/" class="logo" aria-label="Trang chủ SHT Security">
+                            <img src="/images/logo.png" alt="SHT Security Logo" class="logo-img" />
+                        </NuxtLink>
+
+                        <nav v-if="showBreadcrumb" class="inline-breadcrumb" aria-label="Breadcrumb">
+                            <span class="breadcrumb-divider">/</span>
+                            <ol class="breadcrumb-list">
+                                <template v-for="(item, index) in breadcrumbItems" :key="index">
+                                    <li v-if="index > 0" class="breadcrumb-separator">
+                                        <Icon name="mdi:chevron-right" />
+                                    </li>
+                                    <li class="breadcrumb-item">
+                                        <NuxtLink v-if="item.to" :to="item.to" class="breadcrumb-link">
+                                            {{ item.label }}
+                                        </NuxtLink>
+                                        <span v-else class="breadcrumb-current">{{ item.label }}</span>
+                                    </li>
+                                </template>
+                            </ol>
+                        </nav>
+                    </div>
 
                     <nav class="nav-desktop" aria-label="Main navigation">
                         <NuxtLink to="/" class="nav-link">Trang Chủ</NuxtLink>
@@ -69,12 +88,11 @@
                     </div>
                 </Transition>
 
-                <nav v-if="showBreadcrumb" class="header-breadcrumb" aria-label="Breadcrumb">
+                <nav v-if="showBreadcrumb" class="mobile-breadcrumb" aria-label="Breadcrumb">
                     <ol class="breadcrumb-list">
                         <li class="breadcrumb-item">
                             <NuxtLink to="/" class="breadcrumb-link">
                                 <Icon name="mdi:home" class="breadcrumb-icon" />
-                                <span>Trang chủ</span>
                             </NuxtLink>
                         </li>
                         <template v-for="(item, index) in breadcrumbItems" :key="index">

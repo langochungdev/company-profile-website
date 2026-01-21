@@ -1,7 +1,11 @@
-.service-list-section {
-    padding: 80px 0;
+.service-list-wrapper {
+    padding-top: var(--header-offset, 120px);
     background-color: #f8fafc;
-    min-height: 600px;
+    min-height: 100vh;
+}
+
+.service-list-section {
+    padding: 40px 0 80px;
 }
 
 .container {

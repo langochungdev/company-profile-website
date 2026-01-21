@@ -44,7 +44,7 @@ export interface ProductDetailConfig {
 export const productDetailConfig: ProductDetailConfig = {
     type: "detail",
     collection: "products",
-    collectionName: "Chi tiết sản phẩm",
+    collectionName: "danh sách sản phẩm",
     path: "collections/products/items",
     icon: "mdi:package-variant",
     schemaType: "product",

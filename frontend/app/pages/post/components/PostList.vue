@@ -13,18 +13,10 @@
             </div>
 
             <transition-group v-else name="fade" tag="div" class="post-grid">
-                <PostItem v-for="post in previews" :key="post.id" :post="post" />
+                <PostItem v-for="post in displayPosts" :key="post.id" :post="post" :class="{ 'is-placeholder': post.isPlaceholder }" />
             </transition-group>
 
-            <div v-if="!loading && previews.length === 0" class="empty-state">
-                <div class="empty-icon">
-                    <Icon name="mdi:file-search-outline" />
-                </div>
-                <h3>Không tìm thấy bài viết</h3>
-                <p>Vui lòng thử chọn danh mục khác</p>
-            </div>
-
-            <div v-if="hasMore && !loading" class="load-more-wrapper">
+            <div v-if="hasMore && !loading && previews.length > 0" class="load-more-wrapper">
                 <button class="load-more-btn" @click="loadMore">
                     <Icon name="mdi:plus" />
                     Xem thêm bài viết
@@ -37,6 +29,7 @@
 <script setup>
 import PostItem from './PostItem.vue'
 import { usePreviewContext } from '@/admin/composables/usePreviewContext'
+import { PLACEHOLDER_POSTS } from '@/constants/placeholders'
 
 const POST_CATEGORIES = ['Tất cả', 'Công nghệ', 'Hướng dẫn', 'Tin tức', 'Sự kiện']
 
@@ -44,6 +37,13 @@ const categories = POST_CATEGORIES
 const currentCategory = ref('Tất cả')
 
 const { previews, loading, hasMore, loadPreviews, loadMore: loadMorePreviews, filterByCategory } = usePreviewContext('collections/posts/items')
+
+const displayPosts = computed(() => {
+    if (previews.value.length === 0 && !loading.value) {
+        return PLACEHOLDER_POSTS
+    }
+    return previews.value
+})
 
 onMounted(() => {
     loadPreviews({ limitCount: 12 })
@@ -66,4 +66,9 @@ const loadMore = () => {
 <style scoped>
 @import "@/styles/post/post-list/desktop.css";
 @import "@/styles/post/post-list/mobile.css";
+
+.is-placeholder {
+    opacity: 0.6;
+}
 </style>
+
