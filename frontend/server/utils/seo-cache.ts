@@ -47,14 +47,15 @@ function getFirebaseAdmin(): Firestore {
     }
 
     const config = useRuntimeConfig();
-    const serviceAccount = config.firebaseServiceAccount as string;
+    const serviceAccount = config.firebaseServiceAccount;
 
     if (!serviceAccount) {
         throw new Error("FIREBASE_SERVICE_ACCOUNT not configured");
     }
 
     try {
-        const credentials = JSON.parse(serviceAccount);
+        const credentials = typeof serviceAccount === "string" ? JSON.parse(serviceAccount) : serviceAccount;
+
         firebaseApp = initializeApp({
             credential: cert(credentials),
         });
@@ -76,12 +77,14 @@ export async function fetchSeoSettings(pageKey: string): Promise<SeoSettings> {
 
         const config = useRuntimeConfig();
         const publicConfig = config.public as Record<string, unknown>;
+        const siteName = (publicConfig.siteName as string) || "default";
         const isProd = publicConfig.envIsProd === true || publicConfig.envIsProd === "true";
         const env = isProd ? "product" : "develop";
-        const settingsPath = `shtcam/${env}/pages/${pageKey}/settings`;
+        const pagePath = `${siteName}/${env}/pages/${pageKey}`;
 
-        const docSnap = await db.doc(settingsPath).get();
-        const data: SeoSettings = docSnap.exists ? (docSnap.data() as SeoSettings) : {};
+        const docSnap = await db.doc(pagePath).get();
+        const docData = docSnap.exists ? docSnap.data() : null;
+        const data: SeoSettings = docData?._settings || {};
 
         settingsCache.set(pageKey, {
             data,

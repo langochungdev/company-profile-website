@@ -45,7 +45,7 @@
                         <div v-else-if="field.type === 'image'" class="image-field">
                             <div v-if="settingsData[sectionKey][fieldKey]" class="image-preview">
                                 <img :src="getImageSrc(settingsData[sectionKey][fieldKey])" :alt="field.label" />
-                                <button v-if="!readonly" class="btn-remove" @click="settingsData[sectionKey][fieldKey] = ''">
+                                <button v-if="!readonly" class="btn-remove" @click="handleImageRemove(sectionKey, fieldKey)">
                                     <Icon name="mdi:close" />
                                 </button>
                             </div>
@@ -115,6 +115,7 @@
 import { ref, reactive, computed, watch, onMounted, nextTick } from "vue";
 import { useSettingsContext } from "@/admin/composables/useSettingsContext";
 import { usePendingUploads, type PendingImageValue } from "@/admin/composables/usePendingUploads";
+import { useDeleteQueue } from "@/admin/composables/useDeleteQueue";
 import { SCHEMA_TYPE_MAP, type SchemaPageType } from "@/admin/types/schema";
 import { generateDefaultSchema } from "@/admin/utils/schema-generator";
 import { getSchemaConfigFields, getSchemaFieldMappingFields } from "@/admin/config/schema-settings.config";
@@ -247,6 +248,7 @@ const toggleSection = (key: string) => {
 };
 
 const { addPending, uploadAllPending, hasPending } = usePendingUploads();
+const { addToDeleteQueue, processDeleteQueue, hasUrlsToDelete } = useDeleteQueue();
 
 const handleImageUpload = (event: Event, sectionKey: string, fieldKey: string) => {
     const input = event.target as HTMLInputElement;
@@ -256,6 +258,10 @@ const handleImageUpload = (event: Event, sectionKey: string, fieldKey: string) =
     const fieldPath = `${sectionKey}.${fieldKey}`;
     const currentValue = (settingsData as any)[sectionKey][fieldKey];
     const oldUrl = typeof currentValue === 'string' && currentValue.includes('cloudinary') ? currentValue : undefined;
+
+    if (oldUrl) {
+        addToDeleteQueue(oldUrl);
+    }
 
     const previewUrl = addPending(fieldPath, file, oldUrl, sectionKey);
 
@@ -268,6 +274,16 @@ const handleImageUpload = (event: Event, sectionKey: string, fieldKey: string) =
 
     (settingsData as any)[sectionKey][fieldKey] = pendingValue;
     input.value = "";
+};
+
+const handleImageRemove = (sectionKey: string, fieldKey: string) => {
+    const currentValue = (settingsData as any)[sectionKey][fieldKey];
+
+    if (typeof currentValue === 'string' && currentValue.includes('cloudinary')) {
+        addToDeleteQueue(currentValue);
+    }
+
+    (settingsData as any)[sectionKey][fieldKey] = '';
 };
 
 const syncFromContext = () => {
@@ -297,7 +313,12 @@ const syncToContext = () => {
 };
 
 const handleSave = async () => {
+    emit("saving-change", true);
     try {
+        if (hasUrlsToDelete.value) {
+            await processDeleteQueue();
+        }
+
         if (hasPending.value) {
             const results = await uploadAllPending();
 
@@ -314,8 +335,9 @@ const handleSave = async () => {
         await saveSettings();
     } catch (e) {
         console.error("Save failed:", e);
-        // Error is handled in useSettingsContext or UI can show toast
         alert("Lưu thất bại: " + (e as Error).message);
+    } finally {
+        emit("saving-change", false);
     }
 };
 
