@@ -16,6 +16,12 @@ export interface PendingImageValue {
     file: File;
     previewUrl: string;
     oldUrl?: string;
+    metadata?: {
+        alt?: string;
+        title?: string;
+        width?: number;
+        height?: number;
+    };
 }
 
 export function isPendingImage(value: unknown): value is PendingImageValue {

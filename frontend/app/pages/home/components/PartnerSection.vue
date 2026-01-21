@@ -15,8 +15,8 @@
                         <div class="partners-scroll" @mouseenter="pausePartners = true" @mouseleave="pausePartners = false">
                             <div class="partners-track" :class="{ paused: pausePartners }">
                                 <template v-for="set in duplicateCount" :key="'partner-set-' + set">
-                                    <a v-for="(partner, index) in displayItems" :key="'partner-' + set + '-' + index" :href="partner.link || '#'" target="_blank" rel="noopener" class="partner-item">
-                                        <img :src="getImageSrc(partner.logo)" :alt="partner.name || 'Đối tác'" loading="lazy" class="partner-logo" :data-field="`items.${index}.logo`" data-field-type="image" />
+                                    <a v-for="(partner, index) in displayItems" :key="'partner-' + set + '-' + index" :href="partner.link || '#'" target="_blank" rel="noopener" class="partner-item" :data-field-link="`items.${index}.link`">
+                                        <img :src="getImageSrc(partner.logo)" :alt="getImageAlt(partner.logo, partner.name || 'Đối tác')" :title="getImageTitle(partner.logo)" :width="getImageWidth(partner.logo)" :height="getImageHeight(partner.logo)" loading="lazy" class="partner-logo" :data-field="`items.${index}.logo`" data-field-type="image" />
                                     </a>
                                 </template>
                             </div>
@@ -30,7 +30,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { getImageSrc, type ImageValue } from '@/admin/utils/imageHelper'
+import { getImageSrc, getImageAlt, getImageTitle, getImageWidth, getImageHeight, type ImageValue } from '@/admin/utils/imageHelper'
 
 interface PartnerItem {
     logo: ImageValue

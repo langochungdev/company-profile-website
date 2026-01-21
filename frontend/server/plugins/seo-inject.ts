@@ -52,13 +52,12 @@ function generateMetaTags(settings: any, siteUrl: string, path: string): string[
     tags.push(`<meta property="og:title" content="${escapeHtml(og.ogTitle || seo.title || "")}">`);
     tags.push(`<meta property="og:description" content="${escapeHtml(og.ogDescription || seo.description || "")}">`);
 
-    if (og.ogImage) {
-        tags.push(`<meta property="og:image" content="${escapeHtml(og.ogImage)}">`);
-        tags.push(`<meta property="og:image:width" content="1200">`);
-        tags.push(`<meta property="og:image:height" content="630">`);
-        if (og.ogImageAlt) {
-            tags.push(`<meta property="og:image:alt" content="${escapeHtml(og.ogImageAlt)}">`);
-        }
+    const ogImage = og.ogImage || `${siteUrl}/seo/banner.png`;
+    tags.push(`<meta property="og:image" content="${escapeHtml(ogImage)}">`);
+    tags.push(`<meta property="og:image:width" content="1200">`);
+    tags.push(`<meta property="og:image:height" content="630">`);
+    if (og.ogImageAlt) {
+        tags.push(`<meta property="og:image:alt" content="${escapeHtml(og.ogImageAlt)}">`);
     }
 
     tags.push(`<meta name="twitter:card" content="${escapeHtml(og.twitterCard || "summary_large_image")}">`);
@@ -72,17 +71,57 @@ function generateMetaTags(settings: any, siteUrl: string, path: string): string[
     return tags;
 }
 
-function generateSchemaScript(settings: any): string | null {
-    const schemaConfig = settings.schema?.config;
-    if (!schemaConfig || Object.keys(schemaConfig).length === 0) {
-        return null;
-    }
+async function generateSchemaScript(settings: any, pageKey: string): Promise<string | null> {
+    const schemaConfig = settings.schema?.config || {};
 
     try {
-        const schemaJson = JSON.stringify(schemaConfig);
-        return `<script type="application/ld+json">${schemaJson}</script>`;
-    } catch {
-        return null;
+        const { generateHomeSchema, generateGlobalSchema } = await import("~/admin/utils/schema-generator");
+
+        // 1. Generate Global Schema (Always)
+        // Note: Using hardcoded defaults here since Global UI is not built yet.
+        // In future, this should come from a fetchGlobalSettings() call.
+        const globalConfig = {
+            organization: {
+                name: "SHT Security",
+                url: "https://sht.langochung.me",
+                telephone: "0901 234 567",
+                email: "info@sht.vn",
+                address: {
+                    "@type": "PostalAddress" as const,
+                    streetAddress: "123 Đường ABC, Phường XYZ, Quận 1, TP. Hồ Chí Minh",
+                },
+            },
+            website: {
+                name: "SHT Security",
+                url: "https://sht.langochung.me",
+            },
+        };
+
+        let allSchemas: any[] = generateGlobalSchema(globalConfig);
+
+        // 2. Generate Page Specific Schema
+        let pageSchemas: any[] = [];
+        if (pageKey === "home") {
+            // Home page now has empty/minimal specific schema
+            pageSchemas = generateHomeSchema(schemaConfig);
+        } else {
+            // Other pages might use the raw config as schema for now
+            if (Object.keys(schemaConfig).length > 0) {
+                // Wrap in array if not
+                pageSchemas = Array.isArray(schemaConfig) ? schemaConfig : [schemaConfig];
+            }
+        }
+
+        if (pageSchemas.length > 0) {
+            allSchemas = [...allSchemas, ...pageSchemas];
+        }
+
+        if (allSchemas.length === 0) return null;
+
+        return allSchemas.map((schema) => `<script type="application/ld+json">${JSON.stringify(schema)}</script>`).join("\n");
+    } catch (error) {
+        console.error(`[seo-inject] Error generating schema for ${pageKey}:`, error);
+        return null; // Don't crash request
     }
 }
 
@@ -110,7 +149,7 @@ export default defineNitroPlugin((nitro) => {
                 html.head.push(tag);
             });
 
-            const schemaScript = generateSchemaScript(settings);
+            const schemaScript = await generateSchemaScript(settings, pageKey);
             if (schemaScript) {
                 html.head.push(schemaScript);
             }

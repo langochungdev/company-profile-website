@@ -25,10 +25,11 @@ export const useFieldScanner = (options: FieldScannerOptions) => {
     const scanFields = () => {
         if (!containerRef.value || (enabled && !enabled.value)) return;
 
-        const elements = containerRef.value.querySelectorAll("[data-field]");
+        const textElements = containerRef.value.querySelectorAll("[data-field]");
+        const linkElements = containerRef.value.querySelectorAll("[data-field-link]");
         scannedFields.value = [];
 
-        elements.forEach((el) => {
+        textElements.forEach((el) => {
             const element = el as HTMLElement;
             const fieldPath = element.dataset.field;
 
@@ -41,6 +42,21 @@ export const useFieldScanner = (options: FieldScannerOptions) => {
             });
 
             setupFieldElement(element, fieldPath);
+        });
+
+        linkElements.forEach((el) => {
+            const element = el as HTMLElement;
+            const fieldPath = element.dataset.fieldLink;
+
+            if (!fieldPath) return;
+
+            scannedFields.value.push({
+                element,
+                path: fieldPath,
+                sectionId,
+            });
+
+            setupLinkField(element, fieldPath);
         });
     };
 
@@ -133,6 +149,35 @@ export const useFieldScanner = (options: FieldScannerOptions) => {
         (element as any).__imageButtonContainer = buttonContainer;
     };
 
+    const setupLinkField = (element: HTMLElement, fieldPath: string) => {
+        if (element.classList.contains("link-edit-wrapper")) return;
+
+        element.classList.add("link-edit-wrapper");
+
+        const card = element.closest(".news-card, .project-card, .service-card, .cert-card, .partner-card, [class*='-card']");
+        const buttonContainer = card || element;
+
+        if (buttonContainer.querySelector(`.link-edit-button[data-for="${fieldPath}"]`)) return;
+
+        const button = document.createElement("button");
+        button.className = "link-edit-button";
+        button.setAttribute("data-for", fieldPath);
+        button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`;
+        button.title = "Thay đổi link";
+
+        const clickHandler = (e: Event) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onFieldClick(sectionId, fieldPath);
+        };
+
+        (button as any).__fieldClickHandler = clickHandler;
+        button.addEventListener("click", clickHandler, { capture: true });
+
+        buttonContainer.appendChild(button);
+        (element as any).__linkButtonContainer = buttonContainer;
+    };
+
     const cleanup = () => {
         scannedFields.value.forEach(({ element, path }) => {
             const handler = (element as any).__fieldClickHandler;
@@ -142,6 +187,7 @@ export const useFieldScanner = (options: FieldScannerOptions) => {
             }
             element.classList.remove("scannable-field");
             element.classList.remove("image-edit-wrapper");
+            element.classList.remove("link-edit-wrapper");
             element.style.pointerEvents = "";
             if ((element as any).__originalPosition === "static") {
                 element.style.position = "";
@@ -149,8 +195,8 @@ export const useFieldScanner = (options: FieldScannerOptions) => {
             }
             element.style.cursor = "";
 
-            const buttonContainer = (element as any).__imageButtonContainer || element;
-            const imageButton = buttonContainer.querySelector(`.image-edit-button[data-for="${path}"]`);
+            const imageButtonContainer = (element as any).__imageButtonContainer || element;
+            const imageButton = imageButtonContainer.querySelector(`.image-edit-button[data-for="${path}"]`);
             if (imageButton) {
                 const btnHandler = (imageButton as any).__fieldClickHandler;
                 if (btnHandler) {
@@ -159,6 +205,17 @@ export const useFieldScanner = (options: FieldScannerOptions) => {
                 imageButton.remove();
             }
             delete (element as any).__imageButtonContainer;
+
+            const linkButtonContainer = (element as any).__linkButtonContainer || element;
+            const linkButton = linkButtonContainer.querySelector(`.link-edit-button[data-for="${path}"]`);
+            if (linkButton) {
+                const btnHandler = (linkButton as any).__fieldClickHandler;
+                if (btnHandler) {
+                    linkButton.removeEventListener("click", btnHandler, { capture: true });
+                }
+                linkButton.remove();
+            }
+            delete (element as any).__linkButtonContainer;
 
             const indicator = element.querySelector(".field-edit-indicator");
             if (indicator) indicator.remove();
@@ -189,7 +246,7 @@ export const useFieldScanner = (options: FieldScannerOptions) => {
                 if (m.type === "childList") {
                     const addedNodes = Array.from(m.addedNodes);
                     const removedNodes = Array.from(m.removedNodes);
-                    return [...addedNodes, ...removedNodes].some((node) => node instanceof HTMLElement && (node.hasAttribute("data-field") || node.querySelector?.("[data-field]")));
+                    return [...addedNodes, ...removedNodes].some((node) => node instanceof HTMLElement && (node.hasAttribute("data-field") || node.hasAttribute("data-field-link") || node.querySelector("[data-field]") !== null || node.querySelector("[data-field-link]") !== null));
                 }
                 return false;
             });
@@ -208,7 +265,7 @@ export const useFieldScanner = (options: FieldScannerOptions) => {
             childList: true,
             subtree: true,
             attributes: true,
-            attributeFilter: ["data-field"],
+            attributeFilter: ["data-field", "data-field-link"],
         });
     };
 

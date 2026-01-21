@@ -1,43 +1,17 @@
-/** Home Page Schema - WebSite và Organization */
+/**
+ * Home Page Schema - Specific cho trang chủ
+ */
 
-export interface SearchAction {
-    "@type": "SearchAction";
-    target: string;
-    "query-input": string;
-}
+import type { GlobalSchemaConfig } from "../global.schema";
 
-export interface WebSiteSchema {
-    "@context": "https://schema.org";
-    "@type": "WebSite";
-    name: string;
-    url: string;
-    potentialAction: SearchAction;
-}
+/**
+ * Home hiện tại chỉ cần global schema
+ * File này dành cho extend sau nếu cần thêm
+ */
 
-export interface PostalAddress {
-    "@type": "PostalAddress";
-    streetAddress: string;
-    addressLocality: string;
-    addressRegion: string;
-    postalCode: string;
-    addressCountry: string;
-}
-
-export interface ContactPoint {
-    "@type": "ContactPoint";
-    telephone: string;
-    contactType: "customer service";
-    email: string;
-}
-
-export interface OrganizationSchema {
-    "@context": "https://schema.org";
-    "@type": "Organization";
-    name: string;
-    url: string;
-    logo: string;
-    description: string;
-    address: PostalAddress;
-    contactPoint: ContactPoint;
-    sameAs: string[];
+export interface HomeSchemaConfig {
+    global?: GlobalSchemaConfig;
+    // Thêm schema đặc thù cho home nếu cần
+    // breadcrumb?: BreadcrumbSchema;
+    // featuredItems?: ItemListSchema;
 }

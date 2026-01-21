@@ -515,3 +515,125 @@
 .upload-dropzone input {
     display: none;
 }
+
+.metadata-panel {
+    margin-top: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.metadata-panel.collapsed {
+    border-color: #f1f5f9;
+}
+
+.metadata-toggle {
+    width: 100%;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f9fafb;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    color: #334155;
+    transition: all 0.2s ease;
+}
+
+.metadata-toggle:hover {
+    background: #f1f5f9;
+}
+
+.metadata-toggle .toggle-icon {
+    width: 18px;
+    height: 18px;
+    color: #64748b;
+}
+
+.metadata-toggle .toggle-label {
+    flex: 1;
+    text-align: left;
+}
+
+.metadata-toggle .toggle-arrow {
+    width: 16px;
+    height: 16px;
+    color: #94a3b8;
+    transition: transform 0.2s ease;
+}
+
+.metadata-fields {
+    padding: 16px;
+    background: #ffffff;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.field-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.field-group .required {
+    color: #ef4444;
+    margin-left: 2px;
+}
+
+.metadata-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #1f2937;
+    background: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.metadata-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.metadata-input:disabled {
+    background: #f3f4f6;
+    color: #6b7280;
+    cursor: not-allowed;
+}
+
+.metadata-input::placeholder {
+    color: #9ca3af;
+}
+
+.hint {
+    display: block;
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 2px;
+    line-height: 1.4;
+}
+
+.field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.field-row .field-group {
+    margin-bottom: 0;
+}

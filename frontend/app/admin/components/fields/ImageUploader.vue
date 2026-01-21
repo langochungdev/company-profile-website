@@ -70,6 +70,41 @@
                 </button>
             </div>
 
+            <div v-if="hasPreview" class="metadata-panel" :class="{ collapsed: !metadataExpanded }">
+                <button type="button" class="metadata-toggle" @click="metadataExpanded = !metadataExpanded">
+                    <Icon name="mdi:cog-outline" class="toggle-icon" />
+                    <span class="toggle-label">SEO Metadata</span>
+                    <Icon :name="metadataExpanded ? 'mdi:chevron-up' : 'mdi:chevron-down'" class="toggle-arrow" />
+                </button>
+
+                <div v-show="metadataExpanded" class="metadata-fields">
+                    <div class="field-group">
+                        <label>
+                            Alt Text
+                            <span class="required">*</span>
+                        </label>
+                        <input ref="altInput" v-model="metadata.alt" type="text" placeholder="Mô tả ngắn gọn cho ảnh" class="metadata-input" />
+                        <span class="hint">Quan trọng cho SEO và accessibility</span>
+                    </div>
+
+                    <div class="field-group">
+                        <label>Title (Hover)</label>
+                        <input v-model="metadata.title" type="text" placeholder="Text hiển thị khi hover" class="metadata-input" />
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label>Width</label>
+                            <input v-model.number="metadata.width" type="number" disabled class="metadata-input" />
+                        </div>
+                        <div class="field-group">
+                            <label>Height</label>
+                            <input v-model.number="metadata.height" type="number" disabled class="metadata-input" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div v-else class="upload-zone" @click="triggerFileInput" @dragover.prevent="dragOver = true" @dragleave.prevent="dragOver = false" @drop.prevent="handleDrop">
                 <Icon name="mdi:cloud-upload" class="upload-icon" />
                 <p class="upload-text">Click hoặc kéo thả ảnh vào</p>
@@ -86,11 +121,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, nextTick } from "vue";
 import { usePendingUploads, isPendingImage, type PendingImageValue } from "@/admin/composables/usePendingUploads";
 import { useDeleteQueue } from "@/admin/composables/useDeleteQueue";
 import { getImageSrc, type ImageValue } from "@/admin/utils/imageHelper";
 import { resizeImage, type ImageQuality } from "@/admin/utils/imageResizer";
+import { extractImageDimensions } from "@/admin/utils/imageExtractor";
 
 interface CollectionItem {
     [key: string]: ImageValue | string | undefined
@@ -98,7 +134,7 @@ interface CollectionItem {
 
 const props = withDefaults(
     defineProps<{
-        modelValue: string | PendingImageValue | CollectionItem[];
+        modelValue: ImageValue | CollectionItem[];
         fieldPath: string;
         folder?: string;
         accept?: string;
@@ -119,7 +155,7 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-    (e: "update:modelValue", value: string | PendingImageValue | CollectionItem[]): void;
+    (e: "update:modelValue", value: ImageValue | CollectionItem[]): void;
 }>();
 
 const { addPending, removePending } = usePendingUploads();
@@ -137,6 +173,14 @@ const originalPreview = ref<string>("");
 const isProcessing = ref(false);
 const imageErrors = ref<Set<number>>(new Set());
 const singleImageError = ref(false);
+const metadataExpanded = ref(true);
+const altInput = ref<HTMLInputElement | null>(null);
+const metadata = ref({
+    alt: "",
+    title: "",
+    width: undefined as number | undefined,
+    height: undefined as number | undefined,
+});
 
 const isCollectionMode = computed(() => props.mode === "collection");
 
@@ -156,7 +200,7 @@ watch(
     () => props.modelValue,
     (newVal) => {
         if (isCollectionMode.value) return;
-        
+
         if (typeof newVal === "string") {
             if (newVal && newVal.includes("cloudinary")) {
                 lastKnownUrl.value = newVal;
@@ -168,7 +212,17 @@ watch(
                     URL.revokeObjectURL(originalPreview.value);
                 }
                 originalPreview.value = "";
+                metadata.value = { alt: "", title: "", width: undefined, height: undefined };
             }
+        } else if (newVal && typeof newVal === "object" && "url" in newVal) {
+            const imgMeta = newVal as { url: string; alt?: string; title?: string; width?: number; height?: number };
+            lastKnownUrl.value = imgMeta.url;
+            metadata.value = {
+                alt: imgMeta.alt || "",
+                title: imgMeta.title || "",
+                width: imgMeta.width,
+                height: imgMeta.height,
+            };
         }
     },
     { immediate: true }
@@ -178,20 +232,32 @@ const isPending = computed(() => !isCollectionMode.value && isPendingImage(props
 
 const hasPreview = computed(() => {
     if (isCollectionMode.value) return false;
-    const val = props.modelValue as string | PendingImageValue;
+    const val = props.modelValue;
     if (isPendingImage(val)) {
         return !!val.previewUrl;
     }
-    return !!val;
+    if (typeof val === "string") {
+        return !!val;
+    }
+    if (val && typeof val === "object" && "url" in val) {
+        return !!(val as { url: string }).url;
+    }
+    return false;
 });
 
 const previewSrc = computed(() => {
     if (isCollectionMode.value) return "";
-    const val = props.modelValue as string | PendingImageValue;
+    const val = props.modelValue;
     if (isPendingImage(val)) {
         return val.previewUrl;
     }
-    return val as string;
+    if (typeof val === "string") {
+        return val;
+    }
+    if (val && typeof val === "object" && "url" in val) {
+        return (val as { url: string }).url;
+    }
+    return "";
 });
 
 const isQualityEnabled = computed(() => {
@@ -210,6 +276,44 @@ watch(selectedQuality, async (newQuality) => {
         isProcessing.value = false;
     }
 });
+
+watch(
+    metadata,
+    (newMeta) => {
+        if (!hasPreview.value) return;
+
+        const currentValue = props.modelValue;
+
+        if (isPending.value) {
+            emit("update:modelValue", {
+                ...(currentValue as PendingImageValue),
+                metadata: {
+                    alt: newMeta.alt,
+                    title: newMeta.title,
+                    width: newMeta.width,
+                    height: newMeta.height,
+                },
+            });
+        } else if (currentValue && typeof currentValue === "object" && "url" in currentValue) {
+            emit("update:modelValue", {
+                url: (currentValue as { url: string }).url,
+                alt: newMeta.alt || undefined,
+                title: newMeta.title || undefined,
+                width: newMeta.width,
+                height: newMeta.height,
+            });
+        } else if (typeof currentValue === "string" && currentValue) {
+            emit("update:modelValue", {
+                url: currentValue,
+                alt: newMeta.alt || undefined,
+                title: newMeta.title || undefined,
+                width: newMeta.width,
+                height: newMeta.height,
+            });
+        }
+    },
+    { deep: true }
+);
 
 const triggerFileInput = () => {
     fileInput.value?.click();
@@ -246,11 +350,18 @@ const handleFile = async (file: File) => {
         addToDeleteQueue(lastKnownUrl.value);
     }
 
-    emit("update:modelValue", {
-        pending: true,
-        file,
-        previewUrl: originalPreview.value,
-    });
+    try {
+        const dimensions = await extractImageDimensions(file);
+        metadata.value.width = dimensions.width;
+        metadata.value.height = dimensions.height;
+    } catch (e) {
+        console.error("[ImageUploader] Failed to extract dimensions:", e);
+    }
+
+    metadataExpanded.value = true;
+
+    await nextTick();
+    altInput.value?.focus();
 
     await processOriginalFile(selectedQuality.value);
 };
@@ -265,6 +376,12 @@ const processOriginalFile = async (quality: ImageQuality) => {
         pending: true,
         file: resizedFile,
         previewUrl,
+        metadata: {
+            alt: metadata.value.alt,
+            title: metadata.value.title,
+            width: metadata.value.width,
+            height: metadata.value.height,
+        },
     });
 };
 
@@ -280,6 +397,12 @@ const handleRemove = () => {
     originalPreview.value = "";
     lastKnownUrl.value = "";
     singleImageError.value = false;
+    metadata.value = {
+        alt: "",
+        title: "",
+        width: undefined,
+        height: undefined,
+    };
     emit("update:modelValue", "");
 };
 

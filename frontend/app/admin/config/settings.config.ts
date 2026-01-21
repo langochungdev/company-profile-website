@@ -14,6 +14,27 @@ export interface SettingsFieldConfig {
     options?: string[] | { value: string; label: string }[];
 }
 
+export interface SchemaFieldsConfig {
+    config: Record<string, SettingsFieldConfig>;
+    fieldMapping: Record<string, SettingsFieldConfig>;
+}
+
+export const COMMON_SCHEMA_CONFIG: Record<string, SettingsFieldConfig> = {
+    siteName: {
+        type: "text",
+        label: "Tên Website",
+        note: "Tên website/thương hiệu hiển thị trong schema",
+        max: 100,
+        required: true,
+    },
+    siteUrl: {
+        type: "text",
+        label: "URL Website",
+        note: "URL chính của website",
+        max: 200,
+    },
+};
+
 export const SEO_FIELDS: Record<string, SettingsFieldConfig> = {
     title: {
         type: "text",

@@ -35,12 +35,6 @@ export default defineNuxtConfig({
                 { name: "theme-color", content: "#000000" },
                 { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
                 { name: "mobile-web-app-capable", content: "yes" },
-                { property: "og:image", content: "https://sht.langochung.me/seo/banner.png" },
-                { property: "og:image:width", content: "1920" },
-                { property: "og:image:height", content: "661" },
-                { property: "og:image:type", content: "image/png" },
-                { name: "twitter:image", content: "https://sht.langochung.me/seo/banner.png" },
-                { name: "twitter:card", content: "summary_large_image" },
             ],
             link: [
                 { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },

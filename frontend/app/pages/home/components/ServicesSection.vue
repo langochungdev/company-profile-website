@@ -24,8 +24,8 @@
             </div>
 
             <div class="mobile-scroll">
-                <NuxtLink v-for="(service, index) in displayItems" :key="'m-' + index" :to="service.link" class="mobile-card" :class="{ 'active': activeIndex === index }" @click="activeIndex = index">
-                    <img :src="getImageSrc(service.image)" :alt="service.title" class="mobile-card-bg" />
+                <NuxtLink v-for="(service, index) in displayItems" :key="'m-' + index" :to="service.link" class="mobile-card" :class="{ 'active': activeIndex === index }" :data-field-link="`items.${index}.link`" @click="activeIndex = index">
+                    <img :src="getImageSrc(service.image)" :alt="getImageAlt(service.image, service.title)" :title="getImageTitle(service.image)" :width="getImageWidth(service.image)" :height="getImageHeight(service.image)" class="mobile-card-bg" />
                     <div class="mobile-card-overlay"></div>
                     <div class="mobile-card-content">
                         <Icon :name="service.icon" class="mobile-card-icon" />
@@ -42,9 +42,9 @@
             </div>
 
             <div class="services-grid">
-                <div v-for="(service, index) in displayItems" :key="index" :class="['service-card', getGridClass(index)]">
+                <div v-for="(service, index) in displayItems" :key="index" :class="['service-card', getGridClass(index)]" :data-field-link="`items.${index}.link`">
                     <NuxtLink :to="service.link" class="service-card-link" />
-                    <img :src="getImageSrc(service.image)" :alt="service.title" loading="lazy" class="service-image" :data-field="`items.${index}.image`" data-field-type="image" />
+                    <img :src="getImageSrc(service.image)" :alt="getImageAlt(service.image, service.title)" :title="getImageTitle(service.image)" :width="getImageWidth(service.image)" :height="getImageHeight(service.image)" loading="lazy" class="service-image" :data-field="`items.${index}.image`" data-field-type="image" />
                     <div class="service-gradient"></div>
                     <div class="service-content">
                         <div class="service-info">
@@ -64,7 +64,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { getImageSrc, type ImageValue } from '@/admin/utils/imageHelper'
+import { getImageSrc, getImageAlt, getImageTitle, getImageWidth, getImageHeight, type ImageValue } from '@/admin/utils/imageHelper'
 
 interface ServiceItem {
     title: string

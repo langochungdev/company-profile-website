@@ -1,15 +1,15 @@
 <!-- Chức năng: Footer chính với thông tin liên hệ, liên kết nhanh và bản đồ -->
 <template>
-    <footer class="footer" itemscope itemtype="https://schema.org/Organization">
+    <footer class="footer">
         <div class="footer-container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <div class="brand-logo" itemprop="url">
-                        <div class="brand-name" itemprop="name">
+                    <div class="brand-logo">
+                        <div class="brand-name">
                             <span class="text-primary">SHT</span> Security
                         </div>
                     </div>
-                    <p class="brand-desc" itemprop="description">
+                    <p class="brand-desc">
                         Chuyên cung cấp giải pháp an ninh và hạ tầng mạng cho gia đình, doanh nghiệp.
                         Camera AI, mạng LAN, WiFi, Access Control, Báo cháy, Tổng đài IP.
                     </p>
@@ -39,7 +39,7 @@
                     <h3 class="footer-title">Liên Hệ</h3>
                     <ul class="contact-list">
                         <li>
-                            <div class="contact-item" itemprop="telephone">
+                            <div class="contact-item">
                                 <Icon name="mdi:phone" class="contact-icon" />
                                 0901 234 567
                             </div>
@@ -51,7 +51,7 @@
                             </div>
                         </li>
                         <li>
-                            <div class="contact-item" itemprop="email">
+                            <div class="contact-item">
                                 <Icon name="mdi:email" class="contact-icon" />
                                 info@sht.vn
                             </div>
@@ -83,9 +83,9 @@
 
                 <div class="footer-map">
                     <h3 class="footer-title">Bản Đồ</h3>
-                    <div class="map-address" itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+                    <div class="map-address">
                         <Icon name="mdi:map-marker" class="map-icon" />
-                        <span itemprop="streetAddress">123 Đường ABC, Phường XYZ, Quận 1, TP. Hồ Chí Minh</span>
+                        <span>123 Đường ABC, Phường XYZ, Quận 1, TP. Hồ Chí Minh</span>
                     </div>
                     <div class="map-wrapper">
                         <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.4241674197956!2d106.69765841533417!3d10.778789792319392!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f38f9ed887b%3A0x14aded5703768989!2zUXXhuq1uIDEsIFRow6BuaCBwaOG7kSBI4buTIENow60gTWluaCwgVmnhu4d0IE5hbQ!5e0!3m2!1svi!2s!4v1704796800000" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Bản đồ địa chỉ SHT Security"></iframe>

@@ -1,6 +1,35 @@
-// Utility auto-generate SEO, OpenGraph, Schema từ item data
-
 import { SCHEMA_TYPE_MAP, type SchemaPageType } from "@/admin/types/schema";
+import type { GlobalSchemaConfig, OrganizationSchema, WebSiteSchema } from "@/admin/types/schema/global.schema";
+import type { HomeSchemaConfig } from "@/admin/types/schema/page/home.schema";
+
+export function generateGlobalSchema(config: GlobalSchemaConfig): Array<OrganizationSchema | WebSiteSchema> {
+    const schemas: Array<OrganizationSchema | WebSiteSchema> = [];
+
+    if (config.organization) {
+        const organizationSchema: OrganizationSchema = {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            ...config.organization,
+        };
+        schemas.push(organizationSchema);
+    }
+
+    if (config.website) {
+        const websiteSchema: WebSiteSchema = {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            ...config.website,
+        };
+        schemas.push(websiteSchema);
+    }
+
+    return schemas;
+}
+
+export function generateHomeSchema(config: HomeSchemaConfig): Array<any> {
+    // Home specific schema logic here if needed
+    return [];
+}
 
 interface ProductData {
     name: string;

@@ -16,7 +16,7 @@
                                 <template v-for="set in duplicateCount" :key="'cert-set-' + set">
                                     <div v-for="(cert, index) in displayItems" :key="'cert-' + set + '-' + index" class="certificate-item">
                                         <div class="certificate-card" @click="openPopup(cert.image)">
-                                            <img :src="getImageSrc(cert.image)" :alt="cert.title || 'Giấy chứng nhận'" loading="lazy" class="certificate-img" :data-field="`items.${index}.image`" data-field-type="image" />
+                                            <img :src="getImageSrc(cert.image)" :alt="getImageAlt(cert.image, cert.title || 'Giấy chứng nhận')" :title="getImageTitle(cert.image)" :width="getImageWidth(cert.image)" :height="getImageHeight(cert.image)" loading="lazy" class="certificate-img" :data-field="`items.${index}.image`" data-field-type="image" />
                                         </div>
                                     </div>
                                 </template>
@@ -32,7 +32,7 @@
                 <Transition name="fade">
                     <div v-if="showPopup" class="popup-overlay" @click="closePopup">
                         <div class="popup-content">
-                            <img :src="selectedImage" alt="Giấy chứng nhận" class="popup-img" />
+                            <img :src="selectedImage" :alt="getImageAlt(selectedImage, 'Giấy chứng nhận')" class="popup-img" />
                         </div>
                     </div>
                 </Transition>
@@ -43,7 +43,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
-import { getImageSrc, type ImageValue } from '@/admin/utils/imageHelper'
+import { getImageSrc, getImageAlt, getImageTitle, getImageWidth, getImageHeight, type ImageValue } from '@/admin/utils/imageHelper'
 
 interface CertItem {
     image: ImageValue

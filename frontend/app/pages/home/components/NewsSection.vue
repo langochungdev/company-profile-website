@@ -28,10 +28,10 @@
             </div>
 
             <div v-else class="news-grid">
-                <div v-for="(post, index) in displayItems" :key="post.id || index" class="news-card">
+                <div v-for="(post, index) in displayItems" :key="post.id || index" class="news-card" :data-field-link="`items.${index}.link`">
                     <NuxtLink :to="`/post/${post.slug || post.link}`" class="news-card-link" />
                     <div class="card-image-wrapper" :data-field="`items.${index}.thumbnail`" data-field-type="image">
-                        <img :src="getImageSrc(post.thumbnail) || getImageSrc(post.image) || 'https://placehold.co/400x300/webp?text=400x300'" :alt="post.title" loading="lazy" class="card-image" />
+                        <img :src="getImageSrc(post.thumbnail) || getImageSrc(post.image) || 'https://placehold.co/400x300/webp?text=400x300'" :alt="getImageAlt(post.thumbnail || post.image, post.title)" :title="getImageTitle(post.thumbnail || post.image)" :width="getImageWidth(post.thumbnail || post.image)" :height="getImageHeight(post.thumbnail || post.image)" loading="lazy" class="card-image" />
                         <div class="card-gradient" />
                     </div>
                     <div class="card-overlay">
@@ -60,7 +60,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { usePreviewContext } from '@/admin/composables/usePreviewContext'
-import { getImageSrc, type ImageValue } from '@/admin/utils/imageHelper'
+import { getImageSrc, getImageAlt, getImageTitle, getImageWidth, getImageHeight, type ImageValue } from '@/admin/utils/imageHelper'
 
 interface NewsItem {
     id?: string

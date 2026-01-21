@@ -29,7 +29,7 @@
                         </div>
                     </div>
                     <div class="slide-visual" :data-field="`slides.${index}.image`" data-field-type="image">
-                        <img :src="getImageSrc(slide.image) || 'https://placehold.co/600x600/webp?text=600x600'" alt="Ảnh minh họa" class="visual-img" />
+                        <img :src="getImageSrc(slide.image) || 'https://placehold.co/600x600/webp?text=600x600'" :alt="getImageAlt(slide.image, slide.title)" :title="getImageTitle(slide.image)" :width="getImageWidth(slide.image)" :height="getImageHeight(slide.image)" class="visual-img" />
                     </div>
                 </div>
             </div>
@@ -52,7 +52,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import { getImageSrc, type ImageValue } from '@/admin/utils/imageHelper'
+import { getImageSrc, getImageAlt, getImageTitle, getImageWidth, getImageHeight, type ImageValue } from '@/admin/utils/imageHelper'
 
 interface SlideData {
     badge: string

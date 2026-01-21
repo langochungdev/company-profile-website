@@ -28,4 +28,16 @@
         width: 16px;
         height: 16px;
     }
+
+    .link-edit-button {
+        width: 32px;
+        height: 32px;
+        top: 6px;
+        right: 44px;
+    }
+
+    .link-edit-button svg {
+        width: 16px;
+        height: 16px;
+    }
 }

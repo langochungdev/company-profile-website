@@ -4,8 +4,32 @@
  * - Đệ quy traverse nested objects và arrays
  */
 
-import { isPendingImage } from "@/admin/composables/usePendingUploads";
+import { isPendingImage, type PendingImageValue } from "@/admin/composables/usePendingUploads";
 import type { CloudinaryUploadResult } from "@/admin/services/cloudinary.service";
+
+interface ImageMetadataOutput {
+    url: string;
+    alt?: string;
+    title?: string;
+    width?: number;
+    height?: number;
+}
+
+function buildImageValue(uploadResult: CloudinaryUploadResult, pendingValue: PendingImageValue): ImageMetadataOutput | string {
+    const meta = pendingValue.metadata;
+
+    if (meta && (meta.alt || meta.title || meta.width || meta.height)) {
+        return {
+            url: uploadResult.secure_url,
+            alt: meta.alt || undefined,
+            title: meta.title || undefined,
+            width: meta.width || uploadResult.width,
+            height: meta.height || uploadResult.height,
+        };
+    }
+
+    return uploadResult.secure_url;
+}
 
 export function normalizeImageData(data: Record<string, unknown>, uploadResults: Map<string, CloudinaryUploadResult>, basePath: string = ""): Record<string, unknown> {
     const result: Record<string, unknown> = {};
@@ -15,13 +39,20 @@ export function normalizeImageData(data: Record<string, unknown>, uploadResults:
 
         if (isPendingImage(value)) {
             const uploadResult = uploadResults.get(fieldPath);
-            result[key] = uploadResult?.secure_url || "";
+            if (uploadResult) {
+                result[key] = buildImageValue(uploadResult, value as PendingImageValue);
+            } else {
+                result[key] = "";
+            }
         } else if (Array.isArray(value)) {
             result[key] = value.map((item, index) => {
                 if (isPendingImage(item)) {
                     const itemPath = `${fieldPath}.${index}`;
                     const uploadResult = uploadResults.get(itemPath);
-                    return uploadResult?.secure_url || "";
+                    if (uploadResult) {
+                        return buildImageValue(uploadResult, item as PendingImageValue);
+                    }
+                    return "";
                 }
                 if (typeof item === "object" && item !== null) {
                     return normalizeImageData(item as Record<string, unknown>, uploadResults, `${fieldPath}.${index}`);
