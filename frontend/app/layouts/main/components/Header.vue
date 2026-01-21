@@ -2,7 +2,7 @@
 <template>
     <div>
         <TopBar class="top-bar" />
-        <header :class="['header', scrolled ? 'header-scrolled' : 'header-transparent', navVisible ? 'header-visible' : 'header-hidden']">
+        <header :class="['header', isHeaderTransparent ? 'header-transparent' : 'header-scrolled', navVisible ? 'header-visible' : 'header-hidden']">
             <div class="header-container">
                 <div class="header-content">
                     <div class="header-left">
@@ -30,25 +30,10 @@
 
                     <nav class="nav-desktop" aria-label="Main navigation">
                         <NuxtLink to="/" class="nav-link">Trang Chủ</NuxtLink>
-                        <NuxtLink to="/about-us" class="nav-link">Giới Thiệu</NuxtLink>
-
-                        <div class="dropdown" ref="dropdownRef">
-                            <button @click="toggleDropdown" class="dropdown-trigger" :aria-expanded="isDropdownOpen">
-                                <NuxtLink to="/product" class="trigger-link">Sản Phẩm</NuxtLink>
-                                <Icon name="mdi:chevron-down" class="dropdown-icon" :class="{ 'dropdown-icon-open': isDropdownOpen }" />
-                            </button>
-                            <Transition enter-active-class="dropdown-enter-active" enter-from-class="dropdown-enter-from" enter-to-class="dropdown-enter-to" leave-active-class="dropdown-leave-active" leave-from-class="dropdown-leave-from" leave-to-class="dropdown-leave-to">
-                                <div v-if="isDropdownOpen" class="dropdown-menu">
-                                    <NuxtLink v-for="product in products" :key="product.path" :to="product.path" class="dropdown-item" @click="isDropdownOpen = false">
-                                        <Icon :name="product.icon" class="dropdown-item-icon" />
-                                        <span class="dropdown-item-text">{{ product.name }}</span>
-                                    </NuxtLink>
-                                </div>
-                            </Transition>
-                        </div>
-
+                        <NuxtLink to="/product" class="nav-link">Sản Phẩm</NuxtLink>
                         <NuxtLink to="/service" class="nav-link">Dịch Vụ</NuxtLink>
                         <NuxtLink to="/post" class="nav-link">Tin Tức</NuxtLink>
+                        <NuxtLink to="/about-us" class="nav-link">Giới Thiệu</NuxtLink>
                         <NuxtLink to="/contact" class="nav-link">Liên Hệ</NuxtLink>
                     </nav>
 
@@ -65,23 +50,10 @@
                     <div v-if="isMenuOpen" class="mobile-menu">
                         <nav class="mobile-nav">
                             <NuxtLink to="/" class="mobile-nav-link" @click="isMenuOpen = false">Trang Chủ</NuxtLink>
-                            <NuxtLink to="/about-us" class="mobile-nav-link" @click="isMenuOpen = false">Giới Thiệu</NuxtLink>
-
-                            <div>
-                                <button @click="isMobileProductsOpen = !isMobileProductsOpen" class="mobile-accordion-trigger">
-                                    <NuxtLink to="/product" @click.stop="isMenuOpen = false" class="accordion-link">Sản Phẩm</NuxtLink>
-                                    <Icon name="mdi:chevron-down" class="mobile-accordion-icon" :class="{ 'mobile-accordion-icon-open': isMobileProductsOpen }" />
-                                </button>
-                                <div v-if="isMobileProductsOpen" class="mobile-accordion-content">
-                                    <NuxtLink v-for="product in products" :key="product.path" :to="product.path" class="mobile-product-item" @click="isMenuOpen = false">
-                                        <Icon :name="product.icon" class="mobile-product-icon" />
-                                        {{ product.name }}
-                                    </NuxtLink>
-                                </div>
-                            </div>
-
+                            <NuxtLink to="/product" class="mobile-nav-link" @click="isMenuOpen = false">Sản Phẩm</NuxtLink>
                             <NuxtLink to="/service" class="mobile-nav-link" @click="isMenuOpen = false">Dịch Vụ</NuxtLink>
                             <NuxtLink to="/post" class="mobile-nav-link" @click="isMenuOpen = false">Tin Tức</NuxtLink>
+                            <NuxtLink to="/about-us" class="mobile-nav-link" @click="isMenuOpen = false">Giới Thiệu</NuxtLink>
                             <NuxtLink to="/contact" class="mobile-nav-link" @click="isMenuOpen = false">Liên Hệ</NuxtLink>
                             <button class="cta-btn cta-mobile" @click="isMenuOpen = false">Báo Giá</button>
                         </nav>
@@ -118,12 +90,9 @@ import TopBar from './TopBar.vue'
 
 const route = useRoute()
 const isMenuOpen = ref(false)
-const isDropdownOpen = ref(false)
-const isMobileProductsOpen = ref(false)
 const scrolled = ref(false)
 const navVisible = ref(true)
 const lastScrollY = ref(0)
-const dropdownRef = ref(null)
 
 const products = [
     { name: 'Camera An Ninh - AI', path: '/product/camera-ai-sht-pro', icon: 'mdi:cctv' },
@@ -138,6 +107,11 @@ const products = [
 
 const showBreadcrumb = computed(() => {
     return route.path !== '/' && route.path !== '/home'
+})
+
+const isHeaderTransparent = computed(() => {
+    const isHome = route.path === '/' || route.path === '/home'
+    return isHome && !scrolled.value
 })
 
 const breadcrumbItems = computed(() => {
@@ -174,23 +148,11 @@ const breadcrumbItems = computed(() => {
     return items
 })
 
-const toggleDropdown = () => {
-    isDropdownOpen.value = !isDropdownOpen.value
-}
-
-const handleClickOutside = (event) => {
-    if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
-        isDropdownOpen.value = false
-    }
-}
-
 const handleScroll = () => {
     const currentScrollY = window.scrollY
     scrolled.value = currentScrollY > 50
 
-    isDropdownOpen.value = false
     isMenuOpen.value = false
-    isMobileProductsOpen.value = false
 
     if (currentScrollY < lastScrollY.value || currentScrollY < 100) {
         navVisible.value = true
@@ -202,12 +164,10 @@ const handleScroll = () => {
 
 onMounted(() => {
     window.addEventListener('scroll', handleScroll)
-    document.addEventListener('click', handleClickOutside)
 })
 
 onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll)
-    document.removeEventListener('click', handleClickOutside)
 })
 </script>
 

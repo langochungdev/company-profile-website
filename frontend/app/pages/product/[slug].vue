@@ -142,8 +142,4 @@ useAutoSeo(productDetailConfig, product)
 <style scoped>
 @import "@/styles/product/slug/desktop.css";
 @import "@/styles/product/slug/mobile.css";
-
-.is-placeholder {
-    opacity: 0.7;
-}
 </style>

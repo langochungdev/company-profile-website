@@ -66,9 +66,4 @@ const loadMore = () => {
 <style scoped>
 @import "@/styles/service/service-list/desktop.css";
 @import "@/styles/service/service-list/mobile.css";
-
-.is-placeholder {
-    opacity: 0.6;
-}
 </style>
-

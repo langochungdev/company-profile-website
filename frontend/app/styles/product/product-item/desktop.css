@@ -1,9 +1,14 @@
 .product-card {
     background: #ffffff;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    border: 1px solid #cbd5e1;
+    box-shadow:
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
     text-decoration: none;
@@ -14,9 +19,10 @@
 
 .product-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 20px 40px -6px rgba(0, 0, 0, 0.1);
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
     border-color: #34d399;
-
 }
 
 .card-image-wrapper {

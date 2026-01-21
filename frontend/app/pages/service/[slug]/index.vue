@@ -206,8 +206,4 @@ useHead({
 <style scoped>
 @import "@/styles/service/slug/desktop.css";
 @import "@/styles/service/slug/mobile.css";
-
-.is-placeholder {
-    opacity: 0.7;
-}
 </style>
