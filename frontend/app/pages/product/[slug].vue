@@ -54,6 +54,25 @@
                         </div>
                     </div>
 
+                    <div class="article-section" v-if="displayProduct.content">
+                        <h2 class="article-title">
+                            <Icon name="mdi:text-box-outline" class="title-icon" />
+                            Thông Tin Chi Tiết
+                        </h2>
+                        <div class="article-content tiptap-content" v-html="displayProduct.content"></div>
+                    </div>
+
+                    <div class="article-section" v-else-if="displayProduct.isPlaceholder">
+                        <h2 class="article-title">
+                            <Icon name="mdi:text-box-outline" class="title-icon" />
+                            Thông Tin Chi Tiết
+                        </h2>
+                        <div class="article-content tiptap-content placeholder-content">
+                            <p>Nội dung đang được cập nhật...</p>
+                            <p>Vui lòng liên hệ với chúng tôi để được tư vấn chi tiết về sản phẩm này.</p>
+                        </div>
+                    </div>
+
                     <div class="related-section" v-if="relatedProducts.length">
                         <h2 class="related-title">Sản Phẩm Liên Quan</h2>
                         <div class="related-grid">

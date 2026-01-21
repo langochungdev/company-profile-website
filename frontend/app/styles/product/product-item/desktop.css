@@ -9,6 +9,7 @@
     text-decoration: none;
     color: inherit;
     position: relative;
+    height: 100%;
 }
 
 .product-card:hover {
@@ -100,10 +101,11 @@
 }
 
 .card-content {
-    padding: 20px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    flex: 1;
+    min-height: 0;
 }
 
 .category {
@@ -130,8 +132,9 @@
 }
 
 .features-list {
-    margin-bottom: 20px;
-    flex-grow: 1;
+    margin-bottom: 12px;
+    flex: 1;
+    min-height: 0;
 }
 
 .feature-item {
@@ -150,11 +153,9 @@
 }
 
 .card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 16px;
+    padding-top: 12px;
     border-top: 1px solid #f1f5f9;
+    margin-top: auto;
 }
 
 .price-box {
@@ -178,23 +179,4 @@
     font-size: 14px;
     font-weight: 600;
     color: #3b82f6;
-}
-
-.btn-add {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: #f1f5f9;
-    color: #0f172a;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    cursor: pointer;
-}
-
-.btn-add:hover {
-    background: #34d399;
-    color: white;
 }

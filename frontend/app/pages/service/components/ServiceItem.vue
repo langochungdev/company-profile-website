@@ -17,10 +17,10 @@
             <h3 class="card-title">{{ service.title }}</h3>
             <p class="card-desc">{{ service.description }}</p>
 
-            <div class="features-list">
+            <div class="features-list" v-if="service.features?.length">
                 <div v-for="(feature, index) in service.features.slice(0, 3)" :key="index" class="feature-item">
                     <Icon name="mdi:check-circle" class="check-icon" />
-                    <span>{{ feature }}</span>
+                    <span>{{ feature.text || feature }}</span>
                 </div>
             </div>
 

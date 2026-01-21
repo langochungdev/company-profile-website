@@ -27,9 +27,6 @@
                     <span class="price-value" v-if="product.price">{{ formatPrice(product.price) }}</span>
                     <span class="price-contact" v-else>Liên hệ</span>
                 </div>
-                <button class="btn-add">
-                    <Icon name="mdi:plus" />
-                </button>
             </div>
         </div>
     </NuxtLink>

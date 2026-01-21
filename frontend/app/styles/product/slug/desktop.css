@@ -194,7 +194,240 @@
     transform: translateY(-2px);
 }
 
+.article-section {
+    margin-top: 60px;
+    padding-top: 60px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.article-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 28px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 32px;
+}
+
+.title-icon {
+    width: 32px;
+    height: 32px;
+    color: #10b981;
+}
+
+.article-content {
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    border: 1px solid #e2e8f0;
+}
+
+.placeholder-content {
+    color: #64748b;
+    text-align: center;
+    padding: 60px 40px;
+}
+
+.placeholder-content p {
+    margin-bottom: 12px;
+}
+
+.tiptap-content {
+    font-size: 17px;
+    line-height: 1.8;
+    color: #334155;
+}
+
+.tiptap-content h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 40px 0 20px;
+    line-height: 1.3;
+}
+
+.tiptap-content h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 36px 0 16px;
+    line-height: 1.4;
+}
+
+.tiptap-content h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 28px 0 12px;
+}
+
+.tiptap-content p {
+    margin-bottom: 20px;
+}
+
+.tiptap-content strong {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.tiptap-content em {
+    font-style: italic;
+}
+
+.tiptap-content u {
+    text-decoration: underline;
+}
+
+.tiptap-content s {
+    text-decoration: line-through;
+}
+
+.tiptap-content a {
+    color: #10b981;
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+
+.tiptap-content a:hover {
+    color: #059669;
+}
+
+.tiptap-content ul,
+.tiptap-content ol {
+    margin: 20px 0;
+    padding-left: 28px;
+}
+
+.tiptap-content li {
+    margin-bottom: 10px;
+}
+
+.tiptap-content li::marker {
+    color: #10b981;
+}
+
+.tiptap-content blockquote {
+    margin: 28px 0;
+    padding: 20px 24px;
+    background: #f0fdf4;
+    border-left: 4px solid #10b981;
+    border-radius: 0 12px 12px 0;
+    font-style: italic;
+    color: #166534;
+}
+
+.tiptap-content pre {
+    margin: 24px 0;
+    padding: 20px;
+    background: #1e293b;
+    border-radius: 12px;
+    overflow-x: auto;
+}
+
+.tiptap-content code {
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 14px;
+    color: #e2e8f0;
+}
+
+.tiptap-content p code {
+    background: #f1f5f9;
+    color: #dc2626;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 15px;
+}
+
+.tiptap-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin: 24px 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.tiptap-content figure {
+    margin: 28px 0;
+}
+
+.tiptap-content figcaption {
+    text-align: center;
+    font-size: 14px;
+    color: #64748b;
+    margin-top: 12px;
+}
+
+.tiptap-content iframe {
+    max-width: 100%;
+    border-radius: 12px;
+    margin: 28px 0;
+}
+
+.tiptap-content .youtube-embed,
+.tiptap-content .video-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    height: 0;
+    margin: 28px 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.tiptap-content .youtube-embed iframe,
+.tiptap-content .video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border: none;
+    border-radius: 12px;
+}
+
+.tiptap-content video {
+    max-width: 100%;
+    border-radius: 12px;
+    margin: 28px 0;
+}
+
+.tiptap-content hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+    margin: 40px 0;
+}
+
+.tiptap-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 28px 0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.tiptap-content th,
+.tiptap-content td {
+    padding: 14px 16px;
+    border: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+.tiptap-content th {
+    background: #f8fafc;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.tiptap-content tr:hover {
+    background: #f8fafc;
+}
+
 .related-section {
+    margin-top: 60px;
     padding-top: 60px;
     border-top: 1px solid #e2e8f0;
 }
