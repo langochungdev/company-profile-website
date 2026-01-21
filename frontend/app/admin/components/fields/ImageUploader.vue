@@ -1,20 +1,51 @@
-<!-- Chức năng: Component upload ảnh với local preview, deferred upload -->
+<!-- Chức năng: Component upload ảnh với local preview, deferred upload - hỗ trợ single và collection mode -->
 <template>
-    <div class="image-uploader-wrapper" :class="{ 'drag-over': dragOver, 'has-error': !!error, 'is-pending': isPending }">
-        <div v-if="hasPreview" class="image-preview">
-            <img :src="previewSrc" alt="Preview" />
-            <span v-if="isPending" class="pending-badge">Chưa lưu</span>
-            <button type="button" class="remove-btn" @click="handleRemove">
-                <Icon name="mdi:close" />
-            </button>
-        </div>
+    <div class="image-uploader-wrapper" :class="wrapperClasses">
+        <template v-if="isCollectionMode">
+            <div v-if="collectionItems.length === 0" class="collection-empty">
+                <div class="empty-icon">
+                    <Icon name="mdi:image-multiple-outline" />
+                </div>
+                <h4>Chưa có ảnh nào</h4>
+                <p>Thêm ảnh bằng cách kéo thả hoặc click bên dưới</p>
+            </div>
 
-        <div v-else class="upload-zone" @click="triggerFileInput" @dragover.prevent="dragOver = true" @dragleave.prevent="dragOver = false" @drop.prevent="handleDrop">
-            <Icon name="mdi:cloud-upload" class="upload-icon" />
-            <p class="upload-text">Click hoặc kéo thả ảnh vào</p>
-        </div>
+            <div v-else class="collection-grid">
+                <div v-for="(item, index) in collectionItems" :key="index" class="collection-item" :class="{ dragging: dragIndex === index }" draggable="true" @dragstart="handleDragStart(index)" @dragover.prevent="handleDragOver(index)" @dragend="handleDragEnd">
+                    <span class="item-index">{{ index + 1 }}</span>
+                    <img :src="getImageSrc(item[imageField])" :alt="`Ảnh ${index + 1}`" />
+                    <div class="item-overlay" />
+                    <div class="item-actions">
+                        <button type="button" class="btn-item-action delete" @click="removeItem(index)" :disabled="collectionItems.length <= minItems" title="Xóa">
+                            <Icon name="mdi:trash-can-outline" />
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-        <input ref="fileInput" type="file" :accept="accept" class="hidden-input" @change="handleFileSelect" />
+            <label class="upload-dropzone" :class="{ 'drag-over': dragOver, disabled: collectionItems.length >= maxItems }" @dragover.prevent="dragOver = true" @dragleave="dragOver = false" @drop.prevent="handleCollectionDrop">
+                <Icon name="mdi:cloud-upload-outline" class="upload-icon" />
+                <span class="upload-text">Kéo thả ảnh hoặc click để chọn</span>
+                <input type="file" accept="image/*" multiple :disabled="collectionItems.length >= maxItems" @change="handleCollectionFileSelect" />
+            </label>
+        </template>
+
+        <template v-else>
+            <div v-if="hasPreview" class="image-preview">
+                <img :src="previewSrc" alt="Preview" />
+                <span v-if="isPending" class="pending-badge">Chưa lưu</span>
+                <button type="button" class="remove-btn" @click="handleRemove">
+                    <Icon name="mdi:close" />
+                </button>
+            </div>
+
+            <div v-else class="upload-zone" @click="triggerFileInput" @dragover.prevent="dragOver = true" @dragleave.prevent="dragOver = false" @drop.prevent="handleDrop">
+                <Icon name="mdi:cloud-upload" class="upload-icon" />
+                <p class="upload-text">Click hoặc kéo thả ảnh vào</p>
+            </div>
+
+            <input ref="fileInput" type="file" :accept="accept" class="hidden-input" @change="handleFileSelect" />
+        </template>
 
         <p v-if="error" class="error-message">
             <Icon name="mdi:alert-circle" />
@@ -27,21 +58,34 @@
 import { ref, computed, watch } from "vue";
 import { usePendingUploads, isPendingImage, type PendingImageValue } from "@/admin/composables/usePendingUploads";
 import { useDeleteQueue } from "@/admin/composables/useDeleteQueue";
+import { getImageSrc, type ImageValue } from "@/admin/utils/imageHelper";
+
+interface CollectionItem {
+    [key: string]: ImageValue | string | undefined
+}
 
 const props = withDefaults(
     defineProps<{
-        modelValue: string | PendingImageValue;
+        modelValue: string | PendingImageValue | CollectionItem[];
         fieldPath: string;
         folder?: string;
         accept?: string;
+        mode?: "single" | "collection";
+        imageField?: string;
+        minItems?: number;
+        maxItems?: number;
     }>(),
     {
         accept: "image/*",
+        mode: "single",
+        imageField: "image",
+        minItems: 1,
+        maxItems: 20,
     }
 );
 
 const emit = defineEmits<{
-    (e: "update:modelValue", value: string | PendingImageValue): void;
+    (e: "update:modelValue", value: string | PendingImageValue | CollectionItem[]): void;
 }>();
 
 const { addPending, removePending } = usePendingUploads();
@@ -51,31 +95,51 @@ const fileInput = ref<HTMLInputElement | null>(null);
 const dragOver = ref(false);
 const error = ref<string | null>(null);
 const lastKnownUrl = ref<string>("");
+const dragIndex = ref<number | null>(null);
+const dragOverIndex = ref<number | null>(null);
+
+const isCollectionMode = computed(() => props.mode === "collection");
+
+const wrapperClasses = computed(() => ({
+    "drag-over": dragOver.value,
+    "has-error": !!error.value,
+    "is-pending": isPending.value,
+    "is-collection": isCollectionMode.value
+}));
+
+const collectionItems = computed({
+    get: () => (Array.isArray(props.modelValue) ? props.modelValue : []) as CollectionItem[],
+    set: (val) => emit("update:modelValue", val)
+});
 
 watch(
     () => props.modelValue,
     (newVal) => {
-        if (typeof newVal === "string" && newVal && newVal.includes("cloudinary")) {
+        if (!isCollectionMode.value && typeof newVal === "string" && newVal && newVal.includes("cloudinary")) {
             lastKnownUrl.value = newVal;
         }
     },
     { immediate: true }
 );
 
-const isPending = computed(() => isPendingImage(props.modelValue));
+const isPending = computed(() => !isCollectionMode.value && isPendingImage(props.modelValue as string | PendingImageValue));
 
 const hasPreview = computed(() => {
-    if (isPendingImage(props.modelValue)) {
-        return !!props.modelValue.previewUrl;
+    if (isCollectionMode.value) return false;
+    const val = props.modelValue as string | PendingImageValue;
+    if (isPendingImage(val)) {
+        return !!val.previewUrl;
     }
-    return !!props.modelValue;
+    return !!val;
 });
 
 const previewSrc = computed(() => {
-    if (isPendingImage(props.modelValue)) {
-        return props.modelValue.previewUrl;
+    if (isCollectionMode.value) return "";
+    const val = props.modelValue as string | PendingImageValue;
+    if (isPendingImage(val)) {
+        return val.previewUrl;
     }
-    return props.modelValue;
+    return val as string;
 });
 
 const triggerFileInput = () => {
@@ -104,7 +168,6 @@ const handleFile = (file: File) => {
 
     if (lastKnownUrl.value) {
         addToDeleteQueue(lastKnownUrl.value);
-        console.log("[ImageUploader] Added to delete queue:", lastKnownUrl.value);
     }
 
     const previewUrl = addPending(props.fieldPath, file, undefined, props.folder);
@@ -123,6 +186,71 @@ const handleRemove = () => {
     removePending(props.fieldPath);
     lastKnownUrl.value = "";
     emit("update:modelValue", "");
+};
+
+const handleDragStart = (index: number) => {
+    dragIndex.value = index;
+};
+
+const handleDragOver = (index: number) => {
+    if (dragIndex.value === null || dragIndex.value === index) return;
+    dragOverIndex.value = index;
+
+    const items = [...collectionItems.value];
+    const draggedItem = items.splice(dragIndex.value, 1)[0];
+    if (!draggedItem) return;
+    items.splice(index, 0, draggedItem);
+    dragIndex.value = index;
+    collectionItems.value = items;
+};
+
+const handleDragEnd = () => {
+    dragIndex.value = null;
+    dragOverIndex.value = null;
+};
+
+const handleCollectionDrop = async (event: DragEvent) => {
+    dragOver.value = false;
+    const files = event.dataTransfer?.files;
+    if (!files || files.length === 0) return;
+    await processFiles(Array.from(files));
+};
+
+const handleCollectionFileSelect = async (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    await processFiles(Array.from(input.files));
+    input.value = "";
+};
+
+const processFiles = async (files: File[]) => {
+    const remainingSlots = props.maxItems - collectionItems.value.length;
+    const filesToAdd = files.filter(f => f.type.startsWith("image/")).slice(0, remainingSlots);
+
+    const newItems: CollectionItem[] = [];
+    const currentLength = collectionItems.value.length;
+
+    for (let i = 0; i < filesToAdd.length; i++) {
+        const file = filesToAdd[i];
+        if (!file) continue;
+
+        const fieldPath = `${props.fieldPath}.${currentLength + i}.${props.imageField}`;
+        const previewUrl = addPending(fieldPath, file);
+
+        const pendingImage: PendingImageValue = {
+            pending: true,
+            file,
+            previewUrl,
+        };
+        newItems.push({ [props.imageField]: pendingImage });
+    }
+
+    collectionItems.value = [...collectionItems.value, ...newItems];
+};
+
+const removeItem = (index: number) => {
+    if (collectionItems.value.length <= props.minItems) return;
+    collectionItems.value = collectionItems.value.filter((_, i) => i !== index);
 };
 </script>
 
