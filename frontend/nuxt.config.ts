@@ -9,10 +9,12 @@ export default defineNuxtConfig({
     runtimeConfig: {
         cloudinaryApiKey: "",
         cloudinaryApiSecret: "",
+        firebaseServiceAccount: "",
         public: {
             siteName: "",
             siteUrl: "",
             envIsProd: false,
+
             cloudinaryCloudName: "",
             cloudinaryUploadPreset: "",
             firebaseApiKey: "",

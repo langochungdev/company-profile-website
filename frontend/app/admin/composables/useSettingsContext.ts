@@ -86,8 +86,15 @@ export function useSettingsContext(configPath: string): SettingsContextResult {
         try {
             const db = getDb();
             const settingsPath = getSettingsPath();
-            await SettingsService.save(db, settingsPath, settings.value);
+            const cleanData = JSON.parse(JSON.stringify(settings.value));
+            await SettingsService.save(db, settingsPath, cleanData);
             originalSettings.value = JSON.parse(JSON.stringify(settings.value));
+
+            const pageKey = configPath.split("/").pop() || "";
+            await $fetch("/api/seo/invalidate", {
+                method: "POST",
+                body: { pageKey },
+            }).catch(() => {});
         } catch (e) {
             error.value = e as Error;
             console.error("[useSettingsContext] saveSettings error:", e);

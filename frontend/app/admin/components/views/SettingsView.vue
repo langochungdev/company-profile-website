@@ -114,6 +114,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch, onMounted, nextTick } from "vue";
 import { useSettingsContext } from "@/admin/composables/useSettingsContext";
+import { usePendingUploads, type PendingImageValue } from "@/admin/composables/usePendingUploads";
 import { SCHEMA_TYPE_MAP, type SchemaPageType } from "@/admin/types/schema";
 import { generateDefaultSchema } from "@/admin/utils/schema-generator";
 import { getSchemaConfigFields, getSchemaFieldMappingFields } from "@/admin/config/schema-settings.config";
@@ -245,16 +246,28 @@ const toggleSection = (key: string) => {
     collapsedSections.value[key] = !collapsedSections.value[key];
 };
 
+const { addPending, uploadAllPending, hasPending } = usePendingUploads();
+
 const handleImageUpload = (event: Event, sectionKey: string, fieldKey: string) => {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            (settingsData as any)[sectionKey][fieldKey] = e.target?.result as string;
-        };
-        reader.readAsDataURL(file);
-    }
+    if (!file) return;
+
+    const fieldPath = `${sectionKey}.${fieldKey}`;
+    const currentValue = (settingsData as any)[sectionKey][fieldKey];
+    const oldUrl = typeof currentValue === 'string' && currentValue.includes('cloudinary') ? currentValue : undefined;
+
+    const previewUrl = addPending(fieldPath, file, oldUrl, sectionKey);
+
+    const pendingValue: PendingImageValue = {
+        pending: true,
+        file,
+        previewUrl,
+        oldUrl,
+    };
+
+    (settingsData as any)[sectionKey][fieldKey] = pendingValue;
+    input.value = "";
 };
 
 const syncFromContext = () => {
@@ -284,8 +297,26 @@ const syncToContext = () => {
 };
 
 const handleSave = async () => {
-    syncToContext();
-    await saveSettings();
+    try {
+        if (hasPending.value) {
+            const results = await uploadAllPending();
+
+            // Update settingsData with uploaded URLs
+            results.forEach((result, fieldPath) => {
+                const [section, field] = fieldPath.split('.');
+                if (section && field && (settingsData as any)[section]) {
+                    (settingsData as any)[section][field] = result.secure_url;
+                }
+            });
+        }
+
+        syncToContext();
+        await saveSettings();
+    } catch (e) {
+        console.error("Save failed:", e);
+        // Error is handled in useSettingsContext or UI can show toast
+        alert("Lưu thất bại: " + (e as Error).message);
+    }
 };
 
 watch(isDirty, (val) => {
