@@ -114,6 +114,5 @@ const handleSubmit = () => {
 </script>
 
 <style scoped>
-@import "@/styles/contact/contact-form/desktop.css";
-@import "@/styles/contact/contact-form/mobile.css";
+@import "../styles/contact-form.css";
 </style>

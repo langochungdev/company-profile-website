@@ -21,14 +21,14 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import PageLoader from './components/PageLoader.vue'
-import HeroSection from './components/HeroSection.vue'
-import ServicesSection from './components/ServicesSection.vue'
-import ProjectSection from './components/ProjectSection.vue'
-import NewsSection from './components/NewsSection.vue'
-import CertSection from './components/CertSection.vue'
-import PartnerSection from './components/PartnerSection.vue'
-import { usePageData } from '@/composables/usePageData'
+import PageLoader from './(components)/PageLoader.vue'
+import HeroSection from './(components)/HeroSection.vue'
+import ServicesSection from './(components)/ServicesSection.vue'
+import ProjectSection from './(components)/ProjectSection.vue'
+import NewsSection from './(components)/NewsSection.vue'
+import CertSection from './(components)/CertSection.vue'
+import PartnerSection from './(components)/PartnerSection.vue'
+import { usePageData } from '@/admin/composables/usePageData'
 
 type HomePageData = Record<string, Record<string, unknown>>
 

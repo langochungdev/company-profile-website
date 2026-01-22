@@ -513,6 +513,5 @@ const handleSingleImageError = (event: Event) => {
 </script>
 
 <style scoped>
-@import "../../styles/components/fields/image-uploader/desktop.css";
-@import "../../styles/components/fields/image-uploader/mobile.css";
+@import "../../styles/components/fields/image-uploader.css";
 </style>

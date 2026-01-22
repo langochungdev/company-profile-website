@@ -66,6 +66,5 @@ defineEmits<{
 </script>
 
 <style scoped>
-@import "../../styles/components/layouts/admin-header/desktop.css";
-@import "../../styles/components/layouts/admin-header/mobile.css";
+@import "../../styles/components/layouts/admin-header.css";
 </style>

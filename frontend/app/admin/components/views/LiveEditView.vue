@@ -242,6 +242,5 @@ defineExpose({ handleSave, handleDiscard });
 </script>
 
 <style scoped>
-@import "../../styles/components/views/live-edit-view/desktop.css";
-@import "../../styles/components/views/live-edit-view/mobile.css";
+@import "../../styles/components/views/live-edit-view.css";
 </style>

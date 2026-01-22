@@ -16,18 +16,89 @@
                 <div class="modal-body">
                     <div v-if="hasItemFields" class="editor-fields">
                         <template v-for="(field, fieldKey) in config.itemFields" :key="fieldKey">
-                            <ArrayField v-if="isArrayField(field)" :field="field as any" :model-value="(formData[fieldKey as string] as any[]) || []" @update:model-value="formData[fieldKey as string] = $event" />
+                            <div v-if="isArrayField(field)" class="array-field">
+                                <div class="array-header">
+                                    <span class="array-label">{{ field.label }}</span>
+                                    <span v-if="field.min || field.max" class="array-count">{{ ((formData[fieldKey as string] as any[]) || []).length }}/{{ field.max || '∞' }} items</span>
+                                </div>
+                                <div v-if="((formData[fieldKey as string] as any[]) || []).length === 0" class="array-empty">
+                                    <Icon name="mdi:playlist-plus" class="empty-icon" />
+                                    <p>Chưa có items. Nhấn Add để thêm mới.</p>
+                                </div>
+                                <div v-else class="array-items">
+                                    <div v-for="(item, index) in ((formData[fieldKey as string] as any[]) || [])" :key="index" class="array-item">
+                                        <div class="item-header">
+                                            <div class="item-drag">
+                                                <Icon name="mdi:drag-vertical" class="drag-icon" />
+                                                <span class="item-index">Item {{ index + 1 }}</span>
+                                            </div>
+                                            <button class="item-remove" @click="removeArrayItem(fieldKey as string, index)">
+                                                <Icon name="mdi:close" />
+                                                <span>Xóa</span>
+                                            </button>
+                                        </div>
+                                        <div class="item-fields">
+                                            <Field v-for="(subField, subKey) in field.schema" :key="subKey" :field="(subField as any)" :model-value="item[subKey]" @update:model-value="updateArrayItemField(fieldKey as string, index, subKey as string, $event)" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <button v-if="!field.max || ((formData[fieldKey as string] as any[]) || []).length < field.max" class="add-item-btn" @click="addArrayItem(fieldKey as string, field as any)">
+                                    <Icon name="mdi:plus" />
+                                    <span>Thêm item</span>
+                                </button>
+                                <p v-if="field.note" class="field-note">{{ field.note }}</p>
+                            </div>
                             <Field v-else :field="(field as any)" :model-value="formData[fieldKey as string]" :field-path="fieldKey as string" @update:model-value="formData[fieldKey as string] = $event" />
                         </template>
                     </div>
 
                     <div v-else-if="hasSections" class="editor-sections">
-                        <Section v-for="(section, sectionKey) in config.sections" :key="sectionKey" :label="section.label" :is-collapsed="collapsedSections[sectionKey as string] ?? section.collapsed ?? false" @toggle="toggleSection(sectionKey as string)">
-                            <template v-for="(field, fieldKey) in section.fields" :key="fieldKey">
-                                <ArrayField v-if="isArrayField(field)" :field="field as any" :model-value="(formData[fieldKey as string] as any[]) || []" @update:model-value="formData[fieldKey as string] = $event" />
-                                <Field v-else :field="(field as any)" :model-value="formData[fieldKey as string]" :field-path="fieldKey as string" @update:model-value="formData[fieldKey as string] = $event" />
-                            </template>
-                        </Section>
+                        <div v-for="(section, sectionKey) in config.sections" :key="sectionKey" class="admin-section">
+                            <button class="section-header" @click="toggleSection(sectionKey as string)">
+                                <div class="section-title">
+                                    <Icon name="mdi:folder" class="section-icon" />
+                                    <span>{{ section.label }}</span>
+                                </div>
+                                <Icon :name="(collapsedSections[sectionKey as string] ?? section.collapsed ?? false) ? 'mdi:chevron-down' : 'mdi:chevron-up'" class="chevron-icon" />
+                            </button>
+                            <div v-show="!(collapsedSections[sectionKey as string] ?? section.collapsed ?? false)" class="section-content">
+                                <template v-for="(field, fieldKey) in section.fields" :key="fieldKey">
+                                    <div v-if="isArrayField(field)" class="array-field">
+                                        <div class="array-header">
+                                            <span class="array-label">{{ field.label }}</span>
+                                            <span v-if="field.min || field.max" class="array-count">{{ ((formData[fieldKey as string] as any[]) || []).length }}/{{ field.max || '∞' }} items</span>
+                                        </div>
+                                        <div v-if="((formData[fieldKey as string] as any[]) || []).length === 0" class="array-empty">
+                                            <Icon name="mdi:playlist-plus" class="empty-icon" />
+                                            <p>Chưa có items. Nhấn Add để thêm mới.</p>
+                                        </div>
+                                        <div v-else class="array-items">
+                                            <div v-for="(item, index) in ((formData[fieldKey as string] as any[]) || [])" :key="index" class="array-item">
+                                                <div class="item-header">
+                                                    <div class="item-drag">
+                                                        <Icon name="mdi:drag-vertical" class="drag-icon" />
+                                                        <span class="item-index">Item {{ index + 1 }}</span>
+                                                    </div>
+                                                    <button class="item-remove" @click="removeArrayItem(fieldKey as string, index)">
+                                                        <Icon name="mdi:close" />
+                                                        <span>Xóa</span>
+                                                    </button>
+                                                </div>
+                                                <div class="item-fields">
+                                                    <Field v-for="(subField, subKey) in field.schema" :key="subKey" :field="(subField as any)" :model-value="item[subKey]" @update:model-value="updateArrayItemField(fieldKey as string, index, subKey as string, $event)" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button v-if="!field.max || ((formData[fieldKey as string] as any[]) || []).length < field.max" class="add-item-btn" @click="addArrayItem(fieldKey as string, field as any)">
+                                            <Icon name="mdi:plus" />
+                                            <span>Thêm item</span>
+                                        </button>
+                                        <p v-if="field.note" class="field-note">{{ field.note }}</p>
+                                    </div>
+                                    <Field v-else :field="(field as any)" :model-value="formData[fieldKey as string]" :field-path="fieldKey as string" @update:model-value="formData[fieldKey as string] = $event" />
+                                </template>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -44,9 +115,7 @@
 </template>
 
 <script setup lang="ts">
-import Section from "../shared/Section.vue";
 import Field from "../fields/Field.vue";
-import ArrayField from "../fields/ArrayField.vue";
 import type { SectionConfig, FieldConfig, TableColumn } from "../../config/page.config";
 import { usePendingUploads } from "@/admin/composables/usePendingUploads";
 
@@ -113,9 +182,30 @@ const handleClose = () => {
 const handleSave = () => {
     emit("save", { ...formData.value });
 };
+
+const addArrayItem = (fieldKey: string, field: any) => {
+    const items = (formData.value[fieldKey] as any[]) || [];
+    const newItem: Record<string, unknown> = {};
+    for (const [key, fieldConfig] of Object.entries(field.schema || {})) {
+        const config = fieldConfig as { default?: unknown };
+        newItem[key] = config.default ?? '';
+    }
+    formData.value[fieldKey] = [...items, newItem];
+};
+
+const removeArrayItem = (fieldKey: string, index: number) => {
+    const items = [...((formData.value[fieldKey] as any[]) || [])];
+    items.splice(index, 1);
+    formData.value[fieldKey] = items;
+};
+
+const updateArrayItemField = (fieldKey: string, index: number, subKey: string, value: unknown) => {
+    const items = [...((formData.value[fieldKey] as any[]) || [])];
+    items[index] = { ...items[index], [subKey]: value };
+    formData.value[fieldKey] = items;
+};
 </script>
 
 <style scoped>
-@import "../../styles/components/collection/item-editor/desktop.css";
-@import "../../styles/components/collection/item-editor/mobile.css";
+@import "../../styles/components/collection/item-editor.css";
 </style>

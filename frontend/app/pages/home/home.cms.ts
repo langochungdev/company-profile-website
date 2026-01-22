@@ -5,7 +5,7 @@ export const homeConfig = {
     icon: "mdi:home",
     order: 1,
     group: "Trang",
-    componentBase: "components",
+    componentBase: "(components)",
     schemaType: "home",
 
     sections: {

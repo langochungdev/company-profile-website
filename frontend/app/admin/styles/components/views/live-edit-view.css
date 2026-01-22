@@ -1,0 +1,412 @@
+.live-edit-view-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    max-width: 100%;
+    background: #f1f5f9;
+    border-radius: 12px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.live-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.btn-icon:hover {
+    background: #e2e8f0;
+}
+
+.btn-icon svg {
+    width: 20px;
+    height: 20px;
+    color: #64748b;
+}
+
+.divider {
+    width: 1px;
+    height: 24px;
+    background: #e2e8f0;
+}
+
+.page-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #334155;
+}
+
+.page-label svg {
+    width: 18px;
+    height: 18px;
+    color: #3b82f6;
+}
+
+.btn-ghost {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.btn-ghost:hover {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+.btn-ghost svg {
+    width: 16px;
+    height: 16px;
+}
+
+.btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #3b82f6;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #2563eb;
+}
+
+.btn-primary:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+
+.btn-primary svg {
+    width: 16px;
+    height: 16px;
+}
+
+.preview-area {
+    flex: 1;
+    width: 100%;
+    max-width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 80px 20px;
+    color: #64748b;
+}
+
+.loading-state svg {
+    width: 36px;
+    height: 36px;
+    color: #3b82f6;
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.unsupported-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.unsupported-page svg {
+    width: 44px;
+    height: 44px;
+    color: #f59e0b;
+}
+
+.unsupported-page h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.unsupported-page p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.unsupported-page button {
+    margin-top: 12px;
+    padding: 10px 20px;
+    background: #3b82f6;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.unsupported-page button:hover {
+    background: #2563eb;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    border-radius: 6px;
+}
+
+.section-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.section-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.btn-collection {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(59, 130, 246, 0.8);
+    border: none;
+    border-radius: 6px;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-collection:hover {
+    background: rgba(59, 130, 246, 1);
+    transform: scale(1.05);
+}
+
+.btn-collection svg {
+    width: 16px;
+    height: 16px;
+}
+
+.btn-visibility {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 6px;
+    color: #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-visibility:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-visibility svg {
+    width: 16px;
+    height: 16px;
+}
+
+.section-content {
+    transition: opacity 0.3s;
+}
+
+.section-content.is-hidden {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.editable-section-wrapper {
+    margin-bottom: 16px;
+}
+
+.editable-section-wrapper:last-child {
+    margin-bottom: 0;
+}
+
+/* LiveEditView - Mobile styles */
+@media (max-width: 768px) {
+    .live-edit-view-wrapper {
+        border-radius: 0;
+    }
+
+    .live-toolbar {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 12px;
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .divider {
+        display: none;
+    }
+
+    .page-label {
+        font-size: 13px;
+    }
+
+    .btn-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .btn-ghost,
+    .btn-primary {
+        padding: 10px 14px;
+        font-size: 14px;
+        flex: 1;
+        justify-content: center;
+    }
+
+    .preview-area {
+        padding: 12px;
+        overflow-x: hidden;
+    }
+
+    .loading-state {
+        padding: 40px 16px;
+    }
+
+    .loading-state svg {
+        width: 32px;
+        height: 32px;
+    }
+
+    .unsupported-page {
+        padding: 40px 16px;
+    }
+
+    .unsupported-page svg {
+        width: 36px;
+        height: 36px;
+    }
+
+    .unsupported-page h3 {
+        font-size: 16px;
+    }
+
+    .unsupported-page p {
+        font-size: 13px;
+    }
+
+    .unsupported-page button {
+        width: 100%;
+        padding: 12px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .live-toolbar {
+        padding: 10px;
+    }
+
+    .btn-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .btn-ghost,
+    .btn-primary {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    .preview-area {
+        padding: 8px;
+    }
+
+    .section-header {
+        padding: 6px 10px;
+        margin-bottom: 6px;
+    }
+
+    .section-label {
+        font-size: 12px;
+    }
+
+    .editable-section-wrapper {
+        margin-bottom: 12px;
+    }
+}

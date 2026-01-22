@@ -43,6 +43,5 @@ defineProps({
 </script>
 
 <style scoped>
-@import "@/styles/post/post-item/desktop.css";
-@import "@/styles/post/post-item/mobile.css";
+@import "../styles/post-item.css";
 </style>

@@ -35,14 +35,4 @@ const { scannedFields, rescan } = useFieldScanner({
 defineExpose({ rescan, scannedFields })
 </script>
 
-<style scoped>
-.editable-section-wrapper {
-    width: 100%;
-    max-width: 100%;
-}
-</style>
-
-<style>
-@import "../../styles/components/scannable-field/desktop.css";
-@import "../../styles/components/scannable-field/mobile.css";
-</style>
+<style scoped></style>

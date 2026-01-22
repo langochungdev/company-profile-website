@@ -39,11 +39,6 @@
 <script setup lang="ts">
 import AdminSidebar from "./components/layouts/AdminSidebar.vue";
 import AdminHeader from "./components/layouts/AdminHeader.vue";
-import Section from "./components/shared/Section.vue";
-import Field from "./components/fields/Field.vue";
-import ArrayField from "./components/fields/ArrayField.vue";
-import GroupField from "./components/fields/GroupField.vue";
-import ItemsList from "./components/collection/ItemsList.vue";
 import ItemsManager from "./components/collection/ItemsManager.vue";
 import ItemEditor from "./components/collection/ItemEditor.vue";
 import LiveEditView from "./components/views/LiveEditView.vue";
@@ -320,6 +315,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-@import "./styles/desktop.css";
-@import "./styles/mobile.css";
+@import "./styles/admin.css";
 </style>

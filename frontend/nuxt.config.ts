@@ -4,7 +4,7 @@ export default defineNuxtConfig({
     devtools: { enabled: false },
     modules: ["@nuxtjs/tailwindcss", "@nuxt/icon"],
     plugins: ["~/admin/plugins/firebase.client.ts"],
-    css: ["~/styles/reset.css"],
+    css: ["~/admin/styles/reset.css"],
 
     runtimeConfig: {
         cloudinaryApiKey: "",

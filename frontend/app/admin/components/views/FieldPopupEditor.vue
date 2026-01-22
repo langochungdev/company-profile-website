@@ -120,6 +120,5 @@ const handleApply = () => {
 </script>
 
 <style scoped>
-@import "../../styles/components/views/field-popup-editor/desktop.css";
-@import "../../styles/components/views/field-popup-editor/mobile.css";
+@import "../../styles/components/views/field-popup-editor.css";
 </style>

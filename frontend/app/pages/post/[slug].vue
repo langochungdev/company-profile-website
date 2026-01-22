@@ -158,6 +158,5 @@ useHead({
 </script>
 
 <style scoped>
-@import "@/styles/post/slug/desktop.css";
-@import "@/styles/post/slug/mobile.css";
+@import "./styles/post-slug.css";
 </style>

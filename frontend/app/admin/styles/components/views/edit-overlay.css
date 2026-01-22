@@ -1,0 +1,189 @@
+/* EditOverlay - Desktop styles */
+.edit-overlay-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.edit-overlay-wrapper.is-editable {
+    outline: 2px dashed transparent;
+    outline-offset: 4px;
+    transition: outline-color 0.2s;
+}
+
+.edit-overlay-wrapper.is-editable.is-hovered {
+    outline-color: rgba(59, 130, 246, 0.5);
+}
+
+.section-toolbar {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    border-radius: 8px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.2s;
+    pointer-events: none;
+}
+
+.edit-overlay-wrapper.is-hovered .section-toolbar {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.toolbar-left,
+.toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.btn-visibility {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 6px;
+    color: #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-visibility:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-visibility svg {
+    width: 16px;
+    height: 16px;
+}
+
+.section-content {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    transition: opacity 0.3s;
+}
+
+.section-content.content-hidden {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.edit-hint {
+    position: absolute;
+    bottom: -32px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #1e293b;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #94a3b8;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+}
+
+.edit-overlay-wrapper.is-hovered .edit-hint {
+    opacity: 1;
+}
+
+.edit-hint svg {
+    width: 14px;
+    height: 14px;
+    color: #60a5fa;
+}
+
+.is-hidden .section-content {
+    position: relative;
+}
+
+.is-hidden .section-content::after {
+    content: 'Section đang ẩn';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    font-size: 14px;
+    color: #ffffff;
+}
+
+/* EditOverlay - Mobile styles */
+@media (max-width: 768px) {
+    .edit-overlay-wrapper {
+        border-radius: 12px;
+    }
+
+    .section-toolbar {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        border-radius: 8px;
+        transform: none;
+    }
+
+    .section-label {
+        font-size: 13px;
+    }
+
+    .toolbar-actions {
+        gap: 6px;
+    }
+
+    .toolbar-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .edit-hint {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .section-toolbar {
+        padding: 8px 10px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .section-label {
+        font-size: 12px;
+        width: 100%;
+    }
+
+    .toolbar-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}

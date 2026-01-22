@@ -53,6 +53,10 @@
     </div>
 </template>
 
+<style scoped>
+@import "../../styles/components/collection/items-list.css";
+</style>
+
 <script setup lang="ts">
 import type { TableColumn } from '../../config/page.config'
 import { getImageSrc } from '@/admin/utils/imageHelper'
@@ -91,7 +95,4 @@ const formatPrice = (value: unknown) => {
 }
 </script>
 
-<style scoped>
-@import "../../styles/components/collection/items-list/desktop.css";
-@import "../../styles/components/collection/items-list/mobile.css";
-</style>
+<style scoped></style>

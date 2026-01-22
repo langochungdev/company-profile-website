@@ -64,6 +64,5 @@ const loadMore = () => {
 </script>
 
 <style scoped>
-@import "@/styles/service/service-list/desktop.css";
-@import "@/styles/service/service-list/mobile.css";
+@import "../styles/service-list.css";
 </style>

@@ -169,6 +169,5 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-@import "../../styles/components/fields/rich-text-editor/desktop.css";
-@import "../../styles/components/fields/rich-text-editor/mobile.css";
+@import "../../styles/components/fields/rich-text-editor.css";
 </style>

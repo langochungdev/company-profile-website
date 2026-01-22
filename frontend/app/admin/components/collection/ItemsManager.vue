@@ -38,6 +38,10 @@
     </div>
 </template>
 
+<style scoped>
+@import "../../styles/components/collection/items-manager.css";
+</style>
+
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
 import ItemsList from "./ItemsList.vue";
@@ -108,7 +112,4 @@ watch([internalSearchQuery, internalSortBy, internalFilters], () => {
 });
 </script>
 
-<style scoped>
-@import "../../styles/desktop.css";
-@import "../../styles/components/collection/items-manager/mobile.css";
-</style>
+<style scoped></style>
