@@ -175,6 +175,7 @@ const imageErrors = ref<Set<number>>(new Set());
 const singleImageError = ref(false);
 const metadataExpanded = ref(true);
 const altInput = ref<HTMLInputElement | null>(null);
+const isRestoringMetadata = ref(false);
 const metadata = ref({
     alt: "",
     title: "",
@@ -198,10 +199,21 @@ const collectionItems = computed({
 
 watch(
     () => props.modelValue,
-    (newVal) => {
+    async (newVal) => {
         if (isCollectionMode.value) return;
 
-        if (typeof newVal === "string") {
+        isRestoringMetadata.value = true;
+
+        if (isPendingImage(newVal)) {
+            if (newVal.metadata) {
+                metadata.value = {
+                    alt: newVal.metadata.alt || "",
+                    title: newVal.metadata.title || "",
+                    width: newVal.metadata.width,
+                    height: newVal.metadata.height,
+                };
+            }
+        } else if (typeof newVal === "string") {
             if (newVal && newVal.includes("cloudinary")) {
                 lastKnownUrl.value = newVal;
             } else if (newVal === "") {
@@ -224,6 +236,9 @@ watch(
                 height: imgMeta.height,
             };
         }
+
+        await nextTick();
+        isRestoringMetadata.value = false;
     },
     { immediate: true }
 );
@@ -281,6 +296,7 @@ watch(
     metadata,
     (newMeta) => {
         if (!hasPreview.value) return;
+        if (isRestoringMetadata.value) return;
 
         const currentValue = props.modelValue;
 

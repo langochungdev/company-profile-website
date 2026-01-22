@@ -6,6 +6,7 @@ import { ref, computed, watch, toValue, type MaybeRef } from "vue";
 import { getPageConfig, type PageConfig, type FieldConfig } from "../config/page.config";
 import { usePendingUploads } from "./usePendingUploads";
 import { useDeleteQueue } from "./useDeleteQueue";
+import { useTempFormState } from "./useTempFormState";
 import { normalizeImageData, removeUndefinedValues } from "@/admin/utils/normalizeData";
 import { PageService } from "@/admin/services/page.service";
 import { getFirestorePath } from "@/admin/utils/firestore";
@@ -255,6 +256,7 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
         try {
             const { hasPending, uploadAllPending } = usePendingUploads();
             const { hasUrlsToDelete, processDeleteQueue } = useDeleteQueue();
+            const { clearAllTempState } = useTempFormState();
 
             if (hasUrlsToDelete.value) {
                 await processDeleteQueue();
@@ -283,6 +285,8 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
 
             originalData.value = JSON.parse(JSON.stringify(normalizedData));
             editedData.value = JSON.parse(JSON.stringify(normalizedData));
+
+            clearAllTempState();
         } catch (error) {
             console.error("[useLiveEdit] Save failed:", error);
             throw error;
@@ -292,7 +296,9 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
     };
 
     const discard = () => {
+        const { clearAllTempState } = useTempFormState();
         editedData.value = JSON.parse(JSON.stringify(originalData.value));
+        clearAllTempState();
         closeEditor();
     };
 

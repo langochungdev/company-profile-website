@@ -12,18 +12,41 @@
                 <div class="container">
                     <div class="detail-grid">
                         <div class="product-gallery">
-                            <div class="main-image">
-                                <img :src="displayProduct.image" :alt="displayProduct.name" />
-                                <span v-if="displayProduct.badge" class="badge" :class="getBadgeClass(displayProduct.badge)">
-                                    {{ displayProduct.badge }}
-                                </span>
+                            <div class="main-media">
+                                <div class="media-display">
+                                    <img v-if="activeMediaType === 'image'" :src="activeMedia" :alt="displayProduct.name" />
+                                    <div v-else class="video-placeholder">
+                                        <Icon name="mdi:play-circle" class="play-icon" />
+                                        <span>Video Demo</span>
+                                    </div>
+                                    <span v-if="displayProduct.badge" class="badge" :class="getBadgeClass(displayProduct.badge)">
+                                        {{ displayProduct.badge }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="media-thumbnails">
+                                <button v-for="(media, index) in displayMedia" :key="index" class="thumb-item" :class="{ active: activeMediaIndex === index }" @click="activeMediaIndex = index">
+                                    <img v-if="media.type === 'image'" :src="media.url" :alt="`Media ${index + 1}`" />
+                                    <div v-else class="thumb-video">
+                                        <Icon name="mdi:play-circle" />
+                                    </div>
+                                    <span class="media-type-badge">{{ media.type === 'image' ? 'IMG' : 'VID' }}</span>
+                                </button>
                             </div>
                         </div>
 
                         <div class="product-info">
-                            <span class="category">{{ displayProduct.category }}</span>
-                            <h1 class="product-name">{{ displayProduct.name }}</h1>
-                            <p class="product-desc">{{ displayProduct.description }}</p>
+                            <span class="category-badge" :class="{ 'is-placeholder': !displayProduct.category }">
+                                {{ displayProduct.category || 'Chưa phân loại' }}
+                            </span>
+
+                            <h1 class="product-name" :class="{ 'is-placeholder': !displayProduct.name }">
+                                {{ displayProduct.name || 'Tên sản phẩm' }}
+                            </h1>
+
+                            <p class="product-summary" :class="{ 'is-placeholder': !displayProduct.description }">
+                                {{ displayProduct.description || 'Mô tả sản phẩm đang được cập nhật. Vui lòng liên hệ để biết thêm chi tiết.' }}
+                            </p>
 
                             <div class="price-box">
                                 <span class="price-label">Giá tham khảo:</span>
@@ -31,14 +54,11 @@
                                 <span class="price-contact" v-else>Liên hệ để được báo giá</span>
                             </div>
 
-                            <div class="features-section" v-if="displayProduct.features?.length">
-                                <h3 class="features-title">Tính năng nổi bật</h3>
-                                <ul class="features-list">
-                                    <li v-for="(feature, index) in displayProduct.features" :key="index">
-                                        <Icon name="mdi:check-circle" class="check-icon" />
-                                        {{ feature.text || feature }}
-                                    </li>
-                                </ul>
+                            <div class="tags-section" v-if="displayTags.length">
+                                <h3 class="tags-title">Phân loại</h3>
+                                <div class="tags-list">
+                                    <span v-for="tag in displayTags" :key="tag" class="tag-item">{{ tag }}</span>
+                                </div>
                             </div>
 
                             <div class="action-buttons">
@@ -54,21 +74,32 @@
                         </div>
                     </div>
 
-                    <div class="article-section" v-if="displayProduct.content">
+                    <div class="article-section" v-if="displayProduct.content || displayProduct.isPlaceholder">
                         <h2 class="article-title">
                             <Icon name="mdi:text-box-outline" class="title-icon" />
-                            Thông Tin Chi Tiết
+                            Bài Viết Chi Tiết
                         </h2>
-                        <div class="article-content tiptap-content" v-html="displayProduct.content"></div>
-                    </div>
-
-                    <div class="article-section" v-else-if="displayProduct.isPlaceholder">
-                        <h2 class="article-title">
-                            <Icon name="mdi:text-box-outline" class="title-icon" />
-                            Thông Tin Chi Tiết
-                        </h2>
-                        <div class="article-content tiptap-content placeholder-content">
+                        <div class="article-note">
+                            <Icon name="mdi:information" />
+                            <span>Hỗ trợ nhúng: YouTube, TikTok, Facebook, Bảng, Media</span>
+                        </div>
+                        <div v-if="displayProduct.content" class="article-content tiptap-content" v-html="displayProduct.content"></div>
+                        <div v-else class="article-content tiptap-content placeholder-content">
                             <p>Nội dung đang được cập nhật...</p>
+                            <div class="embed-placeholder">
+                                <div class="embed-item youtube">
+                                    <Icon name="mdi:youtube" />
+                                    <span>YouTube Video</span>
+                                </div>
+                                <div class="embed-item tiktok">
+                                    <Icon name="mdi:music-note" />
+                                    <span>TikTok</span>
+                                </div>
+                                <div class="embed-item facebook">
+                                    <Icon name="mdi:facebook" />
+                                    <span>Facebook</span>
+                                </div>
+                            </div>
                             <p>Vui lòng liên hệ với chúng tôi để được tư vấn chi tiết về sản phẩm này.</p>
                         </div>
                     </div>
@@ -108,12 +139,48 @@ const { previews, loadPreviews } = usePreviewContext('collections/products/items
 
 const product = ref(null)
 const relatedProducts = ref([])
+const activeMediaIndex = ref(0)
+
+const mockMedia = ref([
+    { type: 'image', url: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600' },
+    { type: 'video', url: '' },
+    { type: 'image', url: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600' },
+    { type: 'image', url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600' },
+])
+
+const mockTags = ref(['Sản phẩm nổi bật', 'Best Seller', 'Doanh nghiệp'])
+
+const activeMedia = computed(() => {
+    const media = displayMedia.value[activeMediaIndex.value]
+    if (media?.type === 'image') {
+        return media.url || displayProduct.value.image
+    }
+    return ''
+})
+
+const activeMediaType = computed(() => {
+    return displayMedia.value[activeMediaIndex.value]?.type || 'image'
+})
+
+const displayMedia = computed(() => {
+    if (product.value?.media && Array.isArray(product.value.media) && product.value.media.length > 0) {
+        return product.value.media
+    }
+    return mockMedia.value
+})
 
 const displayProduct = computed(() => {
     if (product.value) {
         return product.value
     }
     return PLACEHOLDER_PRODUCT_DETAIL
+})
+
+const displayTags = computed(() => {
+    if (product.value?.tags && Array.isArray(product.value.tags) && product.value.tags.length > 0) {
+        return product.value.tags
+    }
+    return mockTags.value
 })
 
 onMounted(async () => {

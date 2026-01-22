@@ -51,6 +51,7 @@
 import { ref, watch, nextTick, computed } from 'vue'
 import Field from '@/admin/components/fields/Field.vue'
 import ImageUploader from '@/admin/components/fields/ImageUploader.vue'
+import { useTempFormState } from '@/admin/composables/useTempFormState'
 import type { FieldConfig } from '@/admin/config/page.config'
 import type { ImageValue } from '@/admin/utils/imageHelper'
 
@@ -74,6 +75,8 @@ const emit = defineEmits<{
     apply: [value: unknown]
 }>()
 
+const { saveTempState, getTempState, hasTempState } = useTempFormState()
+
 const localValue = ref<unknown>(props.initialValue)
 const isReady = ref(false)
 
@@ -90,15 +93,17 @@ const collectionLength = computed(() => {
     return localValue.value.length
 })
 
-watch(() => props.initialValue, (newVal) => {
-    localValue.value = newVal
-}, { immediate: true })
-
 watch(() => props.isOpen, async (isOpen) => {
     if (isOpen) {
         isReady.value = false
         await nextTick()
-        localValue.value = props.initialValue
+
+        if (props.fieldPath && hasTempState(props.fieldPath)) {
+            localValue.value = getTempState(props.fieldPath)
+        } else {
+            localValue.value = props.initialValue
+        }
+
         await nextTick()
         isReady.value = true
     } else {
@@ -107,6 +112,9 @@ watch(() => props.isOpen, async (isOpen) => {
 })
 
 const handleApply = () => {
+    if (props.fieldPath) {
+        saveTempState(props.fieldPath, localValue.value)
+    }
     emit('apply', localValue.value)
 }
 </script>
