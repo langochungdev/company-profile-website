@@ -9,7 +9,7 @@
 <script setup>
 import ProductList from './(components)/ProductList.vue'
 import { useAutoSeo } from '@/admin/composables/useAutoSeo'
-import { productDetailConfig } from './productDetail.cms'
+import { productDetailConfig } from './product.cms'
 
 useAutoSeo(productDetailConfig)
 </script>

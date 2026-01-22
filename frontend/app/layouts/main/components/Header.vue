@@ -1,4 +1,4 @@
-<!-- Chức năng: Header chính với navigation, dropdown menu và breadcrumb -->
+<!-- Chức năng: Header chính với navigation và dropdown menu -->
 <template>
     <div>
         <TopBar class="top-bar" />
@@ -9,23 +9,6 @@
                         <NuxtLink to="/" class="logo" aria-label="Trang chủ SHT Security">
                             <img src="/images/logo.png" alt="SHT Security Logo" class="logo-img" />
                         </NuxtLink>
-
-                        <nav v-if="showBreadcrumb" class="inline-breadcrumb" aria-label="Breadcrumb">
-                            <span class="breadcrumb-divider">/</span>
-                            <ol class="breadcrumb-list">
-                                <template v-for="(item, index) in breadcrumbItems" :key="index">
-                                    <li v-if="index > 0" class="breadcrumb-separator">
-                                        <Icon name="mdi:chevron-right" />
-                                    </li>
-                                    <li class="breadcrumb-item">
-                                        <NuxtLink v-if="item.to" :to="item.to" class="breadcrumb-link">
-                                            {{ item.label }}
-                                        </NuxtLink>
-                                        <span v-else class="breadcrumb-current">{{ item.label }}</span>
-                                    </li>
-                                </template>
-                            </ol>
-                        </nav>
                     </div>
 
                     <nav class="nav-desktop" aria-label="Main navigation">
@@ -59,27 +42,6 @@
                         </nav>
                     </div>
                 </Transition>
-
-                <nav v-if="showBreadcrumb" class="mobile-breadcrumb" aria-label="Breadcrumb">
-                    <ol class="breadcrumb-list">
-                        <li class="breadcrumb-item">
-                            <NuxtLink to="/" class="breadcrumb-link">
-                                <Icon name="mdi:home" class="breadcrumb-icon" />
-                            </NuxtLink>
-                        </li>
-                        <template v-for="(item, index) in breadcrumbItems" :key="index">
-                            <li class="breadcrumb-separator">
-                                <Icon name="mdi:chevron-right" />
-                            </li>
-                            <li class="breadcrumb-item">
-                                <NuxtLink v-if="item.to" :to="item.to" class="breadcrumb-link">
-                                    {{ item.label }}
-                                </NuxtLink>
-                                <span v-else class="breadcrumb-current">{{ item.label }}</span>
-                            </li>
-                        </template>
-                    </ol>
-                </nav>
             </div>
         </header>
     </div>
@@ -94,58 +56,9 @@ const scrolled = ref(false)
 const navVisible = ref(true)
 const lastScrollY = ref(0)
 
-const products = [
-    { name: 'Camera An Ninh - AI', path: '/product/camera-ai-sht-pro', icon: 'mdi:cctv' },
-    { name: 'Hạ Tầng Mạng', path: '/product/switch-poe-24-port', icon: 'mdi:lan' },
-    { name: 'WiFi & Firewall', path: '/product/wifi-6-enterprise', icon: 'mdi:wifi' },
-    { name: 'Tủ Rack & Hạ Tầng', path: '/product/router-load-balance', icon: 'mdi:server' },
-    { name: 'Access Control', path: '/product/may-cham-cong-faceid', icon: 'mdi:fingerprint' },
-    { name: 'Báo Động - Báo Cháy', path: '/product/bao-chay-dia-chi-4-loop', icon: 'mdi:alarm-light' },
-    { name: 'Tổng Đài IP PBX', path: '/product', icon: 'mdi:phone-voip' },
-    { name: 'Âm Thanh - Loa PA', path: '/product', icon: 'mdi:speaker' }
-]
-
-const showBreadcrumb = computed(() => {
-    return route.path !== '/' && route.path !== '/home'
-})
-
 const isHeaderTransparent = computed(() => {
     const isHome = route.path === '/' || route.path === '/home'
     return isHome && !scrolled.value
-})
-
-const breadcrumbItems = computed(() => {
-    const path = route.path
-    const items = []
-
-    if (path.startsWith('/product')) {
-        if (path === '/product') {
-            items.push({ label: 'Sản phẩm' })
-        } else {
-            items.push({ label: 'Sản phẩm', to: '/product' })
-            const slug = path.replace('/product/', '')
-            const product = products.find(p => p.path.includes(slug))
-            items.push({ label: product?.name || 'Chi tiết sản phẩm' })
-        }
-    } else if (path.startsWith('/post')) {
-        if (path === '/post') {
-            items.push({ label: 'Tin tức' })
-        } else {
-            items.push({ label: 'Tin tức', to: '/post' })
-            items.push({ label: 'Bài viết' })
-        }
-    } else if (path === '/about-us') {
-        items.push({ label: 'Giới thiệu' })
-    } else if (path === '/contact') {
-        items.push({ label: 'Liên hệ' })
-    } else if (path === '/service') {
-        items.push({ label: 'Dịch vụ' })
-    } else {
-        const pageName = path.replace('/', '').replace(/-/g, ' ')
-        items.push({ label: pageName.charAt(0).toUpperCase() + pageName.slice(1) })
-    }
-
-    return items
 })
 
 const handleScroll = () => {
@@ -239,73 +152,6 @@ onUnmounted(() => {
 .logo-img {
     height: 4rem;
     width: auto;
-}
-
-.inline-breadcrumb {
-    display: none;
-    align-items: center;
-}
-
-.breadcrumb-divider {
-    color: rgba(255, 255, 255, 0.3);
-    font-size: 1.25rem;
-    font-weight: 300;
-    margin: 0 0.5rem;
-}
-
-.breadcrumb-list {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.breadcrumb-item {
-    display: flex;
-    align-items: center;
-}
-
-.breadcrumb-link {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    color: rgba(255, 255, 255, 0.6);
-    text-decoration: none;
-    font-size: 0.8125rem;
-    transition: color 0.2s ease;
-}
-
-.breadcrumb-link:hover {
-    color: #38bdf8;
-}
-
-.breadcrumb-icon {
-    width: 0.875rem;
-    height: 0.875rem;
-}
-
-.breadcrumb-separator {
-    display: flex;
-    align-items: center;
-    color: rgba(255, 255, 255, 0.3);
-}
-
-.breadcrumb-separator svg {
-    width: 0.75rem;
-    height: 0.75rem;
-}
-
-.breadcrumb-current {
-    color: #38bdf8;
-    font-size: 0.8125rem;
-    font-weight: 500;
-}
-
-.mobile-breadcrumb {
-    display: flex;
-    padding: 0.5rem 0;
 }
 
 .nav-desktop {
@@ -597,14 +443,6 @@ onUnmounted(() => {
 
     .mobile-menu {
         display: none;
-    }
-
-    .mobile-breadcrumb {
-        display: none;
-    }
-
-    .inline-breadcrumb {
-        display: flex;
     }
 }
 </style>
