@@ -1,0 +1,14 @@
+.editable-section-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.editable-section-wrapper[data-enabled="true"] {
+    cursor: pointer;
+}
+
+.editable-section-wrapper[data-editing="true"] {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+}

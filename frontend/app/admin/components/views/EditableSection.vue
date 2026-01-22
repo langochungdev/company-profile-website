@@ -35,4 +35,6 @@ const { scannedFields, rescan } = useFieldScanner({
 defineExpose({ rescan, scannedFields })
 </script>
 
-<style scoped></style>
+<style scoped>
+@import "../../styles/components/views/editable-section.css";
+</style>

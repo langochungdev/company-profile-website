@@ -244,3 +244,7 @@ defineExpose({ handleSave, handleDiscard });
 <style scoped>
 @import "../../styles/components/views/live-edit-view.css";
 </style>
+
+<style>
+@import "../../styles/components/views/field-scanner.css";
+</style>
