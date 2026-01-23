@@ -50,6 +50,9 @@ import { PAGE_CONFIGS, getAllPages, getPageConfig, isCollectionPage as checkIsCo
 import { useCollectionContext } from "./composables/useCollectionContext";
 import { usePreviewContext } from "./composables/usePreviewContext";
 
+const route = useRoute();
+const router = useRouter();
+
 const sidebarPages = computed(() => {
     return getAllPages().map((page) => ({
         key: page.key,
@@ -59,9 +62,27 @@ const sidebarPages = computed(() => {
     }));
 });
 
-const activePage = ref("home");
-const activeTab = ref<"items" | "settings">("items");
-const activeContentTab = ref<"live" | "settings">("live");
+const getInitialPage = (): string => {
+    const urlPage = route.query.page as string;
+    if (urlPage && PAGE_CONFIGS[urlPage]) return urlPage;
+    return "home";
+};
+
+const getInitialTab = (pageKey: string): "items" | "settings" => {
+    const urlTab = route.query.tab as string;
+    if (urlTab === "settings") return "settings";
+    return checkIsCollection(pageKey) ? "items" : "settings";
+};
+
+const getInitialContentTab = (): "live" | "settings" => {
+    const urlTab = route.query.tab as string;
+    if (urlTab === "settings") return "settings";
+    return "live";
+};
+
+const activePage = ref(getInitialPage());
+const activeTab = ref<"items" | "settings">(getInitialTab(activePage.value));
+const activeContentTab = ref<"live" | "settings">(getInitialContentTab());
 const formData = ref<Record<string, Record<string, Record<string, unknown>>>>({});
 const collapsedSections = ref<Record<string, boolean>>({});
 const isSidebarCollapsed = ref(false);
@@ -340,6 +361,10 @@ const handleSaveItem = async (data: Record<string, unknown>) => {
             alert("Đã cập nhật thành công!");
         }
         closeEditor();
+        
+        if (previewContext.value) {
+            await previewContext.value.loadPreviews();
+        }
     } catch (error: any) {
         alert(error.message || "Có lỗi xảy ra!");
         console.error("[Admin] Save item error:", error);
@@ -356,6 +381,9 @@ const handleDelete = async (item: Record<string, unknown>) => {
         try {
             await collectionContext.value.deleteItem(item.id as string);
             alert("Đã xóa thành công!");
+            if (previewContext.value) {
+                await previewContext.value.loadPreviews();
+            }
         } catch (error: any) {
             alert(error.message || "Có lỗi xảy ra khi xóa!");
             console.error("[Admin] Delete item error:", error);
@@ -364,6 +392,21 @@ const handleDelete = async (item: Record<string, unknown>) => {
         }
     }
 };
+
+
+const syncUrlState = () => {
+    const currentTab = isCollectionPage.value ? activeTab.value : activeContentTab.value;
+    router.replace({
+        query: {
+            page: activePage.value,
+            tab: currentTab,
+        },
+    });
+};
+
+watch([activePage, activeTab, activeContentTab], () => {
+    syncUrlState();
+});
 
 onMounted(() => {
     loadPageData();
