@@ -1,6 +1,4 @@
-// Cấu hình chi tiết sản phẩm cho admin CRUD
-
-import type { FieldConfig } from "~/admin/config/page.config";
+import type { FieldConfig } from "@/admin/config/page.config";
 
 interface SeoMapping {
     title: string;
@@ -41,7 +39,7 @@ export interface ProductDetailConfig {
     defaultValues: Record<string, unknown>;
 }
 
-export const productDetailConfig: ProductDetailConfig = {
+export const productConfig: ProductDetailConfig = {
     type: "detail",
     collection: "products",
     collectionName: "danh sách sản phẩm",

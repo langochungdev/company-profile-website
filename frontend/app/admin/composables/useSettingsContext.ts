@@ -15,8 +15,7 @@ interface SettingsContextResult {
     saveSettings: () => Promise<void>;
     updateSeoField: (key: string, value: string) => void;
     updateOgField: (key: string, value: string) => void;
-    updateSchemaConfig: (key: string, value: unknown) => void;
-    updateSchemaFieldMapping: (key: string, value: string) => void;
+
     resetToDefaults: () => void;
 }
 
@@ -62,10 +61,6 @@ export function useSettingsContext(configPath: string): SettingsContextResult {
                 settings.value = {
                     seo: { ...DEFAULT_SETTINGS.seo, ...data.seo },
                     openGraph: { ...DEFAULT_SETTINGS.openGraph, ...data.openGraph },
-                    schema: {
-                        config: { ...DEFAULT_SETTINGS.schema.config, ...(data.schema?.config || {}) },
-                        fieldMapping: { ...DEFAULT_SETTINGS.schema.fieldMapping, ...(data.schema?.fieldMapping || {}) },
-                    },
                 };
                 originalSettings.value = JSON.parse(JSON.stringify(settings.value));
             }
@@ -112,14 +107,6 @@ export function useSettingsContext(configPath: string): SettingsContextResult {
         (settings.value.openGraph as Record<string, string>)[key] = value;
     };
 
-    const updateSchemaConfig = (key: string, value: unknown) => {
-        settings.value.schema.config[key] = value;
-    };
-
-    const updateSchemaFieldMapping = (key: string, value: string) => {
-        settings.value.schema.fieldMapping[key] = value;
-    };
-
     const resetToDefaults = () => {
         settings.value = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
     };
@@ -133,8 +120,6 @@ export function useSettingsContext(configPath: string): SettingsContextResult {
         saveSettings,
         updateSeoField,
         updateOgField,
-        updateSchemaConfig,
-        updateSchemaFieldMapping,
         resetToDefaults,
     };
 }

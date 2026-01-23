@@ -3,7 +3,7 @@
 import type { CmsConfig, ParsedCmsConfig } from "@/admin/types/cms.type";
 import { SIDEBAR_ORDER } from "@/admin/sidebar.config";
 
-const cmsModules = import.meta.glob("/pages/**/*.cms.ts", { eager: true });
+const cmsModules = import.meta.glob("./cms/**/*.config.ts", { eager: true });
 
 function parseConfigType(config: any): "page" | "detail" {
     if (config.type === "detail") return "detail";
@@ -16,7 +16,7 @@ function parseConfigType(config: any): "page" | "detail" {
 function parseCmsConfigs(modules: Record<string, unknown>): ParsedCmsConfig[] {
     return Object.entries(modules)
         .map(([filePath, module]) => {
-            const fileName = filePath.split("/").pop()?.replace(".cms.ts", "") || "";
+            const fileName = filePath.split("/").pop()?.replace(".config.ts", "") || "";
             const mod = module as Record<string, any>;
             const exportedValues = Object.values(mod).filter((v) => v && typeof v === "object" && !Array.isArray(v));
             const config = exportedValues.find((v: any) => v.path || v.collection || v.sections || v.itemFields);
