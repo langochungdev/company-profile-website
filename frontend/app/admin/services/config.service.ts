@@ -16,9 +16,17 @@ const generateId = (): string => {
     return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
 };
 
+const getConfigPath = (collectionPath: string): string => {
+    const parts = collectionPath.split("/");
+    if (parts[parts.length - 1] === "items") {
+        parts.pop();
+    }
+    return [...parts, "config", "settings"].join("/");
+};
+
 export const ConfigService = {
     async getConfig(db: Firestore, collectionPath: string): Promise<CollectionConfig> {
-        const configPath = collectionPath.replace(/\/items$/, "/config");
+        const configPath = getConfigPath(collectionPath);
         const docRef = doc(db, configPath);
         const docSnap = await getDoc(docRef);
 
@@ -34,7 +42,7 @@ export const ConfigService = {
     },
 
     async saveConfig(db: Firestore, collectionPath: string, data: CollectionConfig): Promise<void> {
-        const configPath = collectionPath.replace(/\/items$/, "/config");
+        const configPath = getConfigPath(collectionPath);
         const docRef = doc(db, configPath);
         await setDoc(docRef, data);
     },
