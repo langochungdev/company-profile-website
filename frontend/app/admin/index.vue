@@ -44,6 +44,7 @@ import ItemEditor from "./components/collection/ItemEditor.vue";
 import LiveEditView from "./components/views/LiveEditView.vue";
 import SettingsView from "./components/views/SettingsView.vue";
 import { PAGE_CONFIGS, getAllPages, getPageConfig, isCollectionPage as checkIsCollection, getListingConfig, getDetailConfig } from "./config/page.config";
+import { useCollectionContext } from "./composables/useCollectionContext";
 
 const sidebarPages = computed(() => {
     return getAllPages().map((page) => ({
@@ -79,7 +80,8 @@ const isEditorOpen = ref(false);
 const isNewItem = ref(true);
 const editingItem = ref<Record<string, unknown>>({});
 
-const itemsList = ref<Record<string, unknown>[]>([]);
+const collectionContext = shallowRef<ReturnType<typeof useCollectionContext> | null>(null);
+const itemsList = computed(() => collectionContext.value?.items?.value || []);
 
 const firstKey = Object.keys(PAGE_CONFIGS)[0] as string;
 const currentConfig = computed(() => getPageConfig(activePage.value) || PAGE_CONFIGS[firstKey]);
@@ -217,8 +219,12 @@ const handleGlobalSave = async () => {
 const loadPageData = async () => {
     loading.value = true;
     try {
-        if (isCollectionPage.value) {
-            itemsList.value = [];
+        if (isCollectionPage.value && detailConfig.value?.path) {
+            collectionContext.value = useCollectionContext({
+                path: detailConfig.value.path,
+                itemFields: detailConfig.value.itemFields,
+            });
+            await collectionContext.value.loadItems();
         }
     } finally {
         loading.value = false;
@@ -287,25 +293,43 @@ const closeEditor = () => {
     editingItem.value = {};
 };
 
-const handleSaveItem = (data: Record<string, unknown>) => {
-    console.log("Save item:", data);
-    if (isNewItem.value) {
-        itemsList.value.push({ ...data, id: Date.now().toString() });
-    } else {
-        const index = itemsList.value.findIndex((i) => i.id === data.id);
-        if (index !== -1) {
-            itemsList.value[index] = { ...data };
+const handleSaveItem = async (data: Record<string, unknown>) => {
+    if (!collectionContext.value) return;
+
+    isSaving.value = true;
+    try {
+        if (isNewItem.value) {
+            await collectionContext.value.addItem(data as any);
+            alert("Đã thêm mới thành công!");
+        } else {
+            const id = data.id as string;
+            const { id: _, ...updateData } = data;
+            await collectionContext.value.updateItem(id, updateData as any);
+            alert("Đã cập nhật thành công!");
         }
+        closeEditor();
+    } catch (error: any) {
+        alert(error.message || "Có lỗi xảy ra!");
+        console.error("[Admin] Save item error:", error);
+    } finally {
+        isSaving.value = false;
     }
-    closeEditor();
-    alert(isNewItem.value ? "Đã thêm mới!" : "Đã cập nhật!");
 };
 
-const handleDelete = (item: Record<string, unknown>) => {
+const handleDelete = async (item: Record<string, unknown>) => {
+    if (!collectionContext.value) return;
+
     if (confirm(`Xóa "${item.name || item.title}"?`)) {
-        itemsList.value = itemsList.value.filter((i) => i.id !== item.id);
-        console.log("Delete:", item);
-        alert("Đã xóa!");
+        isSaving.value = true;
+        try {
+            await collectionContext.value.deleteItem(item.id as string);
+            alert("Đã xóa thành công!");
+        } catch (error: any) {
+            alert(error.message || "Có lỗi xảy ra khi xóa!");
+            console.error("[Admin] Delete item error:", error);
+        } finally {
+            isSaving.value = false;
+        }
     }
 };
 

@@ -2,7 +2,7 @@
 <template>
     <Teleport to="body">
         <Transition name="popup">
-            <div v-if="isOpen" class="popup-overlay" @click.self="$emit('close')">
+            <div v-if="isOpen" class="popup-overlay" @mousedown.self="$emit('close')">
                 <div class="popup-editor" :class="{ 'popup-editor--collection': isCollectionMode }">
                     <header class="popup-header">
                         <div class="header-info">

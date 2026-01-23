@@ -19,9 +19,6 @@
                 <NuxtLink v-for="product in displayProducts" :key="product.id" :to="`/product/${product.slug}`" class="product-card">
                     <div class="card-image-wrapper">
                         <img :src="product.image" :alt="product.name" class="product-img" loading="lazy" />
-                        <div v-if="product.badge" class="badge" :class="getBadgeClass(product.badge)">
-                            {{ product.badge }}
-                        </div>
                         <div class="action-overlay">
                             <button class="btn-detail">Xem Chi Tiết</button>
                         </div>
@@ -31,11 +28,10 @@
                         <div class="category">{{ product.category }}</div>
                         <h3 class="product-name">{{ product.name }}</h3>
 
-                        <div class="features-list" v-if="product.features?.length">
-                            <div v-for="(feature, index) in product.features.slice(0, 3)" :key="index" class="feature-item">
-                                <Icon name="mdi:check-circle" class="check-icon" />
-                                <span>{{ feature.text || feature }}</span>
-                            </div>
+                        <div class="tags-list" v-if="product.tags?.length">
+                            <span v-for="(tag, index) in product.tags.slice(0, 3)" :key="index" class="tag-item">
+                                {{ tag.value || tag }}
+                            </span>
                         </div>
 
                         <div class="card-footer">
@@ -67,7 +63,6 @@ const LISTING_CONFIG = {
     gridColumns: 3,
     itemsPerPage: 12,
     showPrice: true,
-    showBadge: true,
 }
 
 const CATEGORIES = ['Tất cả', 'Camera AI', 'WiFi Doanh Nghiệp', 'Switch & Router', 'Báo Cháy', 'Access Control']
@@ -86,12 +81,6 @@ const displayProducts = computed(() => {
 
 const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
-}
-
-const getBadgeClass = (badge) => {
-    if (badge === 'Best Seller') return 'badge-hot'
-    if (badge === 'New') return 'badge-new'
-    return 'badge-default'
 }
 
 onMounted(() => {

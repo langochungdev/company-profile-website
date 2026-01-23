@@ -1,7 +1,7 @@
 <!-- Chức năng: Modal editor cho CRUD item -->
 <template>
     <Teleport to="body">
-        <div v-if="isOpen" class="modal-overlay" @click.self="handleClose">
+        <div v-if="isOpen" class="modal-overlay" @mousedown.self="handleClose">
             <div class="modal-container">
                 <div class="modal-header">
                     <h2 class="modal-title">

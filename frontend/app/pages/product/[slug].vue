@@ -23,9 +23,6 @@
                             <div v-else class="video-wrapper">
                                 <iframe :src="selectedMedia" frameborder="0" allowfullscreen></iframe>
                             </div>
-                            <div v-if="product.badge" class="badge" :class="getBadgeClass(product.badge)">
-                                {{ product.badge }}
-                            </div>
                         </div>
 
                         <div v-if="allMedia.length > 1" class="media-thumbs">
@@ -54,16 +51,6 @@
 
                         <div class="description-section">
                             <p>{{ product.description }}</p>
-
-                            <div v-if="product.features?.length" class="features-section">
-                                <h3>Tính năng nổi bật:</h3>
-                                <ul class="features-list">
-                                    <li v-for="(feature, idx) in product.features" :key="idx">
-                                        <Icon name="mdi:check-circle" />
-                                        <span>{{ feature.text || feature }}</span>
-                                    </li>
-                                </ul>
-                            </div>
                         </div>
 
                         <div class="action-buttons">
@@ -172,14 +159,6 @@ const selectMedia = (index) => {
 
 const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
-}
-
-const getBadgeClass = (badge) => {
-    if (badge === 'Best Seller') return 'badge-hot'
-    if (badge === 'New') return 'badge-new'
-    if (badge === 'Hot') return 'badge-hot'
-    if (badge === 'Sale') return 'badge-sale'
-    return 'badge-default'
 }
 
 onMounted(async () => {

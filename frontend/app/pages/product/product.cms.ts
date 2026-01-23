@@ -89,7 +89,6 @@ export const productDetailConfig: ProductDetailConfig = {
             },
         },
         price: { type: "number", label: "Giá (VNĐ)", min: 0, note: "Để trống nếu liên hệ", isPreview: true },
-        badge: { type: "select", label: "Badge", options: ["", "Best Seller", "New", "Hot", "Sale"], note: "Hiển thị góc sản phẩm", isPreview: true },
         description: { type: "textarea", label: "Tóm tắt", max: 500, rows: 4, placeholder: "Mô tả ngắn gọn về sản phẩm...", isPreview: true, previewMaxLength: 150 },
         image: { type: "image", label: "Ảnh chính", note: "800x800px, max 2MB", required: true, isPreview: true },
         media: {
@@ -104,16 +103,6 @@ export const productDetailConfig: ProductDetailConfig = {
                 type: { type: "select", label: "Loại", options: ["image", "video"], default: "image", required: true },
                 url: { type: "text", label: "URL", max: 500, required: true, note: "URL ảnh hoặc embed video (YouTube/TikTok/Facebook)" },
                 caption: { type: "text", label: "Chú thích", max: 100 },
-            },
-        },
-        features: {
-            type: "array",
-            label: "Tính năng nổi bật",
-            min: 0,
-            max: 10,
-            sortable: true,
-            schema: {
-                text: { type: "text", label: "Tính năng", max: 100, required: true },
             },
         },
         content: { type: "richtext", label: "Bài viết chi tiết", placeholder: "Nội dung chi tiết sản phẩm (có thể nhúng video, bảng, media)..." },
@@ -135,17 +124,15 @@ export const productDetailConfig: ProductDetailConfig = {
         { key: "name", label: "Tên sản phẩm", type: "text" },
         { key: "category", label: "Danh mục", type: "badge" },
         { key: "price", label: "Giá", type: "currency" },
-        { key: "badge", label: "Badge", type: "badge" },
     ],
 
     defaultValues: {
         name: "",
         slug: "",
         category: "",
+        tags: [],
         price: 0,
-        badge: "",
         description: "",
-        features: [],
         image: "",
     },
 };
