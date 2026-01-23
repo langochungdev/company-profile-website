@@ -86,7 +86,14 @@ const getItemId = (item: Record<string, unknown>, index: number) => {
 }
 
 const getItemValue = (item: Record<string, unknown>, key: string) => {
-    return item[key] ?? ''
+    const value = item[key]
+    if (Array.isArray(value) && value.length > 0) {
+        const firstItem = value[0]
+        if (firstItem && typeof firstItem === 'object' && 'url' in firstItem) {
+            return (firstItem as { url: string }).url
+        }
+    }
+    return value ?? ''
 }
 
 const getTagsArray = (item: Record<string, unknown>, key: string): string[] => {

@@ -37,7 +37,7 @@ export interface ProductDetailConfig {
     listingMeta?: ListingMeta;
 
     itemFields: Record<string, FieldConfig>;
-    tableColumns: Array<{ key: string; label: string; type: "text" | "image" | "badge" | "currency" | "date"; width?: number }>;
+    tableColumns: Array<{ key: string; label: string; type: "text" | "image" | "badge" | "currency" | "date" | "tags" | "text-truncate"; width?: number }>;
     defaultValues: Record<string, unknown>;
 }
 
@@ -53,14 +53,14 @@ export const productDetailConfig: ProductDetailConfig = {
     seoMapping: {
         title: "name",
         description: "description",
-        image: "image",
+        image: "images[0].url",
     },
 
     schemaMapping: {
         name: "name",
         description: "description",
-        image: "image",
-        gallery: "gallery",
+        image: "images[0].url",
+        gallery: "images",
         sku: "slug",
         price: "price",
         brand: "SHT Security",
@@ -93,37 +93,28 @@ export const productDetailConfig: ProductDetailConfig = {
         },
         price: { type: "number", label: "Giá (VNĐ)", min: 0, note: "Để trống nếu liên hệ", isPreview: true },
         description: { type: "textarea", label: "Tóm tắt", max: 500, rows: 4, placeholder: "Mô tả ngắn gọn về sản phẩm...", isPreview: true, previewMaxLength: 150 },
-        image: { type: "image", label: "Ảnh chính", note: "800x800px, max 2MB", required: true, isPreview: true },
-        media: {
+        images: {
             type: "array",
-            label: "Media (Ảnh & Video)",
-            min: 0,
+            label: "Danh sách ảnh (ảnh đầu = ảnh chính)",
+            min: 1,
             max: 10,
             sortable: true,
-            note: "Thêm ảnh hoặc video (YouTube, TikTok, Facebook)",
-            previewCount: 0,
+            isPreview: true,
+            previewCount: 1,
+            note: "Ảnh đầu tiên sẽ làm ảnh chính hiển thị ở danh sách",
             schema: {
-                type: { type: "select", label: "Loại", options: ["image", "video"], default: "image", required: true },
-                url: { type: "text", label: "URL", max: 500, required: true, note: "URL ảnh hoặc embed video (YouTube/TikTok/Facebook)" },
-                caption: { type: "text", label: "Chú thích", max: 100 },
+                url: { type: "image", label: "Ảnh", required: true, note: "800x800px" },
+                alt: { type: "text", label: "Alt Text", max: 150, required: true, note: "Mô tả ảnh cho SEO" },
+                title: { type: "text", label: "Title (Hover)", max: 100 },
+                width: { type: "number", label: "Width" },
+                height: { type: "number", label: "Height" },
             },
         },
         content: { type: "richtext", label: "Bài viết chi tiết", placeholder: "Nội dung chi tiết sản phẩm (có thể nhúng video, bảng, media)..." },
-        gallery: {
-            type: "array",
-            label: "Gallery ảnh phụ",
-            min: 0,
-            max: 8,
-            previewCount: 0,
-            schema: {
-                url: { type: "image", label: "Ảnh", note: "800x600px" },
-                caption: { type: "text", label: "Chú thích", max: 100 },
-            },
-        },
     },
 
     tableColumns: [
-        { key: "image", label: "", type: "image", width: 60 },
+        { key: "images", label: "", type: "image", width: 60 },
         { key: "name", label: "Tên sản phẩm", type: "text" },
         { key: "category", label: "Danh mục", type: "badge" },
         { key: "price", label: "Giá", type: "currency" },
@@ -138,6 +129,6 @@ export const productDetailConfig: ProductDetailConfig = {
         tags: [],
         price: 0,
         description: "",
-        image: "",
+        images: [],
     },
 };
