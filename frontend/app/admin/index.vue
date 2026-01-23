@@ -35,6 +35,7 @@
         <ItemEditor v-if="detailConfig" :is-open="isEditorOpen" :is-new="isNewItem" :item-name="getCollectionName" :config="detailConfig" :initial-data="editingItem" @close="closeEditor" @save="handleSaveItem" />
 
         <ConfigManager v-if="detailConfig" :is-open="isConfigOpen" :collection-path="detailConfig.path" :initial-tab="configTab" @close="isConfigOpen = false" />
+        <Toast />
     </div>
 </template>
 
@@ -49,9 +50,12 @@ import SettingsView from "./components/views/SettingsView.vue";
 import { PAGE_CONFIGS, getAllPages, getPageConfig, isCollectionPage as checkIsCollection, getListingConfig, getDetailConfig } from "./config/page.config";
 import { useCollectionContext } from "./composables/useCollectionContext";
 import { usePreviewContext } from "./composables/usePreviewContext";
+import Toast from "./components/Toast.vue";
+import { useToast } from "./composables/useToast";
 
 const route = useRoute();
 const router = useRouter();
+const toast = useToast();
 
 const sidebarPages = computed(() => {
     return getAllPages().map((page) => ({
@@ -303,7 +307,7 @@ const setFieldValue = (sectionKey: string, fieldKey: string, subKey: string | nu
 const saveForm = () => {
     console.log("Saving form data:", formData.value);
     liveEditDirty.value = false;
-    alert("Đã lưu thành công!");
+    toast.success("Đã lưu thành công!");
 };
 
 const openAddModal = () => {
@@ -353,20 +357,20 @@ const handleSaveItem = async (data: Record<string, unknown>) => {
     try {
         if (isNewItem.value) {
             await collectionContext.value.addItem(data as any);
-            alert("Đã thêm mới thành công!");
+            toast.success("Đã thêm mới thành công!");
         } else {
             const id = data.id as string;
             const { id: _, ...updateData } = data;
             await collectionContext.value.updateItem(id, updateData as any);
-            alert("Đã cập nhật thành công!");
+            toast.success("Đã cập nhật thành công!");
         }
         closeEditor();
-        
+
         if (previewContext.value) {
             await previewContext.value.loadPreviews();
         }
     } catch (error: any) {
-        alert(error.message || "Có lỗi xảy ra!");
+        toast.error(error.message || "Có lỗi xảy ra!");
         console.error("[Admin] Save item error:", error);
     } finally {
         isSaving.value = false;
@@ -380,12 +384,12 @@ const handleDelete = async (item: Record<string, unknown>) => {
         isSaving.value = true;
         try {
             await collectionContext.value.deleteItem(item.id as string);
-            alert("Đã xóa thành công!");
+            toast.success("Đã xóa thành công!");
             if (previewContext.value) {
                 await previewContext.value.loadPreviews();
             }
         } catch (error: any) {
-            alert(error.message || "Có lỗi xảy ra khi xóa!");
+            toast.error(error.message || "Có lỗi xảy ra khi xóa!");
             console.error("[Admin] Delete item error:", error);
         } finally {
             isSaving.value = false;
