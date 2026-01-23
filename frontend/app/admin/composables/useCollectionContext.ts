@@ -28,7 +28,7 @@ interface CollectionContentResult {
     addItem: (item: Omit<CollectionItem, "id">) => Promise<string>;
     updateItem: (id: string, data: Partial<CollectionItem>) => Promise<void>;
     deleteItem: (id: string) => Promise<void>;
-    getItem: (id: string) => CollectionItem | undefined;
+    getItem: (id: string) => Promise<CollectionItem | null>;
     checkDuplicateSlug: (slug: string, excludeId?: string) => boolean;
 }
 
@@ -266,8 +266,21 @@ export function useCollectionContext(config: CollectionConfig): CollectionConten
         }
     };
 
-    const getItem = (id: string): CollectionItem | undefined => {
-        return items.value.find((item) => item.id === id);
+    const getItem = async (id: string): Promise<CollectionItem | null> => {
+        if (import.meta.server) return null;
+
+        const cachedItem = items.value.find((item) => item.id === id);
+        if (cachedItem) return cachedItem;
+
+        try {
+            const db = getDb();
+            const collectionPath = getCollectionPath();
+            const item = await CollectionService.getById<CollectionItem>(db, collectionPath, id);
+            return item;
+        } catch (e) {
+            console.error("[useCollectionContext] getItem error:", e);
+            return null;
+        }
     };
 
     return {

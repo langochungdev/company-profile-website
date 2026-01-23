@@ -1,4 +1,4 @@
-<!-- Chức năng: Hiển thị danh sách items cho collection pages -->
+<!-- Chức năng: Hiển thị danh sách preview items với full fields support -->
 <template>
     <div class="items-list">
         <div class="items-header">
@@ -35,7 +35,12 @@
                         <td v-for="col in columns" :key="col.key" :data-label="col.label">
                             <img v-if="col.type === 'image'" :src="getImageSrc(getItemValue(item, col.key))" class="item-image" />
                             <span v-else-if="col.type === 'badge'" class="item-badge">{{ getItemValue(item, col.key) }}</span>
+                            <div v-else-if="col.type === 'tags'" class="item-tags">
+                                <span v-for="(tag, idx) in getTagsArray(item, col.key)" :key="idx" class="tag-badge">{{ tag }}</span>
+                                <span v-if="hasMoreTags(item, col.key)" class="tag-more">+{{ getMoreTagsCount(item, col.key) }}</span>
+                            </div>
                             <span v-else-if="col.type === 'currency'" class="item-price">{{ formatPrice(getItemValue(item, col.key)) }}</span>
+                            <span v-else-if="col.type === 'text-truncate'" class="item-text-truncate" :title="String(getItemValue(item, col.key))">{{ truncateText(getItemValue(item, col.key), 80) }}</span>
                             <span v-else class="item-text">{{ getItemValue(item, col.key) }}</span>
                         </td>
                         <td class="actions-cell">
@@ -53,9 +58,6 @@
     </div>
 </template>
 
-<style scoped>
-@import "../../styles/components/collection/items-list.css";
-</style>
 
 <script setup lang="ts">
 import type { TableColumn } from '../../config/page.config'
@@ -87,6 +89,37 @@ const getItemValue = (item: Record<string, unknown>, key: string) => {
     return item[key] ?? ''
 }
 
+const getTagsArray = (item: Record<string, unknown>, key: string): string[] => {
+    const value = item[key]
+    if (Array.isArray(value)) {
+        return value.slice(0, 3).map((tag) => {
+            if (typeof tag === 'string') return tag
+            if (typeof tag === 'object' && tag !== null) {
+                if ('value' in tag) return String((tag as { value: string }).value)
+                if ('name' in tag) return String((tag as { name: string }).name)
+            }
+            return String(tag)
+        })
+    }
+    return []
+}
+
+const hasMoreTags = (item: Record<string, unknown>, key: string): boolean => {
+    const value = item[key]
+    return Array.isArray(value) && value.length > 3
+}
+
+const getMoreTagsCount = (item: Record<string, unknown>, key: string): number => {
+    const value = item[key]
+    return Array.isArray(value) ? value.length - 3 : 0
+}
+
+const truncateText = (value: unknown, maxLength: number): string => {
+    const text = String(value || '')
+    if (text.length <= maxLength) return text
+    return text.substring(0, maxLength) + '...'
+}
+
 const formatPrice = (value: unknown) => {
     if (!value) return 'Liên hệ'
     const num = Number(value)
@@ -95,4 +128,6 @@ const formatPrice = (value: unknown) => {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+@import "../../styles/components/collection/items-list.css";
+</style>

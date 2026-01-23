@@ -127,6 +127,8 @@ export const productDetailConfig: ProductDetailConfig = {
         { key: "name", label: "Tên sản phẩm", type: "text" },
         { key: "category", label: "Danh mục", type: "badge" },
         { key: "price", label: "Giá", type: "currency" },
+        { key: "tags", label: "Tags", type: "tags" },
+        { key: "description", label: "Mô tả", type: "text-truncate" },
     ],
 
     defaultValues: {

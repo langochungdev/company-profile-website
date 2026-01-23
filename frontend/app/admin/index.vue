@@ -48,6 +48,7 @@ import LiveEditView from "./components/views/LiveEditView.vue";
 import SettingsView from "./components/views/SettingsView.vue";
 import { PAGE_CONFIGS, getAllPages, getPageConfig, isCollectionPage as checkIsCollection, getListingConfig, getDetailConfig } from "./config/page.config";
 import { useCollectionContext } from "./composables/useCollectionContext";
+import { usePreviewContext } from "./composables/usePreviewContext";
 
 const sidebarPages = computed(() => {
     return getAllPages().map((page) => ({
@@ -87,7 +88,8 @@ const isConfigOpen = ref(false);
 const configTab = ref<"categories" | "tags">("categories");
 
 const collectionContext = shallowRef<ReturnType<typeof useCollectionContext> | null>(null);
-const itemsList = computed(() => collectionContext.value?.items?.value || []);
+const previewContext = shallowRef<ReturnType<typeof usePreviewContext> | null>(null);
+const itemsList = computed(() => previewContext.value?.previews?.value || []);
 
 const firstKey = Object.keys(PAGE_CONFIGS)[0] as string;
 const currentConfig = computed(() => getPageConfig(activePage.value) || PAGE_CONFIGS[firstKey]);
@@ -230,7 +232,8 @@ const loadPageData = async () => {
                 path: detailConfig.value.path,
                 itemFields: detailConfig.value.itemFields,
             });
-            await collectionContext.value.loadItems();
+            previewContext.value = usePreviewContext(detailConfig.value.path);
+            await previewContext.value.loadPreviews();
         }
     } finally {
         loading.value = false;
@@ -288,10 +291,23 @@ const openAddModal = () => {
     isEditorOpen.value = true;
 };
 
-const openEditModal = (item: Record<string, unknown>) => {
+const openEditModal = async (item: Record<string, unknown>) => {
     isNewItem.value = false;
-    editingItem.value = { ...item };
-    isEditorOpen.value = true;
+
+    if (!collectionContext.value) return;
+
+    loading.value = true;
+    try {
+        const fullItem = await collectionContext.value.getItem(item.id as string);
+        editingItem.value = fullItem ? { ...fullItem } : { ...item };
+        isEditorOpen.value = true;
+    } catch (error) {
+        console.error("[Admin] Load item detail error:", error);
+        editingItem.value = { ...item };
+        isEditorOpen.value = true;
+    } finally {
+        loading.value = false;
+    }
 };
 
 const closeEditor = () => {

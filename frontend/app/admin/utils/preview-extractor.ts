@@ -39,6 +39,22 @@ function processPreviewValue(value: unknown, config: FieldConfig): unknown {
         return arr.slice(0, count);
     }
 
+    if (config.type === "dynamic-multi-select") {
+        if (Array.isArray(value)) {
+            const normalized = value.map((item) => {
+                if (typeof item === "string") return item;
+                if (typeof item === "object" && item !== null) {
+                    if ("value" in item) return String((item as { value: string }).value);
+                    if ("name" in item) return String((item as { name: string }).name);
+                }
+                return String(item);
+            });
+            const count = config.previewCount ?? normalized.length;
+            return normalized.slice(0, count);
+        }
+        return value;
+    }
+
     return value;
 }
 

@@ -135,7 +135,7 @@ export interface SectionConfig {
 export interface TableColumn {
     key: string;
     label: string;
-    type: "text" | "image" | "badge" | "currency" | "date";
+    type: "text" | "image" | "badge" | "currency" | "date" | "tags" | "text-truncate";
     width?: number;
 }
 
