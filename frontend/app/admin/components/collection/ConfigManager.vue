@@ -92,8 +92,9 @@ const props = defineProps<{
     initialTab?: "categories" | "tags";
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
     close: [];
+    updated: [];
 }>();
 
 const activeTab = ref<"categories" | "tags">(props.initialTab || "categories");
@@ -124,6 +125,15 @@ const handleAdd = async () => {
     const name = newItemName.value.trim();
     if (!name) return;
 
+    const isDuplicate = currentItems.value.some(
+        (item) => item.name.toLowerCase() === name.toLowerCase()
+    );
+
+    if (isDuplicate) {
+        alert(`"${name}" đã tồn tại!`);
+        return;
+    }
+
     try {
         if (activeTab.value === "categories") {
             await addCategory(name);
@@ -131,6 +141,7 @@ const handleAdd = async () => {
             await addTag(name);
         }
         newItemName.value = "";
+        emit('updated');
     } catch (error) {
         console.error("Add error:", error);
         alert("Có lỗi xảy ra khi thêm!");
@@ -145,13 +156,24 @@ const startEdit = (item: ConfigItem) => {
 const saveEdit = async () => {
     if (!editingId.value || !editingName.value.trim()) return;
 
+    const name = editingName.value.trim();
+    const isDuplicate = currentItems.value.some(
+        (item) => item.id !== editingId.value && item.name.toLowerCase() === name.toLowerCase()
+    );
+
+    if (isDuplicate) {
+        alert(`"${name}" đã tồn tại!`);
+        return;
+    }
+
     try {
         if (activeTab.value === "categories") {
-            await updateCategory(editingId.value, editingName.value.trim());
+            await updateCategory(editingId.value, name);
         } else {
-            await updateTag(editingId.value, editingName.value.trim());
+            await updateTag(editingId.value, name);
         }
         cancelEdit();
+        emit('updated');
     } catch (error) {
         console.error("Update error:", error);
         alert("Có lỗi xảy ra khi cập nhật!");
@@ -172,6 +194,7 @@ const handleDelete = async (item: ConfigItem) => {
         } else {
             await deleteTag(item.id);
         }
+        emit('updated');
     } catch (error) {
         console.error("Delete error:", error);
         alert("Có lỗi xảy ra khi xóa!");

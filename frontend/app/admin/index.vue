@@ -24,7 +24,10 @@
 
                 <div v-else-if="currentConfig" class="editor-container">
                     <div v-if="isCollectionPage" class="collection-page">
-                        <ItemsManager v-if="activeTab === 'items'" :items="itemsList" :columns="itemColumns" :item-config="itemConfigForList" :list-config="listConfig || undefined" @add="openAddModal" @edit="openEditModal" @delete="handleDelete" @manage-categories="openCategoriesManager" @manage-tags="openTagsManager" />
+                        <template v-if="activeTab === 'items'">
+                            <ProductTable v-if="activePage === 'product'" :items="itemsList" @add="openAddModal" @edit="openEditModal" @delete="handleDelete" @manage-categories="openCategoriesManager" @manage-tags="openTagsManager" />
+                            <ItemsManager v-else :items="itemsList" :columns="itemColumns" :item-config="itemConfigForList" :list-config="listConfig || undefined" @add="openAddModal" @edit="openEditModal" @delete="handleDelete" @manage-categories="openCategoriesManager" @manage-tags="openTagsManager" />
+                        </template>
 
                         <SettingsView v-else ref="collectionSettingsRef" :key="activePage" :page-key="activePage" :page-name="currentPageName" :config-path="currentConfigPath" :schema-type="currentSchemaType" :readonly="true" @dirty-change="settingsDirty = $event" @saving-change="isSaving = $event" />
                     </div>
@@ -32,9 +35,10 @@
             </div>
         </main>
 
-        <ItemEditor v-if="detailConfig" :is-open="isEditorOpen" :is-new="isNewItem" :item-name="getCollectionName" :config="detailConfig" :initial-data="editingItem" @close="closeEditor" @save="handleSaveItem" />
+        <ProductEditor v-if="activePage === 'product'" :is-open="isEditorOpen" :is-new="isNewItem" :initial-data="editingItem" @close="closeEditor" @save="handleSaveItem" />
+        <ItemEditor v-else-if="detailConfig" :is-open="isEditorOpen" :is-new="isNewItem" :item-name="getCollectionName" :config="detailConfig" :initial-data="editingItem" @close="closeEditor" @save="handleSaveItem" />
 
-        <ConfigManager v-if="detailConfig" :is-open="isConfigOpen" :collection-path="detailConfig.path" :initial-tab="configTab" @close="isConfigOpen = false" />
+        <ConfigManager v-if="detailConfig || activePage === 'product'" :is-open="isConfigOpen" :collection-path="activePage === 'product' ? 'collections/products/items' : detailConfig?.path || ''" :initial-tab="configTab" @close="isConfigOpen = false" @updated="handleConfigUpdated" />
         <Toast />
     </div>
 </template>
@@ -44,6 +48,8 @@ import AdminSidebar from "./components/layouts/AdminSidebar.vue";
 import AdminHeader from "./components/layouts/AdminHeader.vue";
 import ItemsManager from "./components/collection/ItemsManager.vue";
 import ItemEditor from "./components/collection/ItemEditor.vue";
+import ProductTable from "./components/collection/products/ProductTable.vue";
+import ProductEditor from "./components/collection/products/ProductEditor.vue";
 import ConfigManager from "./components/collection/ConfigManager.vue";
 import LiveEditView from "./components/views/LiveEditView.vue";
 import SettingsView from "./components/views/SettingsView.vue";
@@ -350,7 +356,7 @@ const openTagsManager = () => {
     isConfigOpen.value = true;
 };
 
-const handleSaveItem = async (data: Record<string, unknown>) => {
+const handleSaveItem = async (data: any) => {
     if (!collectionContext.value) return;
 
     isSaving.value = true;
@@ -395,6 +401,10 @@ const handleDelete = async (item: Record<string, unknown>) => {
             isSaving.value = false;
         }
     }
+};
+
+const handleConfigUpdated = () => {
+    toast.success("Đã cập nhật cấu hình!");
 };
 
 
