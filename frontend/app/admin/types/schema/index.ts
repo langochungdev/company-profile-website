@@ -1,8 +1,7 @@
 // Export tất cả schema types và registry
 
 export * from "./base.schema";
-export type { WebSiteSchema, SearchAction, PostalAddress, ContactPoint } from "./page/home.schema";
-export type { OrganizationSchema as HomeOrganizationSchema } from "./page/home.schema";
+export type { WebSiteSchema, OrganizationSchema as HomeOrganizationSchema } from "./global.schema";
 export type { CollectionPageSchema, BreadcrumbList } from "./page/product-list.schema";
 export type { ProductSchema, Brand, Offer, AggregateRating, Review, ReviewRating, ReviewAuthor, BreadcrumbListSchema, AvailabilityType } from "./page/product-detail.schema";
 
