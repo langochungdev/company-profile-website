@@ -66,47 +66,7 @@
                 </div>
             </section>
 
-            <section class="settings-section">
-                <button class="section-header" @click="toggleSection('schema')">
-                    <div class="section-title">
-                        <Icon name="mdi:code-json" />
-                        <span>Schema Markup</span>
-                    </div>
-                    <Icon :name="collapsedSections.schema ? 'mdi:chevron-down' : 'mdi:chevron-up'" class="collapse-icon" />
-                </button>
 
-                <div v-show="!collapsedSections.schema" class="section-body">
-                    <div class="schema-type-info">
-                        <Icon name="mdi:information-outline" />
-                        <span>Schema Type: <strong>{{ currentSchemaTypeName }}</strong></span>
-                    </div>
-
-                    <div class="schema-subsection">
-                        <h4 class="subsection-title">Cấu hình Schema</h4>
-                        <div v-for="(field, fieldKey) in schemaConfigFields" :key="fieldKey" class="field-group">
-                            <label class="field-label">{{ field.label }}</label>
-                            <p v-if="field.note" class="field-note">{{ field.note }}</p>
-
-                            <input v-if="field.type === 'text'" v-model="schemaData.config[fieldKey]" type="text" class="field-input" :class="{ 'input-readonly': readonly }" :placeholder="String(field.default || '')" :disabled="readonly" />
-
-                            <textarea v-else-if="field.type === 'textarea'" v-model="schemaData.config[fieldKey]" class="field-textarea" :class="{ 'input-readonly': readonly }" :rows="field.rows || 2" :disabled="readonly" />
-
-                            <select v-else-if="field.type === 'select'" v-model="schemaData.config[fieldKey]" class="field-select" :class="{ 'input-readonly': readonly }" :disabled="readonly">
-                                <option v-for="opt in getSelectOptions(field.options)" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div v-if="Object.keys(schemaFieldMappingFields).length > 0" class="schema-subsection">
-                        <h4 class="subsection-title">Field Mapping</h4>
-                        <p class="subsection-note">Định nghĩa field nào trong data sẽ được dùng cho schema</p>
-                        <div v-for="(field, fieldKey) in schemaFieldMappingFields" :key="fieldKey" class="field-group field-inline">
-                            <label class="field-label">{{ field.label }}</label>
-                            <input v-model="schemaData.fieldMapping[fieldKey]" type="text" class="field-input" :class="{ 'input-readonly': readonly }" :placeholder="String(field.default || '')" :disabled="readonly" />
-                        </div>
-                    </div>
-                </div>
-            </section>
         </div>
     </div>
 </template>
@@ -116,16 +76,13 @@ import { ref, reactive, computed, watch, onMounted, nextTick } from "vue";
 import { useSettingsContext } from "@/admin/composables/useSettingsContext";
 import { usePendingUploads, type PendingImageValue } from "@/admin/composables/usePendingUploads";
 import { useDeleteQueue } from "@/admin/composables/useDeleteQueue";
-import { SCHEMA_TYPE_MAP, type SchemaPageType } from "@/admin/types/schema";
-import { generateDefaultSchema } from "@/admin/utils/schema-generator";
-import { getSchemaConfigFields, getSchemaFieldMappingFields } from "@/admin/config/schema-settings.config";
+
 import { getImageSrc } from "@/admin/utils/imageHelper";
 
 const props = defineProps<{
     pageKey: string;
     pageName: string;
     configPath: string;
-    schemaType?: SchemaPageType;
     readonly?: boolean;
 }>();
 
@@ -153,21 +110,6 @@ const emit = defineEmits<{
 }>();
 
 const { settings, loading, isDirty, loadSettings, saveSettings } = useSettingsContext(props.configPath);
-
-const currentSchemaTypeName = computed(() => {
-    if (!props.schemaType) return "WebPage";
-    return SCHEMA_TYPE_MAP[props.schemaType] || "WebPage";
-});
-
-const schemaConfigFields = computed(() => {
-    if (!props.schemaType) return {};
-    return getSchemaConfigFields(props.schemaType);
-});
-
-const schemaFieldMappingFields = computed(() => {
-    if (!props.schemaType) return {};
-    return getSchemaFieldMappingFields(props.schemaType);
-});
 
 const settingsSections = {
     seo: {
@@ -225,15 +167,9 @@ const settingsData = reactive<Record<SectionKey, Record<string, string>>>({
     openGraph: { ogTitle: "", ogDescription: "", ogImage: "", ogType: "website", twitterCard: "summary_large_image" },
 });
 
-const schemaData = reactive<{ config: Record<string, string>; fieldMapping: Record<string, string> }>({
-    config: {},
-    fieldMapping: {},
-});
-
 const collapsedSections = ref<Record<string, boolean>>({
     seo: false,
     openGraph: true,
-    schema: true,
 });
 
 const isSyncing = ref(false);
@@ -290,26 +226,12 @@ const syncFromContext = () => {
     if (settings.value) {
         settingsData.seo = { ...settingsData.seo, ...settings.value.seo };
         settingsData.openGraph = { ...settingsData.openGraph, ...settings.value.openGraph };
-
-        if (settings.value.schema) {
-            const savedSchema = settings.value.schema as any;
-            if (savedSchema.config) {
-                schemaData.config = { ...savedSchema.config };
-            }
-            if (savedSchema.fieldMapping) {
-                schemaData.fieldMapping = { ...savedSchema.fieldMapping };
-            }
-        }
     }
 };
 
 const syncToContext = () => {
     settings.value.seo = { ...settingsData.seo } as any;
     settings.value.openGraph = { ...settingsData.openGraph } as any;
-    settings.value.schema = {
-        config: { ...schemaData.config },
-        fieldMapping: { ...schemaData.fieldMapping },
-    } as any;
 };
 
 const handleSave = async () => {
@@ -349,7 +271,7 @@ watch(loading, (val) => {
     emit("saving-change", val);
 });
 
-watch([settingsData, schemaData], () => {
+watch(settingsData, () => {
     if (isSyncing.value) return;
     syncToContext();
 }, { deep: true });

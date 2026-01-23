@@ -1,7 +1,3 @@
-// Settings Config - SEO, OpenGraph, Schema sections cho admin panel
-
-import type { SchemaPageType } from "@/admin/types/schema";
-
 export interface SettingsFieldConfig {
     type: "text" | "textarea" | "image" | "select" | "code";
     label: string;
@@ -13,27 +9,6 @@ export interface SettingsFieldConfig {
     language?: string;
     options?: string[] | { value: string; label: string }[];
 }
-
-export interface SchemaFieldsConfig {
-    config: Record<string, SettingsFieldConfig>;
-    fieldMapping: Record<string, SettingsFieldConfig>;
-}
-
-export const COMMON_SCHEMA_CONFIG: Record<string, SettingsFieldConfig> = {
-    siteName: {
-        type: "text",
-        label: "Tên Website",
-        note: "Tên website/thương hiệu hiển thị trong schema",
-        max: 100,
-        required: true,
-    },
-    siteUrl: {
-        type: "text",
-        label: "URL Website",
-        note: "URL chính của website",
-        max: 200,
-    },
-};
 
 export const SEO_FIELDS: Record<string, SettingsFieldConfig> = {
     title: {
@@ -140,23 +115,13 @@ export const OG_FIELDS: Record<string, SettingsFieldConfig> = {
     },
 };
 
-export const SCHEMA_FIELDS: Record<string, SettingsFieldConfig> = {
-    jsonLd: {
-        type: "code",
-        label: "JSON-LD Schema",
-        language: "json",
-        note: "Structured data cho Google Rich Results. Phải là valid JSON.",
-        rows: 20,
-    },
-};
-
 export interface SettingsSection {
     label: string;
     collapsed: boolean;
     fields: Record<string, SettingsFieldConfig>;
 }
 
-export const getSettingsSections = (_schemaType?: SchemaPageType): Record<string, SettingsSection> => ({
+export const getSettingsSections = (): Record<string, SettingsSection> => ({
     seo: {
         label: "SEO",
         collapsed: false,
@@ -166,11 +131,6 @@ export const getSettingsSections = (_schemaType?: SchemaPageType): Record<string
         label: "Open Graph",
         collapsed: true,
         fields: OG_FIELDS,
-    },
-    schema: {
-        label: "Schema Markup",
-        collapsed: true,
-        fields: SCHEMA_FIELDS,
     },
 });
 
@@ -193,10 +153,6 @@ export interface SettingsData {
         twitterDescription?: string;
         twitterImage?: string;
     };
-    schema: {
-        config: Record<string, unknown>;
-        fieldMapping: Record<string, string>;
-    };
 }
 
 export const DEFAULT_SETTINGS: SettingsData = {
@@ -217,9 +173,5 @@ export const DEFAULT_SETTINGS: SettingsData = {
         twitterTitle: "",
         twitterDescription: "",
         twitterImage: "",
-    },
-    schema: {
-        config: {},
-        fieldMapping: {},
     },
 };
