@@ -53,13 +53,23 @@
             <RichTextEditor :model-value="String(modelValue || '')" :placeholder="field.placeholder" :max-length="field.max" @update:model-value="emit('update:modelValue', $event)" />
         </template>
 
-        <p v-if="field.note" class="field-note">{{ field.note }}</p>
+        <template v-else-if="field.type === 'dynamic-select'">
+            <DynamicSelect :field="(field as any)" :model-value="String(modelValue || '')" @update:model-value="emit('update:modelValue', $event)" />
+        </template>
+
+        <template v-else-if="field.type === 'dynamic-multi-select'">
+            <DynamicMultiSelect :field="(field as any)" :model-value="(modelValue as any) || []" @update:model-value="emit('update:modelValue', $event)" />
+        </template>
+
+        <p v-if="field.note && !['dynamic-select', 'dynamic-multi-select'].includes(field.type)" class="field-note">{{ field.note }}</p>
     </div>
 </template>
 
 <script setup lang="ts">
 import RichTextEditor from './RichTextEditor.vue'
 import ImageUploader from './ImageUploader.vue'
+import DynamicSelect from './DynamicSelect.vue'
+import DynamicMultiSelect from './DynamicMultiSelect.vue'
 
 interface FieldConfig {
     type: string

@@ -100,7 +100,7 @@ const ALL_SIDEBAR_PAGES: Array<{ key: string; config: PageConfig; group?: string
 export const SIDEBAR_PAGES = SIDEBAR_ORDER.map((key) => ALL_SIDEBAR_PAGES.find((p) => p.key === key)).filter((p): p is NonNullable<typeof p> => p !== undefined);
 
 export interface FieldConfig {
-    type: "text" | "textarea" | "number" | "boolean" | "select" | "image" | "video" | "array" | "group" | "richtext" | "date" | "color" | "object";
+    type: "text" | "textarea" | "number" | "boolean" | "select" | "image" | "video" | "array" | "group" | "richtext" | "date" | "color" | "object" | "dynamic-select" | "dynamic-multi-select";
     label: string;
     note?: string;
     max?: number;
@@ -120,6 +120,8 @@ export interface FieldConfig {
     isPreview?: boolean;
     previewCount?: number;
     previewMaxLength?: number;
+    configKey?: "categories" | "tags";
+    collectionPath?: string;
 }
 
 export interface SectionConfig {
@@ -257,6 +259,8 @@ export const FIELD_TYPE_MAP = {
     group: "FieldGroup",
     date: "DatePicker",
     color: "ColorPicker",
+    "dynamic-select": "DynamicSelect",
+    "dynamic-multi-select": "DynamicMultiSelect",
 } as const;
 
 export type FieldType = keyof typeof FIELD_TYPE_MAP;

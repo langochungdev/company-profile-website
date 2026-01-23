@@ -24,7 +24,7 @@
 
                 <div v-else-if="currentConfig" class="editor-container">
                     <div v-if="isCollectionPage" class="collection-page">
-                        <ItemsManager v-if="activeTab === 'items'" :items="itemsList" :columns="itemColumns" :item-config="itemConfigForList" :list-config="listConfig || undefined" @add="openAddModal" @edit="openEditModal" @delete="handleDelete" />
+                        <ItemsManager v-if="activeTab === 'items'" :items="itemsList" :columns="itemColumns" :item-config="itemConfigForList" :list-config="listConfig || undefined" @add="openAddModal" @edit="openEditModal" @delete="handleDelete" @manage-categories="openCategoriesManager" @manage-tags="openTagsManager" />
 
                         <SettingsView v-else ref="collectionSettingsRef" :key="activePage" :page-key="activePage" :page-name="currentPageName" :config-path="currentConfigPath" :schema-type="currentSchemaType" :readonly="true" @dirty-change="settingsDirty = $event" @saving-change="isSaving = $event" />
                     </div>
@@ -33,6 +33,8 @@
         </main>
 
         <ItemEditor v-if="detailConfig" :is-open="isEditorOpen" :is-new="isNewItem" :item-name="getCollectionName" :config="detailConfig" :initial-data="editingItem" @close="closeEditor" @save="handleSaveItem" />
+
+        <ConfigManager v-if="detailConfig" :is-open="isConfigOpen" :collection-path="detailConfig.path" :initial-tab="configTab" @close="isConfigOpen = false" />
     </div>
 </template>
 
@@ -41,6 +43,7 @@ import AdminSidebar from "./components/layouts/AdminSidebar.vue";
 import AdminHeader from "./components/layouts/AdminHeader.vue";
 import ItemsManager from "./components/collection/ItemsManager.vue";
 import ItemEditor from "./components/collection/ItemEditor.vue";
+import ConfigManager from "./components/collection/ConfigManager.vue";
 import LiveEditView from "./components/views/LiveEditView.vue";
 import SettingsView from "./components/views/SettingsView.vue";
 import { PAGE_CONFIGS, getAllPages, getPageConfig, isCollectionPage as checkIsCollection, getListingConfig, getDetailConfig } from "./config/page.config";
@@ -79,6 +82,9 @@ const collectionSettingsRef = ref<{ handleSave: () => Promise<void>; handleDisca
 const isEditorOpen = ref(false);
 const isNewItem = ref(true);
 const editingItem = ref<Record<string, unknown>>({});
+
+const isConfigOpen = ref(false);
+const configTab = ref<"categories" | "tags">("categories");
 
 const collectionContext = shallowRef<ReturnType<typeof useCollectionContext> | null>(null);
 const itemsList = computed(() => collectionContext.value?.items?.value || []);
@@ -291,6 +297,16 @@ const openEditModal = (item: Record<string, unknown>) => {
 const closeEditor = () => {
     isEditorOpen.value = false;
     editingItem.value = {};
+};
+
+const openCategoriesManager = () => {
+    configTab.value = "categories";
+    isConfigOpen.value = true;
+};
+
+const openTagsManager = () => {
+    configTab.value = "tags";
+    isConfigOpen.value = true;
 };
 
 const handleSaveItem = async (data: Record<string, unknown>) => {

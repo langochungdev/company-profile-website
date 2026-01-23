@@ -58,6 +58,46 @@
     align-items: center;
 }
 
+.config-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.config-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.config-btn svg {
+    font-size: 1rem;
+}
+
+.categories-btn:hover {
+    color: #2563eb;
+    border-color: #3b82f6;
+}
+
+.tags-btn:hover {
+    color: #059669;
+    border-color: #10b981;
+}
+
+.toolbar-divider {
+    width: 1px;
+    height: 24px;
+    background: #e2e8f0;
+}
+
 .filter-select {
     padding: 0.625rem 1rem;
     background: white;

@@ -8,6 +8,17 @@
             </div>
 
             <div class="toolbar-actions">
+                <button class="config-btn categories-btn" @click="$emit('manage-categories')">
+                    <Icon name="mdi:folder-multiple" />
+                    <span>Danh mục</span>
+                </button>
+                <button class="config-btn tags-btn" @click="$emit('manage-tags')">
+                    <Icon name="mdi:tag-multiple" />
+                    <span>Tags</span>
+                </button>
+
+                <div class="toolbar-divider"></div>
+
                 <select v-if="listConfig?.sortOptions" v-model="internalSortBy" class="filter-select">
                     <option value="">Sắp xếp...</option>
                     <option v-for="opt in listConfig.sortOptions" :key="opt.field + opt.direction" :value="opt.field + ':' + opt.direction">
@@ -19,8 +30,6 @@
                     <option value="">{{ filter.label }}</option>
                     <option v-for="opt in filter.options" :key="String(opt)" :value="opt">{{ opt }}</option>
                 </select>
-
-
             </div>
         </div>
 
@@ -58,6 +67,8 @@ const emit = defineEmits<{
     add: [];
     edit: [item: Record<string, unknown>];
     delete: [item: Record<string, unknown>];
+    "manage-categories": [];
+    "manage-tags": [];
 }>();
 
 const internalSearchQuery = ref("");
