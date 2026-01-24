@@ -33,6 +33,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { usePendingUploads } from '@/admin/composables/usePendingUploads'
+import { resizeImage } from '@/admin/utils/imageResizer'
 
 interface ImageItem {
     url: string
@@ -65,17 +66,18 @@ const triggerUpload = () => {
     fileInput.value?.click()
 }
 
-const handleUpload = (event: Event) => {
+const handleUpload = async (event: Event) => {
     const input = event.target as HTMLInputElement
     const files = Array.from(input.files || [])
 
     for (const file of files) {
         if (props.modelValue.length >= props.max) break
 
+        const resizedFile = await resizeImage(file, 'default')
         const uniqueFieldPath = `images.${Date.now()}.${Math.random().toString(36).substring(7)}`
         const oldUrl = props.modelValue.length > 0 ? props.modelValue[props.modelValue.length - 1]?.url : undefined
 
-        const previewUrl = addPending(uniqueFieldPath, file, oldUrl, 'products')
+        const previewUrl = addPending(uniqueFieldPath, resizedFile, oldUrl, 'products')
 
         const newImages = [...props.modelValue, {
             url: previewUrl,

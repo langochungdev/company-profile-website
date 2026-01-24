@@ -92,6 +92,7 @@ import Placeholder from '@tiptap/extension-placeholder'
 import Youtube from '@tiptap/extension-youtube'
 import { watch, ref } from 'vue'
 import { useRichTextImages } from '@/admin/composables/useRichTextImages'
+import { resizeImage } from '@/admin/utils/imageResizer'
 import ResizableImage from './ResizableImage.vue'
 
 const props = defineProps<{
@@ -191,12 +192,13 @@ const addImage = () => {
     imageInput.value?.click()
 }
 
-const onImageSelected = (event: Event) => {
+const onImageSelected = async (event: Event) => {
     const target = event.target as HTMLInputElement
     const file = target.files?.[0]
 
     if (file && file.type.startsWith('image/')) {
-        const previewUrl = addPendingImage(file)
+        const resizedFile = await resizeImage(file, 'default')
+        const previewUrl = addPendingImage(resizedFile)
 
         if (!editor.value) return
 
