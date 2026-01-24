@@ -117,7 +117,7 @@ const editor = useEditor({
             },
         }),
         Image.configure({
-            inline: true,
+            inline: false,
             allowBase64: true,
             HTMLAttributes: {
                 class: 'editor-image',
@@ -160,6 +160,12 @@ const editor = useEditor({
     onUpdate: ({ editor }) => {
         emit('update:modelValue', editor.getHTML())
     },
+    onCreate: ({ editor }) => {
+        // Đảm bảo luôn có ít nhất 1 paragraph khi khởi tạo
+        if (editor.isEmpty) {
+            editor.commands.setContent('<p></p>')
+        }
+    },
 })
 
 watch(() => props.modelValue, (newValue) => {
@@ -188,7 +194,33 @@ const onImageSelected = (event: Event) => {
 
     if (file && file.type.startsWith('image/')) {
         const previewUrl = addPendingImage(file)
-        editor.value?.chain().focus().setImage({ src: previewUrl }).run()
+
+        if (!editor.value) return
+
+        const { state } = editor.value
+        const { selection } = state
+        const { $from } = selection
+
+        // Nếu ảnh được insert ở đầu document, thêm paragraph trống phía trước
+        if ($from.pos === 1) {
+            editor.value
+                .chain()
+                .focus()
+                .insertContent([
+                    { type: 'paragraph' },
+                    { type: 'image', attrs: { src: previewUrl } },
+                    { type: 'paragraph' }
+                ])
+                .run()
+        } else {
+            // Insert ảnh với paragraph sau nó
+            editor.value
+                .chain()
+                .focus()
+                .setImage({ src: previewUrl })
+                .insertContent({ type: 'paragraph' })
+                .run()
+        }
     }
 
     target.value = ''
