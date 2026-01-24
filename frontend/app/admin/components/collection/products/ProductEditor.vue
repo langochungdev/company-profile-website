@@ -21,8 +21,14 @@
 
                 <div class="field-group">
                     <label>Slug URL</label>
-                    <input v-model="formData.slug" type="text" placeholder="tu-dong-tao-tu-ten" />
-                    <p class="hint">Để trống sẽ tự động tạo từ tên</p>
+                    <div class="slug-input-wrapper">
+                        <input v-model="formData.slug" type="text" placeholder="tu-dong-tao-tu-ten" :class="{ 'error': slugError }" @input="onSlugInput" @focus="onSlugFocus" />
+                        <span v-if="isCheckingSlug" class="slug-spinner">
+                            <Icon name="mdi:loading" class="spin" />
+                        </span>
+                    </div>
+                    <p v-if="slugError" class="error-msg">{{ slugError }}</p>
+                    <p v-else class="hint">Để trống sẽ tự động tạo từ tên</p>
                 </div>
 
                 <div class="field-group">
@@ -66,15 +72,26 @@
 
                 <div class="field-group">
                     <label>Bài viết chi tiết</label>
-                    <textarea v-model="formData.content" rows="6" placeholder="Nội dung chi tiết sản phẩm..." />
+                    <RichTextEditor v-model="formData.content" placeholder="Nội dung chi tiết sản phẩm..." />
+                </div>
+
+                <div v-if="isUploading" class="upload-progress">
+                    <div class="progress-info">
+                        <Icon name="mdi:cloud-upload" class="upload-icon" />
+                        <span>Đang upload ảnh {{ uploadProgress.current }}/{{ uploadProgress.total }}...</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" :style="{ width: `${(uploadProgress.current / uploadProgress.total) * 100}%` }"></div>
+                    </div>
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" @click="$emit('close')" class="btn-secondary">
+                    <button type="button" @click="$emit('close')" class="btn-secondary" :disabled="isUploading">
                         Hủy
                     </button>
-                    <button type="submit" :disabled="!isValid" class="btn-primary">
-                        {{ isNew ? 'Tạo mới' : 'Cập nhật' }}
+                    <button type="submit" :disabled="!isValid || isUploading" class="btn-primary">
+                        <Icon v-if="isUploading" name="mdi:loading" class="spin" />
+                        <span>{{ isUploading ? 'Đang xử lý...' : (isNew ? 'Tạo mới' : 'Cập nhật') }}</span>
                     </button>
                 </div>
             </form>
@@ -86,7 +103,11 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import TagSelector from '@/admin/components/shared/TagSelector.vue'
 import ImageGallery from '@/admin/components/shared/ImageGallery.vue'
+import RichTextEditor from '@/admin/components/shared/RichTextEditor.vue'
 import { useCollectionConfig } from '@/admin/composables/useCollectionConfig'
+import { usePendingUploads } from '@/admin/composables/usePendingUploads'
+import { CollectionService } from '@/admin/services/collection.service'
+import type { Firestore } from 'firebase/firestore'
 
 interface ProductData {
     id?: string
@@ -123,9 +144,17 @@ const formData = ref<ProductData>({
 })
 
 const { config, loadConfig } = useCollectionConfig('collections/products/items')
+const { hasPending, clearAll, uploadAllPending, pendingUploads } = usePendingUploads();
+const { $db } = useNuxtApp();
 
 const categories = computed(() => config.value.categories.map(c => c.name))
 const tags = computed(() => config.value.tags.map(t => t.name))
+
+const isUploading = ref(false);
+const uploadProgress = ref({ current: 0, total: 0 });
+const slugError = ref('');
+const isCheckingSlug = ref(false);
+const manualSlugEdit = ref(false);
 
 onMounted(async () => {
     await loadConfig()
@@ -134,6 +163,9 @@ onMounted(async () => {
 watch(() => props.isOpen, async (newVal) => {
     if (newVal) {
         await loadConfig()
+        clearAll()
+        slugError.value = ''
+        manualSlugEdit.value = false
     }
 })
 
@@ -141,6 +173,7 @@ const isValid = computed(() => {
     return formData.value.name.length > 0
         && formData.value.category !== ''
         && formData.value.images.length > 0
+        && !slugError.value
 })
 
 watch(() => props.initialData, (newData) => {
@@ -156,6 +189,7 @@ watch(() => props.initialData, (newData) => {
             content: '',
             ...newData
         }
+        manualSlugEdit.value = !!newData.slug;
     } else {
         formData.value = {
             name: '',
@@ -170,21 +204,124 @@ watch(() => props.initialData, (newData) => {
     }
 }, { immediate: true })
 
+let nameWatchTimeout: any;
 watch(() => formData.value.name, (newName) => {
-    if (!formData.value.slug || props.isNew) {
-        formData.value.slug = newName
-            .toLowerCase()
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/đ/g, 'd')
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-+|-+$/g, '')
+    if (!manualSlugEdit.value && props.isNew) {
+        const newSlug = generateSlug(newName);
+        if (newSlug !== formData.value.slug) {
+            formData.value.slug = newSlug;
+            clearTimeout(nameWatchTimeout);
+            nameWatchTimeout = setTimeout(() => {
+                validateSlug(formData.value.slug);
+            }, 500);
+        }
     }
 })
 
-const handleSave = () => {
-    if (isValid.value) {
+const generateSlug = (text: string) => {
+    return text
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+}
+
+const validateSlug = async (slug: string) => {
+    if (!slug) {
+        slugError.value = '';
+        return;
+    }
+
+    isCheckingSlug.value = true;
+    try {
+        const isDuplicate = await CollectionService.checkSlug(
+            $db as Firestore,
+            'collections/products/items',
+            slug,
+            props.isNew ? undefined : formData.value.id
+        );
+
+        if (isDuplicate) {
+            slugError.value = 'Slug này đã tồn tại, vui lòng chọn slug khác';
+        } else {
+            slugError.value = '';
+        }
+    } catch (e) {
+        console.error('Slug check failed', e);
+    } finally {
+        isCheckingSlug.value = false;
+    }
+}
+
+// Debounce slug check when user manually types slug
+let slugCheckTimeout: any;
+const onSlugFocus = () => {
+    manualSlugEdit.value = true;
+}
+
+const onSlugInput = () => {
+    manualSlugEdit.value = true;
+    clearTimeout(slugCheckTimeout);
+    slugCheckTimeout = setTimeout(() => {
+        validateSlug(formData.value.slug);
+    }, 500);
+}
+
+const handleSave = async () => {
+    if (!isValid.value) return;
+
+    // Double check slug before saving
+    await validateSlug(formData.value.slug);
+    if (slugError.value) return;
+
+    if (!hasPending.value) {
         emit('save', { ...formData.value })
+        return;
+    }
+
+    isUploading.value = true;
+    uploadProgress.value = { current: 0, total: pendingUploads.value.length };
+
+    try {
+        const results = await uploadAllPending((current, total) => {
+            uploadProgress.value = { current, total };
+        });
+
+        // Replace pending images with uploaded URLs
+        const processedImages = formData.value.images.map(img => {
+            const pendingImg = img as any;
+            if (pendingImg.pending && pendingImg.fieldPath) {
+                const result = results.get(pendingImg.fieldPath);
+                if (result) {
+                    return {
+                        url: result.secure_url,
+                        alt: img.alt,
+                        width: result.width,
+                        height: result.height
+                    };
+                }
+            }
+            return img;
+        });
+
+        const finalData = {
+            ...formData.value,
+            images: processedImages
+        };
+
+        // Clean up old images if needed (optional implementation: check deleted images)
+        // For now we assume ImageGallery handles removal interactions by just removing from array
+
+        emit('save', finalData);
+        clearAll();
+    } catch (error) {
+        console.error("Upload failed:", error);
+        alert("Không thể upload ảnh. Vui lòng thử lại.");
+    } finally {
+        isUploading.value = false;
+        uploadProgress.value = { current: 0, total: 0 };
     }
 }
 </script>

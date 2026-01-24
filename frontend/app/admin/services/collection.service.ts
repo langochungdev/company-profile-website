@@ -1,6 +1,6 @@
 // Service CRUD cho collection items với auto-sync preview
 
-import { collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc, setDoc, query, orderBy, limit, startAfter, type Firestore, type DocumentData, type QueryDocumentSnapshot, type QueryConstraint } from "firebase/firestore";
+import { collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc, setDoc, query, orderBy, limit, startAfter, where, type Firestore, type DocumentData, type QueryDocumentSnapshot, type QueryConstraint } from "firebase/firestore";
 
 export interface CollectionQueryOptions {
     orderByField?: string;
@@ -122,5 +122,21 @@ export const CollectionService = {
     async deletePreview(db: Firestore, previewPath: string, id: string): Promise<void> {
         const previewRef = doc(db, previewPath, id);
         await deleteDoc(previewRef);
+    },
+
+    async checkSlug(db: Firestore, path: string, slug: string, excludeId?: string): Promise<boolean> {
+        const colRef = collection(db, path);
+        const q = query(colRef, where("slug", "==", slug));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) return false;
+
+        if (excludeId) {
+            // Check if the duplicate doc is the one we are editing
+            const isSelf = snapshot.docs.length === 1 && snapshot.docs[0]!.id === excludeId;
+            return !isSelf;
+        }
+
+        return true;
     },
 };

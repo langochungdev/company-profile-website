@@ -55,7 +55,7 @@ const emit = defineEmits<{
     'update:modelValue': [value: ImageItem[]]
 }>()
 
-const { addPending } = usePendingUploads()
+const { addPending, removePending } = usePendingUploads()
 
 const canAddMore = computed(() => props.modelValue.length < props.max)
 
@@ -85,6 +85,10 @@ const handleUpload = (event: Event) => {
 }
 
 const removeImage = (index: number) => {
+    const img = props.modelValue[index]
+    if (img?.fieldPath) {
+        removePending(img.fieldPath)
+    }
     const newImages = [...props.modelValue]
     newImages.splice(index, 1)
     emit('update:modelValue', newImages)

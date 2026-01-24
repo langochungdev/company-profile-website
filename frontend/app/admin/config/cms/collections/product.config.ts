@@ -12,6 +12,15 @@ export const productConfig = {
         descField: "description",
         imageField: "images[0].url",
     },
+    itemFields: {
+        name: { type: "text", label: "Tên sản phẩm", isPreview: true },
+        slug: { type: "text", label: "Slug", isPreview: true },
+        category: { type: "text", label: "Danh mục", isPreview: true },
+        price: { type: "number", label: "Giá", isPreview: true },
+        images: { type: "array", label: "Hình ảnh", isPreview: true },
+        tags: { type: "dynamic-multi-select", label: "Tags", isPreview: true },
+        description: { type: "textarea", label: "Mô tả", isPreview: true },
+    },
 };
 
 export type ProductConfig = typeof productConfig;
