@@ -102,11 +102,21 @@
                     </div>
                 </div>
 
+                <div v-if="isUploading" class="upload-progress">
+                    <div class="progress-info">
+                        <Icon name="mdi:cloud-upload" class="upload-icon" />
+                        <span>Đang upload ảnh {{ uploadProgress.current }}/{{ uploadProgress.total }}...</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" :style="{ width: `${(uploadProgress.current / uploadProgress.total) * 100}%` }"></div>
+                    </div>
+                </div>
+
                 <div class="modal-footer">
-                    <button class="cancel-btn" @click="handleClose">Hủy</button>
-                    <button class="save-btn" @click="handleSave">
-                        <Icon name="mdi:check" />
-                        <span>{{ isNew ? "Thêm mới" : "Lưu thay đổi" }}</span>
+                    <button class="cancel-btn" :disabled="isUploading" @click="handleClose">Hủy</button>
+                    <button class="save-btn" :disabled="isUploading" @click="handleSave">
+                        <Icon :name="isUploading ? 'mdi:loading' : 'mdi:check'" :class="{ 'spin': isUploading }" />
+                        <span>{{ isUploading ? 'Đang xử lý...' : (isNew ? "Thêm mới" : "Lưu thay đổi") }}</span>
                     </button>
                 </div>
             </div>
@@ -141,7 +151,9 @@ const emit = defineEmits<{
 
 const formData = ref<Record<string, unknown>>({});
 const collapsedSections = ref<Record<string, boolean>>({});
-const { hasPending, clearAll } = usePendingUploads();
+const isUploading = ref(false);
+const uploadProgress = ref({ current: 0, total: 0 });
+const { hasPending, clearAll, uploadAllPending, pendingUploads } = usePendingUploads();
 
 const hasItemFields = computed(() => !!props.config?.itemFields && Object.keys(props.config.itemFields).length > 0);
 const hasSections = computed(() => !!props.config?.sections && Object.keys(props.config.sections).length > 0);
@@ -179,8 +191,92 @@ const handleClose = () => {
     emit("close");
 };
 
-const handleSave = () => {
-    emit("save", { ...formData.value });
+const handleSave = async () => {
+    if (!hasPending.value) {
+        emit("save", { ...formData.value });
+        return;
+    }
+
+    isUploading.value = true;
+    uploadProgress.value = { current: 0, total: pendingUploads.value.length };
+
+    try {
+        const results = await uploadAllPending((current, total) => {
+            uploadProgress.value = { current, total };
+        });
+
+        const processedData = await processFormDataImages(formData.value, results);
+
+        await deleteOldImages(results);
+
+        emit("save", processedData);
+        clearAll();
+    } catch (error) {
+        console.error("[ItemEditor] Upload failed:", error);
+        alert("Không thể upload ảnh. Vui lòng thử lại.");
+    } finally {
+        isUploading.value = false;
+        uploadProgress.value = { current: 0, total: 0 };
+    }
+};
+
+const processFormDataImages = async (data: Record<string, unknown>, uploadResults: Map<string, any>): Promise<Record<string, unknown>> => {
+    const processed = JSON.parse(JSON.stringify(data));
+
+    const traverse = (obj: any): any => {
+        if (Array.isArray(obj)) {
+            return obj.map((item) => {
+                if (item && typeof item === 'object' && item.pending && item.fieldPath) {
+                    const result = uploadResults.get(item.fieldPath);
+                    if (result) {
+                        return {
+                            url: result.secure_url,
+                            alt: item.alt || '',
+                            width: result.width,
+                            height: result.height
+                        };
+                    }
+                }
+                return traverse(item);
+            });
+        }
+
+        if (obj && typeof obj === 'object') {
+            const newObj: any = {};
+            for (const key in obj) {
+                newObj[key] = traverse(obj[key]);
+            }
+            return newObj;
+        }
+
+        return obj;
+    };
+
+    return traverse(processed);
+};
+
+const deleteOldImages = async (uploadResults: Map<string, any>) => {
+    const { CloudinaryService } = await import('@/admin/services/cloudinary.service');
+
+    const deletePromises = pendingUploads.value
+        .filter((p) => p.oldUrl && p.oldUrl.includes('cloudinary.com'))
+        .map(async (p) => {
+            try {
+                const publicId = extractPublicId(p.oldUrl!);
+                if (publicId) {
+                    await CloudinaryService.deleteAsset(publicId, 'image');
+                }
+            } catch (error) {
+                console.error(`[ItemEditor] Failed to delete old image:`, error);
+            }
+        });
+
+    await Promise.all(deletePromises);
+};
+
+const extractPublicId = (url: string): string | undefined => {
+    const match = url.match(/\/v\d+\/(.+)\.\w+$/);
+    return match ? match[1] : undefined;
 };
 
 const addArrayItem = (fieldKey: string, field: any) => {

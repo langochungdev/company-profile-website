@@ -38,6 +38,8 @@ interface ImageItem {
     alt: string
     width?: number
     height?: number
+    pending?: boolean
+    fieldPath?: string
 }
 
 const props = withDefaults(defineProps<{
@@ -57,38 +59,26 @@ const { addPending } = usePendingUploads()
 
 const canAddMore = computed(() => props.modelValue.length < props.max)
 
-const handleUpload = async (event: Event) => {
+const handleUpload = (event: Event) => {
     const input = event.target as HTMLInputElement
     const files = Array.from(input.files || [])
 
     for (const file of files) {
         if (props.modelValue.length >= props.max) break
 
-        const previewUrl = addPending(`images.${Date.now()}`, file)
+        const uniqueFieldPath = `images.${Date.now()}.${Math.random().toString(36).substring(7)}`
+        const oldUrl = props.modelValue.length > 0 ? props.modelValue[props.modelValue.length - 1]?.url : undefined
 
-        try {
-            const formData = new FormData()
-            formData.append('file', file)
-            formData.append('upload_preset', 'sht_products')
+        const previewUrl = addPending(uniqueFieldPath, file, oldUrl, 'products')
 
-            const response = await fetch('https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload', {
-                method: 'POST',
-                body: formData
-            })
+        const newImages = [...props.modelValue, {
+            url: previewUrl,
+            alt: file.name.replace(/\.[^/.]+$/, ''),
+            pending: true,
+            fieldPath: uniqueFieldPath
+        }]
 
-            const data = await response.json()
-
-            const newImages = [...props.modelValue, {
-                url: data.secure_url,
-                alt: file.name.replace(/\.[^/.]+$/, ''),
-                width: data.width,
-                height: data.height
-            }]
-
-            emit('update:modelValue', newImages)
-        } catch (error) {
-            console.error('Upload failed:', error)
-        }
+        emit('update:modelValue', newImages)
     }
 
     input.value = ''
