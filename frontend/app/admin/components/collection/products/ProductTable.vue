@@ -6,7 +6,7 @@
 <template>
     <div class="product-table-wrapper">
         <div class="table-header">
-            <h3>{{ items.length }} sản phẩm</h3>
+            <h3>{{ filteredItemsCount }} sản phẩm</h3>
             <div class="header-actions">
                 <button @click="$emit('manage-categories')" class="btn-secondary">
                     <Icon name="mdi:cog" />
@@ -21,6 +21,32 @@
                     Thêm sản phẩm
                 </button>
             </div>
+        </div>
+
+        <div class="filters-section">
+            <div class="filter-group">
+                <label>Danh mục</label>
+                <select v-model="selectedCategory" class="filter-select">
+                    <option value="">Tất cả</option>
+                    <option v-for="cat in availableCategories" :key="cat" :value="cat">
+                        {{ cat }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Tags</label>
+                <div class="tags-filter">
+                    <button v-for="tag in availableTags" :key="tag" @click="toggleTag(tag)" class="tag-filter-btn" :class="{ active: selectedTags.includes(tag) }">
+                        {{ tag }}
+                    </button>
+                </div>
+            </div>
+
+            <button v-if="selectedCategory || selectedTags.length > 0" @click="clearFilters" class="btn-clear-filters">
+                <Icon name="mdi:close" />
+                Xóa bộ lọc
+            </button>
         </div>
 
         <div class="table-container">
@@ -112,6 +138,8 @@ defineEmits<{
 
 const currentPage = ref(1)
 const itemsPerPage = 10
+const selectedCategory = ref('')
+const selectedTags = ref<string[]>([])
 
 const allPlaceholders = Array.from({ length: 50 }, (_, i) => ({
     id: `placeholder-${i + 1}`,
@@ -125,16 +153,52 @@ const allPlaceholders = Array.from({ length: 50 }, (_, i) => ({
     isPlaceholder: true
 }))
 
-const displayItems = computed(() => {
+const availableCategories = computed(() => {
+    const cats = new Set<string>()
+    props.items.forEach(item => {
+        if (item.category) cats.add(item.category)
+    })
+    return Array.from(cats).sort()
+})
+
+const availableTags = computed(() => {
+    const tags = new Set<string>()
+    props.items.forEach(item => {
+        if (item.tags) {
+            getDisplayTags(item.tags).forEach(tag => tags.add(tag))
+        }
+    })
+    return Array.from(tags).sort()
+})
+
+const filteredItems = computed(() => {
     const items = props.items.length > 0 ? props.items : allPlaceholders
+
+    return items.filter(item => {
+        if (selectedCategory.value && item.category !== selectedCategory.value) {
+            return false
+        }
+
+        if (selectedTags.value.length > 0) {
+            const itemTags = getDisplayTags(item.tags || [])
+            const hasSelectedTag = selectedTags.value.some(tag => itemTags.includes(tag))
+            if (!hasSelectedTag) return false
+        }
+
+        return true
+    })
+})
+
+const filteredItemsCount = computed(() => filteredItems.value.length)
+
+const displayItems = computed(() => {
     const start = (currentPage.value - 1) * itemsPerPage
     const end = start + itemsPerPage
-    return items.slice(start, end)
+    return filteredItems.value.slice(start, end)
 })
 
 const totalPages = computed(() => {
-    const items = props.items.length > 0 ? props.items : allPlaceholders
-    return Math.ceil(items.length / itemsPerPage)
+    return Math.ceil(filteredItems.value.length / itemsPerPage)
 })
 
 const paginationPages = computed(() => {
@@ -162,6 +226,26 @@ const goToPage = (page: number) => {
     if (page < 1 || page > totalPages.value) return
     currentPage.value = page
 }
+
+const toggleTag = (tag: string) => {
+    const index = selectedTags.value.indexOf(tag)
+    if (index > -1) {
+        selectedTags.value.splice(index, 1)
+    } else {
+        selectedTags.value.push(tag)
+    }
+    currentPage.value = 1
+}
+
+const clearFilters = () => {
+    selectedCategory.value = ''
+    selectedTags.value = []
+    currentPage.value = 1
+}
+
+watch([selectedCategory], () => {
+    currentPage.value = 1
+})
 
 function formatCurrency(value: number) {
     return new Intl.NumberFormat('vi-VN', {
@@ -219,6 +303,92 @@ function getDisplayTags(tags: any[]): string[] {
     justify-content: space-between;
     padding: 20px 24px;
     border-bottom: 1px solid #e5e7eb;
+}
+
+.filters-section {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    padding: 16px 24px;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 200px;
+}
+
+.filter-group label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.filter-select {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #111827;
+    background: white;
+    cursor: pointer;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.tags-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-width: 600px;
+}
+
+.tag-filter-btn {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #374151;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tag-filter-btn:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.tag-filter-btn.active {
+    border-color: #3b82f6;
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-clear-filters {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #dc2626;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-clear-filters:hover {
+    background: #fee2e2;
+    border-color: #dc2626;
 }
 
 .table-header h3 {
