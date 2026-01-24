@@ -29,7 +29,7 @@ interface PreviewContextResult {
     filterByCategory: (category: string | null) => Promise<void>;
 }
 
-const DEFAULT_LIMIT = 12;
+const DEFAULT_LIMIT = 10;
 
 export function usePreviewContext(collectionPath: string): PreviewContextResult {
     const previews = ref<PreviewItem[]>([]);

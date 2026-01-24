@@ -25,7 +25,7 @@
                 <div v-else-if="currentConfig" class="editor-container">
                     <div v-if="isCollectionPage" class="collection-page">
                         <template v-if="activeTab === 'items'">
-                            <ProductTable v-if="activePage === 'product'" :items="itemsList" @add="openAddModal" @edit="openEditModal" @delete="handleDelete" @manage-categories="openCategoriesManager" @manage-tags="openTagsManager" />
+                            <ProductTable v-if="activePage === 'product'" :items="itemsList" :has-more="previewContext?.hasMore.value" :loading="previewContext?.loading.value" @add="openAddModal" @edit="openEditModal" @delete="handleDelete" @manage-categories="openCategoriesManager" @manage-tags="openTagsManager" @load-more="handleLoadMore" />
                             <ItemsManager v-else :items="itemsList" :columns="itemColumns" :item-config="itemConfigForList" :list-config="listConfig || undefined" @add="openAddModal" @edit="openEditModal" @delete="handleDelete" @manage-categories="openCategoriesManager" @manage-tags="openTagsManager" />
                         </template>
 
@@ -400,6 +400,12 @@ const handleDelete = async (item: Record<string, unknown>) => {
         } finally {
             isSaving.value = false;
         }
+    }
+};
+
+const handleLoadMore = async () => {
+    if (previewContext.value) {
+        await previewContext.value.loadMore();
     }
 };
 

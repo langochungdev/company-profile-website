@@ -24,16 +24,8 @@
         </div>
 
         <div class="table-container">
-            <div v-if="items.length === 0" class="empty-state">
-                <Icon name="mdi:package-variant-closed" />
-                <p>Chưa có sản phẩm nào</p>
-                <button @click="$emit('add')" class="btn-empty">
-                    Thêm sản phẩm đầu tiên
-                </button>
-            </div>
-
-            <div v-else class="product-grid">
-                <div v-for="product in items" :key="product.id" class="product-card">
+            <div class="product-grid">
+                <div v-for="product in displayItems" :key="product.id" class="product-card" :class="{ 'is-placeholder': product.isPlaceholder }">
                     <div class="card-image-wrapper">
                         <img v-if="getProductImage(product)" :src="getProductImage(product)" :alt="getProductImageAlt(product)" class="product-img" />
                         <div v-else class="thumbnail-placeholder">
@@ -70,7 +62,7 @@
                             </span>
                             <span v-else class="text-muted">Liên hệ</span>
 
-                            <div class="action-buttons">
+                            <div v-if="!product.isPlaceholder" class="action-buttons">
                                 <button @click="$emit('edit', product)" class="btn-action btn-edit" title="Chỉnh sửa">
                                     <Icon name="mdi:pencil" />
                                 </button>
@@ -82,13 +74,31 @@
                     </div>
                 </div>
             </div>
+
+            <div v-if="totalPages > 1" class="pagination-section">
+                <button @click="goToPage(currentPage - 1)" class="pagination-btn" :disabled="currentPage === 1" title="Trang trước">
+                    <Icon name="mdi:chevron-left" />
+                </button>
+
+                <button v-for="(page, idx) in paginationPages" :key="idx" @click="typeof page === 'number' ? goToPage(page) : null" class="pagination-btn" :class="{ active: page === currentPage, dots: page === '...' }" :disabled="page === '...'">
+                    {{ page }}
+                </button>
+
+                <button @click="goToPage(currentPage + 1)" class="pagination-btn" :disabled="currentPage === totalPages" title="Trang sau">
+                    <Icon name="mdi:chevron-right" />
+                </button>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { computed } from 'vue'
+
+const props = defineProps<{
     items: any[]
+    hasMore?: boolean
+    loading?: boolean
 }>()
 
 defineEmits<{
@@ -97,7 +107,61 @@ defineEmits<{
     delete: [product: any]
     'manage-categories': []
     'manage-tags': []
+    'load-more': []
 }>()
+
+const currentPage = ref(1)
+const itemsPerPage = 10
+
+const allPlaceholders = Array.from({ length: 50 }, (_, i) => ({
+    id: `placeholder-${i + 1}`,
+    name: `Lorem ipsum dolor ${i + 1}`,
+    slug: `placeholder-${i + 1}`,
+    category: ['Camera AI', 'WiFi Doanh Nghiệp', 'Switch & Router', 'Báo Cháy'][i % 4],
+    description: '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt.</p>',
+    image: { url: 'https://placehold.co/400x400/e2e8f0/94a3b8?text=No+Data', alt: 'Placeholder' },
+    price: i % 3 === 0 ? 0 : (i + 1) * 1000000,
+    tags: [{ value: 'Placeholder' }],
+    isPlaceholder: true
+}))
+
+const displayItems = computed(() => {
+    const items = props.items.length > 0 ? props.items : allPlaceholders
+    const start = (currentPage.value - 1) * itemsPerPage
+    const end = start + itemsPerPage
+    return items.slice(start, end)
+})
+
+const totalPages = computed(() => {
+    const items = props.items.length > 0 ? props.items : allPlaceholders
+    return Math.ceil(items.length / itemsPerPage)
+})
+
+const paginationPages = computed(() => {
+    const pages = []
+    const total = totalPages.value
+    const current = currentPage.value
+
+    if (total <= 7) {
+        for (let i = 1; i <= total; i++) {
+            pages.push(i)
+        }
+    } else {
+        if (current <= 3) {
+            pages.push(1, 2, 3, 4, '...', total)
+        } else if (current >= total - 2) {
+            pages.push(1, '...', total - 3, total - 2, total - 1, total)
+        } else {
+            pages.push(1, '...', current - 1, current, current + 1, '...', total)
+        }
+    }
+    return pages
+})
+
+const goToPage = (page: number) => {
+    if (page < 1 || page > totalPages.value) return
+    currentPage.value = page
+}
 
 function formatCurrency(value: number) {
     return new Intl.NumberFormat('vi-VN', {
@@ -215,7 +279,7 @@ function getDisplayTags(tags: any[]): string[] {
 
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(5, 1fr);
     gap: 20px;
 }
 
@@ -233,6 +297,28 @@ function getDisplayTags(tags: any[]): string[] {
     transform: translateY(-4px);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     border-color: #3b82f6;
+}
+
+.product-card.is-placeholder {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.product-card.is-placeholder:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: #e5e7eb;
+}
+
+.product-card.is-placeholder {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.product-card.is-placeholder:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: #e5e7eb;
 }
 
 .card-image-wrapper {
@@ -431,5 +517,54 @@ function getDisplayTags(tags: any[]): string[] {
 
 .btn-empty:hover {
     background: #1d4ed8;
+}
+
+.pagination-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 24px 0;
+    border-top: 1px solid #f3f4f6;
+}
+
+.pagination-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pagination-btn:hover:not(:disabled):not(.dots) {
+    background: #f9fafb;
+    border-color: #2563eb;
+    color: #2563eb;
+}
+
+.pagination-btn.active {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: white;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pagination-btn.dots {
+    border: none;
+    cursor: default;
+    pointer-events: none;
 }
 </style>
