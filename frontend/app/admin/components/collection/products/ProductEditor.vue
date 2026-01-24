@@ -84,17 +84,17 @@
                         <div class="progress-fill" :style="{ width: `${(uploadProgress.current / uploadProgress.total) * 100}%` }"></div>
                     </div>
                 </div>
-
-                <div class="form-actions">
-                    <button type="button" @click="$emit('close')" class="btn-secondary" :disabled="isUploading">
-                        Hủy
-                    </button>
-                    <button type="submit" :disabled="!isValid || isUploading" class="btn-primary">
-                        <Icon v-if="isUploading" name="mdi:loading" class="spin" />
-                        <span>{{ isUploading ? 'Đang xử lý...' : (isNew ? 'Tạo mới' : 'Cập nhật') }}</span>
-                    </button>
-                </div>
             </form>
+
+            <div class="form-actions">
+                <button type="button" @click="$emit('close')" class="btn-secondary" :disabled="isUploading">
+                    Hủy
+                </button>
+                <button type="submit" :disabled="!isValid || isUploading" class="btn-primary" @click="handleSave">
+                    <Icon v-if="isUploading" name="mdi:loading" class="spin" />
+                    <span>{{ isUploading ? 'Đang xử lý...' : (isNew ? 'Tạo mới' : 'Cập nhật') }}</span>
+                </button>
+            </div>
         </div>
     </div>
 </template>
