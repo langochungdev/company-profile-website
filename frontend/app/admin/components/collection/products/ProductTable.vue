@@ -284,9 +284,20 @@ const clearSearch = () => {
     isSearching.value = false
 }
 
+const removeFromSearchResults = (id: string) => {
+    searchResults.value = searchResults.value.filter(item => item.id !== id)
+}
+
 watch([selectedCategory], () => {
     currentPage.value = 1
 })
+
+watch(() => props.items, (newItems, oldItems) => {
+    if (searchResults.value.length > 0 && oldItems && newItems.length < oldItems.length) {
+        const deletedIds = oldItems.filter(old => !newItems.find(n => n.id === old.id)).map(i => i.id)
+        deletedIds.forEach(id => removeFromSearchResults(id))
+    }
+}, { deep: true })
 
 function formatCurrency(value: number) {
     return new Intl.NumberFormat('vi-VN', {

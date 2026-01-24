@@ -31,8 +31,13 @@ export default defineEventHandler(async (event) => {
         const hits = "hits" in firstResult ? firstResult.hits : [];
         const nbHits = "nbHits" in firstResult ? firstResult.nbHits : 0;
 
+        const transformedHits = hits.map((hit: any) => ({
+            ...hit,
+            id: hit.objectID,
+        }));
+
         return {
-            hits,
+            hits: transformedHits,
             total: nbHits,
         };
     } catch (error: any) {

@@ -312,7 +312,6 @@ const setFieldValue = (sectionKey: string, fieldKey: string, subKey: string | nu
 };
 
 const saveForm = () => {
-    console.log("Saving form data:", formData.value);
     liveEditDirty.value = false;
     toast.success("Đã lưu thành công!");
 };
@@ -374,19 +373,15 @@ const handleSaveProduct = async (data: any) => {
             const newId = await collectionContext.value?.addItem(data as any);
 
             if (newId) {
-                console.log('[handleSaveProduct] Created product with ID:', newId);
                 await ProductsApiService.syncCreate(newId, data);
-                console.log('[handleSaveProduct] Synced to Algolia');
             }
             toast.success("Đã thêm mới sản phẩm thành công!");
         } else {
             const id = data.id as string;
             const { id: _, ...updateData } = data;
 
-            console.log('[handleSaveProduct] Updating product:', id);
             await collectionContext.value?.updateItem(id, updateData as any);
             await ProductsApiService.syncUpdate(id, updateData);
-            console.log('[handleSaveProduct] Synced update to Algolia');
 
             toast.success("Đã cập nhật sản phẩm thành công!");
         }
@@ -440,7 +435,6 @@ function extractCloudinaryUrls(html: string): string[] {
     if (matches) {
         urls.push(...matches);
     }
-    console.log('[handleDelete] Extracted URLs from content:', urls);
     return urls;
 }
 
@@ -455,29 +449,22 @@ const handleDelete = async (item: Record<string, unknown>) => {
             const fullItem = await collectionContext.value.getItem(item.id as string);
             const itemToDelete = fullItem || item;
 
-            console.log('[handleDelete] Full item data:', itemToDelete);
-
             if (itemToDelete.images && Array.isArray(itemToDelete.images)) {
                 itemToDelete.images.forEach((img: any) => {
                     if (img?.url) {
-                        console.log('[handleDelete] Adding image URL:', img.url);
                         addToDeleteQueue(img.url);
                     }
                 });
             }
             if (itemToDelete.image && typeof itemToDelete.image === 'object' && (itemToDelete.image as any)?.url) {
-                console.log('[handleDelete] Adding thumbnail URL:', (itemToDelete.image as any).url);
                 addToDeleteQueue((itemToDelete.image as any).url);
             }
             if (itemToDelete.content && typeof itemToDelete.content === 'string') {
-                console.log('[handleDelete] Content HTML:', itemToDelete.content.substring(0, 200));
                 const contentUrls = extractCloudinaryUrls(itemToDelete.content);
-                console.log('[handleDelete] Content URLs count:', contentUrls.length);
                 contentUrls.forEach(url => addToDeleteQueue(url));
             }
             if (itemToDelete.description && typeof itemToDelete.description === 'string') {
                 const descUrls = extractCloudinaryUrls(itemToDelete.description);
-                console.log('[handleDelete] Description URLs count:', descUrls.length);
                 descUrls.forEach(url => addToDeleteQueue(url));
             }
 
