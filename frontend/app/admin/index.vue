@@ -56,6 +56,7 @@ import SettingsView from "./components/views/SettingsView.vue";
 import { PAGE_CONFIGS, getAllPages, getPageConfig, isCollectionPage as checkIsCollection, getListingConfig, getDetailConfig } from "./config/page.config";
 import { useCollectionContext } from "./composables/useCollectionContext";
 import { usePreviewContext } from "./composables/usePreviewContext";
+import { useDeleteQueue } from "./composables/useDeleteQueue";
 import Toast from "./components/Toast.vue";
 import { useToast } from "./composables/useToast";
 
@@ -357,6 +358,52 @@ const openTagsManager = () => {
 };
 
 const handleSaveItem = async (data: any) => {
+    if (activePage.value === 'product') {
+        await handleSaveProduct(data);
+    } else if (collectionContext.value) {
+        await handleSaveGenericItem(data);
+    }
+};
+
+const handleSaveProduct = async (data: any) => {
+    isSaving.value = true;
+    try {
+        const { ProductsApiService } = await import('@/admin/services/products-api.service');
+
+        if (isNewItem.value) {
+            const newId = await collectionContext.value?.addItem(data as any);
+
+            if (newId) {
+                console.log('[handleSaveProduct] Created product with ID:', newId);
+                await ProductsApiService.syncCreate(newId, data);
+                console.log('[handleSaveProduct] Synced to Algolia');
+            }
+            toast.success("Đã thêm mới sản phẩm thành công!");
+        } else {
+            const id = data.id as string;
+            const { id: _, ...updateData } = data;
+
+            console.log('[handleSaveProduct] Updating product:', id);
+            await collectionContext.value?.updateItem(id, updateData as any);
+            await ProductsApiService.syncUpdate(id, updateData);
+            console.log('[handleSaveProduct] Synced update to Algolia');
+
+            toast.success("Đã cập nhật sản phẩm thành công!");
+        }
+        closeEditor();
+
+        if (previewContext.value) {
+            await previewContext.value.loadPreviews();
+        }
+    } catch (error: any) {
+        toast.error(error.message || "Có lỗi xảy ra!");
+        console.error("[Admin] Save product error:", error);
+    } finally {
+        isSaving.value = false;
+    }
+};
+
+const handleSaveGenericItem = async (data: any) => {
     if (!collectionContext.value) return;
 
     isSaving.value = true;
@@ -383,13 +430,65 @@ const handleSaveItem = async (data: any) => {
     }
 };
 
+const { addToDeleteQueue, processDeleteQueue, clearQueue } = useDeleteQueue();
+
+function extractCloudinaryUrls(html: string): string[] {
+    if (!html) return [];
+    const urls: string[] = [];
+    const regex = /https?:\/\/res\.cloudinary\.com\/[^"\s<>)]+/gi;
+    const matches = html.match(regex);
+    if (matches) {
+        urls.push(...matches);
+    }
+    console.log('[handleDelete] Extracted URLs from content:', urls);
+    return urls;
+}
+
 const handleDelete = async (item: Record<string, unknown>) => {
     if (!collectionContext.value) return;
 
     if (confirm(`Xóa "${item.name || item.title}"?`)) {
         isSaving.value = true;
+        clearQueue();
+
         try {
+            const fullItem = await collectionContext.value.getItem(item.id as string);
+            const itemToDelete = fullItem || item;
+
+            console.log('[handleDelete] Full item data:', itemToDelete);
+
+            if (itemToDelete.images && Array.isArray(itemToDelete.images)) {
+                itemToDelete.images.forEach((img: any) => {
+                    if (img?.url) {
+                        console.log('[handleDelete] Adding image URL:', img.url);
+                        addToDeleteQueue(img.url);
+                    }
+                });
+            }
+            if (itemToDelete.image && typeof itemToDelete.image === 'object' && (itemToDelete.image as any)?.url) {
+                console.log('[handleDelete] Adding thumbnail URL:', (itemToDelete.image as any).url);
+                addToDeleteQueue((itemToDelete.image as any).url);
+            }
+            if (itemToDelete.content && typeof itemToDelete.content === 'string') {
+                console.log('[handleDelete] Content HTML:', itemToDelete.content.substring(0, 200));
+                const contentUrls = extractCloudinaryUrls(itemToDelete.content);
+                console.log('[handleDelete] Content URLs count:', contentUrls.length);
+                contentUrls.forEach(url => addToDeleteQueue(url));
+            }
+            if (itemToDelete.description && typeof itemToDelete.description === 'string') {
+                const descUrls = extractCloudinaryUrls(itemToDelete.description);
+                console.log('[handleDelete] Description URLs count:', descUrls.length);
+                descUrls.forEach(url => addToDeleteQueue(url));
+            }
+
             await collectionContext.value.deleteItem(item.id as string);
+
+            if (activePage.value === 'product') {
+                const { ProductsApiService } = await import('@/admin/services/products-api.service');
+                await ProductsApiService.syncDelete(item.id as string);
+            }
+
+            await processDeleteQueue();
             toast.success("Đã xóa thành công!");
             if (previewContext.value) {
                 await previewContext.value.loadPreviews();
@@ -412,7 +511,6 @@ const handleLoadMore = async () => {
 const handleConfigUpdated = () => {
     toast.success("Đã cập nhật cấu hình!");
 };
-
 
 const syncUrlState = () => {
     const currentTab = isCollectionPage.value ? activeTab.value : activeContentTab.value;

@@ -8,6 +8,13 @@
         <div class="table-header">
             <h3>{{ filteredItemsCount }} sản phẩm</h3>
             <div class="header-actions">
+                <div class="search-input-wrapper">
+                    <Icon name="mdi:magnify" class="search-icon" />
+                    <input v-model="searchQuery" type="text" placeholder="Tìm kiếm sản phẩm..." class="search-input" @input="handleSearch" />
+                    <button v-if="searchQuery" @click="clearSearch" class="btn-clear-search">
+                        <Icon name="mdi:close" />
+                    </button>
+                </div>
                 <button @click="$emit('manage-categories')" class="btn-secondary">
                     <Icon name="mdi:cog" />
                     Danh mục
@@ -119,7 +126,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue';
+import { ProductsApiService } from '@/admin/services/products-api.service';
 
 const props = defineProps<{
     items: any[]
@@ -140,6 +148,10 @@ const currentPage = ref(1)
 const itemsPerPage = 10
 const selectedCategory = ref('')
 const selectedTags = ref<string[]>([])
+const searchQuery = ref('')
+const searchResults = ref<any[]>([])
+const isSearching = ref(false)
+let searchTimeout: NodeJS.Timeout | null = null
 
 const allPlaceholders = Array.from({ length: 50 }, (_, i) => ({
     id: `placeholder-${i + 1}`,
@@ -172,9 +184,9 @@ const availableTags = computed(() => {
 })
 
 const filteredItems = computed(() => {
-    const items = props.items.length > 0 ? props.items : allPlaceholders
+    const baseItems = searchQuery.value.trim() ? searchResults.value : (props.items.length > 0 ? props.items : allPlaceholders)
 
-    return items.filter(item => {
+    return baseItems.filter(item => {
         if (selectedCategory.value && item.category !== selectedCategory.value) {
             return false
         }
@@ -241,6 +253,35 @@ const clearFilters = () => {
     selectedCategory.value = ''
     selectedTags.value = []
     currentPage.value = 1
+}
+
+const handleSearch = () => {
+    if (searchTimeout) clearTimeout(searchTimeout)
+
+    searchTimeout = setTimeout(async () => {
+        if (!searchQuery.value.trim()) {
+            searchResults.value = []
+            isSearching.value = false
+            return
+        }
+
+        isSearching.value = true
+        try {
+            const { hits } = await ProductsApiService.search(searchQuery.value)
+            searchResults.value = hits
+        } catch (error) {
+            console.error('Search error:', error)
+            searchResults.value = []
+        } finally {
+            isSearching.value = false
+        }
+    }, 300)
+}
+
+const clearSearch = () => {
+    searchQuery.value = ''
+    searchResults.value = []
+    isSearching.value = false
 }
 
 watch([selectedCategory], () => {
@@ -402,6 +443,52 @@ function getDisplayTags(tags: any[]): string[] {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    color: #9ca3af;
+    font-size: 18px;
+    pointer-events: none;
+}
+
+.search-input {
+    padding: 10px 40px 10px 40px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 300px;
+    transition: all 0.2s;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.btn-clear-search {
+    position: absolute;
+    right: 8px;
+    padding: 4px;
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.btn-clear-search:hover {
+    background: #f3f4f6;
+    color: #374151;
 }
 
 .btn-secondary {

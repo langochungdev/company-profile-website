@@ -10,7 +10,12 @@ export default defineNuxtConfig({
         cloudinaryApiKey: "",
         cloudinaryApiSecret: "",
         firebaseServiceAccount: "",
+        algoliaAppId: "",
+        algoliaAdminKey: "",
+        algoliaIndexNameDev: "",
+        algoliaIndexNameProd: "",
         public: {
+            algoliaSearchKey: "",
             siteName: "",
             siteUrl: "",
             envIsProd: false,
