@@ -106,6 +106,7 @@ import ImageGallery from '@/admin/components/shared/ImageGallery.vue'
 import RichTextEditor from '@/admin/components/shared/RichTextEditor.vue'
 import { useCollectionConfig } from '@/admin/composables/useCollectionConfig'
 import { usePendingUploads } from '@/admin/composables/usePendingUploads'
+import { useRichTextImages } from '@/admin/composables/useRichTextImages'
 import { CollectionService } from '@/admin/services/collection.service'
 import type { Firestore } from 'firebase/firestore'
 
@@ -145,6 +146,7 @@ const formData = ref<ProductData>({
 
 const { config, loadConfig } = useCollectionConfig('collections/products/items')
 const { hasPending, clearAll, uploadAllPending, pendingUploads } = usePendingUploads();
+const { uploadPendingImages, clearPendingImages } = useRichTextImages();
 const { $db } = useNuxtApp();
 
 const categories = computed(() => config.value.categories.map(c => c.name))
@@ -164,6 +166,7 @@ watch(() => props.isOpen, async (newVal) => {
     if (newVal) {
         await loadConfig()
         clearAll()
+        clearPendingImages()
         slugError.value = ''
         manualSlugEdit.value = false
     }
@@ -272,47 +275,46 @@ const onSlugInput = () => {
 const handleSave = async () => {
     if (!isValid.value) return;
 
-    // Double check slug before saving
     await validateSlug(formData.value.slug);
     if (slugError.value) return;
 
-    if (!hasPending.value) {
-        emit('save', { ...formData.value })
-        return;
-    }
-
     isUploading.value = true;
-    uploadProgress.value = { current: 0, total: pendingUploads.value.length };
+    const totalUploads = pendingUploads.value.length;
+    uploadProgress.value = { current: 0, total: totalUploads };
 
     try {
-        const results = await uploadAllPending((current, total) => {
-            uploadProgress.value = { current, total };
-        });
+        let processedImages = formData.value.images;
+        let processedContent = formData.value.content;
 
-        // Replace pending images with uploaded URLs
-        const processedImages = formData.value.images.map(img => {
-            const pendingImg = img as any;
-            if (pendingImg.pending && pendingImg.fieldPath) {
-                const result = results.get(pendingImg.fieldPath);
-                if (result) {
-                    return {
-                        url: result.secure_url,
-                        alt: img.alt,
-                        width: result.width,
-                        height: result.height
-                    };
+        if (hasPending.value) {
+            const results = await uploadAllPending((current, total) => {
+                uploadProgress.value = { current, total };
+            });
+
+            processedImages = formData.value.images.map(img => {
+                const pendingImg = img as any;
+                if (pendingImg.pending && pendingImg.fieldPath) {
+                    const result = results.get(pendingImg.fieldPath);
+                    if (result) {
+                        return {
+                            url: result.secure_url,
+                            alt: img.alt,
+                            width: result.width,
+                            height: result.height
+                        };
+                    }
                 }
-            }
-            return img;
-        });
+                return img;
+            });
+        }
+
+        processedContent = await uploadPendingImages(formData.value.content, 'products/content');
 
         const finalData = {
             ...formData.value,
-            images: processedImages
+            images: processedImages,
+            content: processedContent
         };
-
-        // Clean up old images if needed (optional implementation: check deleted images)
-        // For now we assume ImageGallery handles removal interactions by just removing from array
 
         emit('save', finalData);
         clearAll();

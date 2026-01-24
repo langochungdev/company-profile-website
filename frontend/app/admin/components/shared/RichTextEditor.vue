@@ -73,11 +73,14 @@
         </div>
 
         <EditorContent :editor="editor" class="editor-content" />
+
+        <input ref="imageInput" type="file" accept="image/*" style="display: none" @change="onImageSelected" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { useEditor, EditorContent } from '@tiptap/vue-3'
+import { VueNodeViewRenderer } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
 import TextAlign from '@tiptap/extension-text-align'
@@ -85,7 +88,9 @@ import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
 import Placeholder from '@tiptap/extension-placeholder'
 import Youtube from '@tiptap/extension-youtube'
-import { watch } from 'vue'
+import { watch, ref } from 'vue'
+import { useRichTextImages } from '@/admin/composables/useRichTextImages'
+import ResizableImage from './ResizableImage.vue'
 
 const props = defineProps<{
     modelValue: string
@@ -112,8 +117,33 @@ const editor = useEditor({
             },
         }),
         Image.configure({
+            inline: true,
+            allowBase64: true,
             HTMLAttributes: {
                 class: 'editor-image',
+            },
+        }).extend({
+            addAttributes() {
+                return {
+                    ...this.parent?.(),
+                    width: {
+                        default: null,
+                        renderHTML: (attributes) => {
+                            if (!attributes.width) return {}
+                            return { width: attributes.width }
+                        },
+                    },
+                    height: {
+                        default: null,
+                        renderHTML: (attributes) => {
+                            if (!attributes.height) return {}
+                            return { height: attributes.height }
+                        },
+                    },
+                }
+            },
+            addNodeView() {
+                return VueNodeViewRenderer(ResizableImage as any)
             },
         }),
         Youtube.configure({
@@ -138,6 +168,9 @@ watch(() => props.modelValue, (newValue) => {
     }
 })
 
+const imageInput = ref<HTMLInputElement>()
+const { addPendingImage } = useRichTextImages()
+
 const setLink = () => {
     const url = window.prompt('Nhập URL:')
     if (url) {
@@ -146,10 +179,19 @@ const setLink = () => {
 }
 
 const addImage = () => {
-    const url = window.prompt('Nhập URL ảnh:')
-    if (url) {
-        editor.value?.chain().focus().setImage({ src: url }).run()
+    imageInput.value?.click()
+}
+
+const onImageSelected = (event: Event) => {
+    const target = event.target as HTMLInputElement
+    const file = target.files?.[0]
+
+    if (file && file.type.startsWith('image/')) {
+        const previewUrl = addPendingImage(file)
+        editor.value?.chain().focus().setImage({ src: previewUrl }).run()
     }
+
+    target.value = ''
 }
 
 const addYouTube = () => {
@@ -276,13 +318,6 @@ onBeforeUnmount(() => {
 .editor-content :deep(.ProseMirror a) {
     color: #3b82f6;
     text-decoration: underline;
-}
-
-.editor-content :deep(.ProseMirror .editor-image) {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin: 1em 0;
 }
 
 .editor-content :deep(.ProseMirror .editor-youtube) {
