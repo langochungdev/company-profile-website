@@ -76,7 +76,7 @@
                     <div class="related-grid">
                         <NuxtLink v-for="item in displayRelated" :key="item.id" :to="item.isPlaceholder ? '#' : `/product/${item.slug}`" class="related-card" :class="{ 'is-placeholder': item.isPlaceholder }">
                             <div class="related-image">
-                                <img :src="item.image" :alt="item.name" loading="lazy" />
+                                <img :src="getRelatedImage(item)" :alt="getRelatedImageAlt(item)" loading="lazy" />
                             </div>
                             <div class="related-info">
                                 <div class="related-category">{{ item.category }}</div>
@@ -123,15 +123,13 @@ const allMedia = computed(() => {
 
     const mediaList = []
 
-    if (product.value.image) {
-        mediaList.push({ type: 'image', url: product.value.image, caption: 'Ảnh chính' })
-    }
-
-    if (product.value.media?.length) {
-        mediaList.push(...product.value.media)
-    } else if (product.value.gallery?.length) {
-        product.value.gallery.forEach(img => {
-            mediaList.push({ type: 'image', url: img.url, caption: img.caption })
+    if (product.value.images?.length) {
+        product.value.images.forEach((img, index) => {
+            mediaList.push({
+                type: 'image',
+                url: img.url,
+                caption: img.alt || img.title || `Ảnh ${index + 1}`
+            })
         })
     }
 
@@ -139,7 +137,7 @@ const allMedia = computed(() => {
 })
 
 const selectedMedia = computed(() => {
-    return allMedia.value[selectedMediaIndex.value]?.url || product.value?.image || ''
+    return allMedia.value[selectedMediaIndex.value]?.url || product.value?.images?.[0]?.url || ''
 })
 
 const isVideoSelected = computed(() => {
@@ -159,6 +157,18 @@ const selectMedia = (index) => {
 
 const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
+}
+
+const getRelatedImage = (item) => {
+    if (item.image?.url) return item.image.url
+    if (item.images?.[0]?.url) return item.images[0].url
+    return item.image || item.images?.[0] || ''
+}
+
+const getRelatedImageAlt = (item) => {
+    if (item.image?.alt) return item.image.alt
+    if (item.images?.[0]?.alt) return item.images[0].alt
+    return item.name || ''
 }
 
 onMounted(async () => {

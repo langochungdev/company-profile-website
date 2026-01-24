@@ -18,7 +18,7 @@
             <div v-else class="product-grid">
                 <NuxtLink v-for="product in displayProducts" :key="product.id" :to="`/product/${product.slug}`" class="product-card">
                     <div class="card-image-wrapper">
-                        <img :src="product.image" :alt="product.name" class="product-img" loading="lazy" />
+                        <img :src="getProductImage(product)" :alt="getProductImageAlt(product)" class="product-img" loading="lazy" />
                         <div class="action-overlay">
                             <button class="btn-detail">Xem Chi Tiết</button>
                         </div>
@@ -81,6 +81,28 @@ const displayProducts = computed(() => {
 
 const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
+}
+
+const getProductImage = (product) => {
+    // Try new format: image object
+    if (product.image?.url) return product.image.url
+
+    // Try old format: images array
+    if (product.images?.[0]?.url) return product.images[0].url
+
+    // Fallback: direct string
+    return product.image || product.images?.[0] || ''
+}
+
+const getProductImageAlt = (product) => {
+    // Try new format: image object
+    if (product.image?.alt) return product.image.alt
+
+    // Try old format: images array
+    if (product.images?.[0]?.alt) return product.images[0].alt
+
+    // Fallback: product name
+    return product.name || ''
 }
 
 onMounted(() => {

@@ -21,6 +21,11 @@ export function extractPreview(data: Record<string, unknown>, fieldConfigs: Reco
         }
     }
 
+    // Special handling: extract first image from images[] array to image object
+    if (data.images && Array.isArray(data.images) && data.images.length > 0) {
+        preview.image = data.images[0];
+    }
+
     return preview;
 }
 

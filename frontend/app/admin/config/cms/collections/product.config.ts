@@ -17,9 +17,9 @@ export const productConfig = {
         slug: { type: "text", label: "Slug", isPreview: true },
         category: { type: "text", label: "Danh mục", isPreview: true },
         price: { type: "number", label: "Giá", isPreview: true },
-        images: { type: "array", label: "Hình ảnh", isPreview: true },
+        images: { type: "array", label: "Hình ảnh", previewCount: 0 },
         tags: { type: "dynamic-multi-select", label: "Tags", isPreview: true },
-        description: { type: "textarea", label: "Mô tả", isPreview: true },
+        description: { type: "textarea", label: "Mô tả", isPreview: true, previewMaxLength: 150 },
     },
 };
 
