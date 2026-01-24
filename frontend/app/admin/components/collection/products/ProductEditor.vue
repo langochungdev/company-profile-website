@@ -110,6 +110,7 @@ import RichTextEditor from '@/admin/components/shared/RichTextEditor.vue'
 import { useCollectionConfig } from '@/admin/composables/useCollectionConfig'
 import { usePendingUploads } from '@/admin/composables/usePendingUploads'
 import { useRichTextImages } from '@/admin/composables/useRichTextImages'
+import { useDeleteQueue } from '@/admin/composables/useDeleteQueue'
 import { CollectionService } from '@/admin/services/collection.service'
 import type { Firestore } from 'firebase/firestore'
 
@@ -150,6 +151,7 @@ const formData = ref<ProductData>({
 const { config, loadConfig } = useCollectionConfig('collections/products/items')
 const { hasPending, clearAll, uploadAllPending, pendingUploads } = usePendingUploads();
 const { uploadPendingImages, clearPendingImages } = useRichTextImages();
+const { addToDeleteQueue, processDeleteQueue, clearQueue } = useDeleteQueue();
 const { $db } = useNuxtApp();
 
 const categories = computed(() => config.value.categories.map(c => c.name))
@@ -170,6 +172,7 @@ watch(() => props.isOpen, async (newVal) => {
         await loadConfig()
         clearAll()
         clearPendingImages()
+        clearQueue()
         slugError.value = ''
         manualSlugEdit.value = false
     }
@@ -289,6 +292,17 @@ const handleSave = async () => {
         let processedImages = formData.value.images;
         let processedContent = formData.value.content;
 
+        // Track ảnh content cũ trước khi upload mới
+        if (!props.isNew && props.initialData?.content) {
+            const oldContentUrls = extractCloudinaryUrls(props.initialData.content);
+            const newContentUrls = extractCloudinaryUrls(formData.value.content);
+            oldContentUrls.forEach(url => {
+                if (!newContentUrls.includes(url)) {
+                    addToDeleteQueue(url);
+                }
+            });
+        }
+
         if (hasPending.value) {
             const results = await uploadAllPending((current, total) => {
                 uploadProgress.value = { current, total };
@@ -320,6 +334,10 @@ const handleSave = async () => {
         };
 
         emit('save', finalData);
+
+        // Xóa ảnh cũ trên Cloudinary
+        await processDeleteQueue();
+
         clearAll();
     } catch (error) {
         console.error("Upload failed:", error);
@@ -328,6 +346,16 @@ const handleSave = async () => {
         isUploading.value = false;
         uploadProgress.value = { current: 0, total: 0 };
     }
+}
+
+function extractCloudinaryUrls(html: string): string[] {
+    const urls: string[] = [];
+    const regex = /https:\/\/res\.cloudinary\.com\/[^"\s]+/g;
+    const matches = html.match(regex);
+    if (matches) {
+        urls.push(...matches);
+    }
+    return urls;
 }
 </script>
 

@@ -33,6 +33,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { usePendingUploads } from '@/admin/composables/usePendingUploads'
+import { useDeleteQueue } from '@/admin/composables/useDeleteQueue'
 import { resizeImage } from '@/admin/utils/imageResizer'
 
 interface ImageItem {
@@ -58,6 +59,7 @@ const emit = defineEmits<{
 }>()
 
 const { addPending, removePending } = usePendingUploads()
+const { addToDeleteQueue } = useDeleteQueue()
 
 const fileInput = ref<HTMLInputElement>()
 const canAddMore = computed(() => props.modelValue.length < props.max)
@@ -96,6 +98,10 @@ const removeImage = (index: number) => {
     const img = props.modelValue[index]
     if (img?.fieldPath) {
         removePending(img.fieldPath)
+    }
+    // Track Cloudinary URL để xóa sau khi save
+    if (img?.url && img.url.includes('cloudinary') && !img.pending) {
+        addToDeleteQueue(img.url)
     }
     const newImages = [...props.modelValue]
     newImages.splice(index, 1)
