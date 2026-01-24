@@ -202,30 +202,14 @@ const onImageSelected = async (event: Event) => {
 
         if (!editor.value) return
 
-        const { state } = editor.value
-        const { selection } = state
-        const { $from } = selection
-
-        // Nếu ảnh được insert ở đầu document, thêm paragraph trống phía trước
-        if ($from.pos === 1) {
-            editor.value
-                .chain()
-                .focus()
-                .insertContent([
-                    { type: 'paragraph' },
-                    { type: 'image', attrs: { src: previewUrl } },
-                    { type: 'paragraph' }
-                ])
-                .run()
-        } else {
-            // Insert ảnh với paragraph sau nó
-            editor.value
-                .chain()
-                .focus()
-                .setImage({ src: previewUrl })
-                .insertContent({ type: 'paragraph' })
-                .run()
-        }
+        editor.value
+            .chain()
+            .focus()
+            .insertContent([
+                { type: 'image', attrs: { src: previewUrl } },
+                { type: 'paragraph' }
+            ])
+            .run()
     }
 
     target.value = ''
