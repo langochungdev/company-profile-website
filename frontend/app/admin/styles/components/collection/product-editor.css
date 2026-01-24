@@ -67,6 +67,20 @@
     min-height: 0;
 }
 
+.form-grid-2cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-grid-desc-price {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
 .field-group {
     margin-bottom: 20px;
 }
@@ -109,6 +123,7 @@
     border: 1px solid #d1d5db;
     border-radius: 6px;
     font-size: 14px;
+    line-height: 1.5;
     transition: border-color 0.2s;
 }
 

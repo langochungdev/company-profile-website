@@ -50,7 +50,7 @@
                         </div>
 
                         <div class="description-section">
-                            <p>{{ product.description }}</p>
+                            <div class="richtext-content" v-html="product.description"></div>
                         </div>
 
                         <div class="action-buttons">

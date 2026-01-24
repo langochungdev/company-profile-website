@@ -1,5 +1,13 @@
 <template>
     <div class="tag-selector-wrapper">
+        <div class="tag-input">
+            <select v-model="selectedOption" @change="addTag">
+                <option value="">-- Chọn tag --</option>
+                <option v-for="opt in availableOptions" :key="opt" :value="opt">
+                    {{ opt }}
+                </option>
+            </select>
+        </div>
         <div class="selected-tags">
             <span v-for="(tag, index) in normalizedTags" :key="index" class="tag-badge">
                 {{ tag }}
@@ -9,14 +17,7 @@
             </span>
         </div>
 
-        <div class="tag-input">
-            <select v-model="selectedOption" @change="addTag">
-                <option value="">-- Chọn tag --</option>
-                <option v-for="opt in availableOptions" :key="opt" :value="opt">
-                    {{ opt }}
-                </option>
-            </select>
-        </div>
+
     </div>
 </template>
 

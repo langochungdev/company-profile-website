@@ -11,55 +11,58 @@
             </div>
 
             <form @submit.prevent="handleSave" class="modal-body">
-                <div class="field-group">
-                    <label>
-                        Tên sản phẩm <span class="required">*</span>
-                    </label>
-                    <input v-model="formData.name" type="text" maxlength="100" placeholder="Nhập tên sản phẩm..." required />
-                    <span class="char-count">{{ formData.name.length }}/100</span>
-                </div>
-
-                <div class="field-group">
-                    <label>Slug URL</label>
-                    <div class="slug-input-wrapper">
-                        <input v-model="formData.slug" type="text" placeholder="tu-dong-tao-tu-ten" :class="{ 'error': slugError }" @input="onSlugInput" @focus="onSlugFocus" />
-                        <span v-if="isCheckingSlug" class="slug-spinner">
-                            <Icon name="mdi:loading" class="spin" />
-                        </span>
+                <div class="form-grid-2cols">
+                    <div class="field-group">
+                        <label>
+                            Tên sản phẩm <span class="required">*</span>
+                        </label>
+                        <input v-model="formData.name" type="text" maxlength="100" placeholder="Nhập tên sản phẩm..." required />
+                        <span class="char-count">{{ formData.name.length }}/100</span>
                     </div>
-                    <p v-if="slugError" class="error-msg">{{ slugError }}</p>
-                    <p v-else class="hint">Để trống sẽ tự động tạo từ tên</p>
+
+                    <div class="field-group">
+                        <label>
+                            Danh mục <span class="required">*</span>
+                        </label>
+                        <select v-model="formData.category" required>
+                            <option value="">-- Chọn danh mục --</option>
+                            <option v-for="cat in categories" :key="cat" :value="cat">
+                                {{ cat }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="field-group">
+                        <label>Slug URL</label>
+                        <div class="slug-input-wrapper">
+                            <input v-model="formData.slug" type="text" placeholder="tu-dong-tao-tu-ten" :class="{ 'error': slugError }" @input="onSlugInput" @focus="onSlugFocus" />
+                            <span v-if="isCheckingSlug" class="slug-spinner">
+                                <Icon name="mdi:loading" class="spin" />
+                            </span>
+                        </div>
+                        <p v-if="slugError" class="error-msg">{{ slugError }}</p>
+                        <p v-else class="hint">Để trống sẽ tự động tạo từ tên</p>
+                    </div>
+
+                    <div class="field-group">
+                        <label>
+                            Tags (Nhóm sản phẩm)
+                        </label>
+                        <TagSelector v-model="formData.tags" :options="tags" />
+                    </div>
                 </div>
 
-                <div class="field-group">
-                    <label>
-                        Danh mục <span class="required">*</span>
-                    </label>
-                    <select v-model="formData.category" required>
-                        <option value="">-- Chọn danh mục --</option>
-                        <option v-for="cat in categories" :key="cat" :value="cat">
-                            {{ cat }}
-                        </option>
-                    </select>
-                </div>
+                <div class="form-grid-desc-price">
+                    <div class="field-group">
+                        <label>Tóm tắt</label>
+                        <RichTextEditor v-model="formData.description" placeholder="Mô tả ngắn gọn về sản phẩm..." simple />
+                    </div>
 
-                <div class="field-group">
-                    <label>
-                        Tags (Nhóm sản phẩm)
-                    </label>
-                    <TagSelector v-model="formData.tags" :options="tags" />
-                </div>
-
-                <div class="field-group">
-                    <label>Giá (VNĐ)</label>
-                    <input v-model.number="formData.price" type="number" min="0" placeholder="0" />
-                    <p class="hint">Để trống nếu liên hệ</p>
-                </div>
-
-                <div class="field-group">
-                    <label>Tóm tắt</label>
-                    <textarea v-model="formData.description" rows="4" maxlength="500" placeholder="Mô tả ngắn gọn về sản phẩm..." />
-                    <span class="char-count">{{ formData.description.length }}/500</span>
+                    <div class="field-group">
+                        <label>Giá (VNĐ)</label>
+                        <input v-model.number="formData.price" type="number" min="0" placeholder="0" />
+                        <p class="hint">Để trống nếu liên hệ</p>
+                    </div>
                 </div>
 
                 <div class="field-group">

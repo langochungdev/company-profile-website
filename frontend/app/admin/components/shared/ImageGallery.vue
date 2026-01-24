@@ -1,5 +1,14 @@
 <template>
     <div class="image-gallery-wrapper">
+        <div class="gallery-header">
+            <button v-if="canAddMore" type="button" class="btn-add-image" @click="triggerUpload">
+                <Icon name="mdi:plus" />
+                <span>Thêm ảnh</span>
+            </button>
+            <input ref="fileInput" type="file" accept="image/*" multiple @change="handleUpload" style="display: none" />
+            <span class="image-count">{{ modelValue.length }}/{{ max }}</span>
+        </div>
+
         <div v-if="modelValue.length > 0" class="gallery-grid">
             <div v-for="(img, index) in modelValue" :key="index" class="gallery-item">
                 <img :src="img.url" :alt="img.alt || 'Image'" />
@@ -15,14 +24,6 @@
             </div>
         </div>
 
-        <div v-if="canAddMore" class="upload-area">
-            <label class="upload-label">
-                <Icon name="mdi:cloud-upload" />
-                <span>Upload ảnh ({{ modelValue.length }}/{{ max }})</span>
-                <input type="file" accept="image/*" multiple @change="handleUpload" style="display: none" />
-            </label>
-        </div>
-
         <p v-if="modelValue.length < min" class="error-hint">
             Cần tối thiểu {{ min }} ảnh
         </p>
@@ -30,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { usePendingUploads } from '@/admin/composables/usePendingUploads'
 
 interface ImageItem {
@@ -57,7 +58,12 @@ const emit = defineEmits<{
 
 const { addPending, removePending } = usePendingUploads()
 
+const fileInput = ref<HTMLInputElement>()
 const canAddMore = computed(() => props.modelValue.length < props.max)
+
+const triggerUpload = () => {
+    fileInput.value?.click()
+}
 
 const handleUpload = (event: Event) => {
     const input = event.target as HTMLInputElement
@@ -115,7 +121,38 @@ const updateAlt = (index: number, newAlt: string) => {
 .image-gallery-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
+}
+
+.gallery-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-add-image {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-add-image:hover {
+    background: #1d4ed8;
+}
+
+.image-count {
+    font-size: 14px;
+    color: #6b7280;
+    font-weight: 500;
 }
 
 .gallery-grid {
@@ -177,27 +214,6 @@ const updateAlt = (index: number, newAlt: string) => {
     border: none;
     border-top: 1px solid #e5e7eb;
     font-size: 12px;
-}
-
-.upload-area {
-    border: 2px dashed #d1d5db;
-    border-radius: 8px;
-    padding: 24px;
-    text-align: center;
-}
-
-.upload-label {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    color: #6b7280;
-    transition: color 0.2s;
-}
-
-.upload-label:hover {
-    color: #2563eb;
 }
 
 .error-hint {

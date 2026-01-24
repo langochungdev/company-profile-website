@@ -1,5 +1,5 @@
 <template>
-    <div class="rich-text-editor">
+    <div class="rich-text-editor" :class="{ 'simple-mode': simple }">
         <div v-if="editor" class="toolbar">
             <button type="button" @click="editor.chain().focus().toggleBold().run()" :class="{ 'is-active': editor.isActive('bold') }" title="Bold">
                 <Icon name="mdi:format-bold" />
@@ -43,12 +43,14 @@
             <button type="button" @click="setLink" :class="{ 'is-active': editor.isActive('link') }" title="Link">
                 <Icon name="mdi:link-variant" />
             </button>
-            <button type="button" @click="addImage" title="Image">
-                <Icon name="mdi:image" />
-            </button>
-            <button type="button" @click="addYouTube" title="YouTube">
-                <Icon name="mdi:youtube" />
-            </button>
+            <template v-if="!simple">
+                <button type="button" @click="addImage" title="Image">
+                    <Icon name="mdi:image" />
+                </button>
+                <button type="button" @click="addYouTube" title="YouTube">
+                    <Icon name="mdi:youtube" />
+                </button>
+            </template>
 
             <div class="divider" />
 
@@ -95,6 +97,7 @@ import ResizableImage from './ResizableImage.vue'
 const props = defineProps<{
     modelValue: string
     placeholder?: string
+    simple?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -242,7 +245,7 @@ onBeforeUnmount(() => {
 .rich-text-editor {
     border: 1px solid #e5e7eb;
     border-radius: 8px;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .toolbar {
@@ -252,6 +255,13 @@ onBeforeUnmount(() => {
     background: #f9fafb;
     border-bottom: 1px solid #e5e7eb;
     flex-wrap: wrap;
+    border-radius: 8px 8px 0 0;
+}
+
+.rich-text-editor:not(.simple-mode) .toolbar {
+    position: sticky;
+    top: -25px;
+    z-index: 10;
 }
 
 .toolbar button {
@@ -291,8 +301,6 @@ onBeforeUnmount(() => {
 
 .editor-content {
     min-height: 200px;
-    max-height: 500px;
-    overflow-y: auto;
 }
 
 .editor-content :deep(.ProseMirror) {
