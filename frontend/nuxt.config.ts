@@ -12,8 +12,6 @@ export default defineNuxtConfig({
         firebaseServiceAccount: "",
         algoliaAppId: "",
         algoliaAdminKey: "",
-        algoliaIndexNameDev: "",
-        algoliaIndexNameProd: "",
         public: {
             algoliaSearchKey: "",
             siteName: "",

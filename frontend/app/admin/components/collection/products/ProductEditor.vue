@@ -67,9 +67,9 @@
 
                 <div class="field-group">
                     <label>
-                        Danh sách ảnh <span class="required">*</span>
+                        Danh sách ảnh
                     </label>
-                    <ImageGallery v-model="formData.images" :min="1" :max="10" />
+                    <ImageGallery v-model="formData.images" :min="0" :max="10" />
                     <p class="hint">Ảnh đầu tiên sẽ làm ảnh chính hiển thị ở danh sách</p>
                 </div>
 
@@ -181,7 +181,6 @@ watch(() => props.isOpen, async (newVal) => {
 const isValid = computed(() => {
     return formData.value.name.length > 0
         && formData.value.category !== ''
-        && formData.value.images.length > 0
         && !slugError.value
 })
 

@@ -20,13 +20,8 @@ export function getAlgoliaClient() {
 function getAlgoliaIndexName(): string {
     const config = useRuntimeConfig();
     const isProd = config.public.envIsProd;
-    const indexName = isProd ? config.algoliaIndexNameProd : config.algoliaIndexNameDev;
-
-    if (!indexName) {
-        throw new Error("Algolia index name missing in .env");
-    }
-
-    return indexName;
+    const prefix = isProd ? "prod_" : "dev_";
+    return `${prefix}PRODUCT`;
 }
 
 export async function saveToAlgolia(objectID: string, data: Record<string, any>) {
