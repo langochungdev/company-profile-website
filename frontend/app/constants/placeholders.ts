@@ -1,51 +1,23 @@
 /* Placeholder Data cho các Category Pages */
 
-export const PLACEHOLDER_PRODUCTS = [
-    {
-        id: "placeholder-1",
-        name: "Lorem ipsum dolor sit amet",
-        slug: "placeholder-product-1",
-        category: "Camera AI",
+const generatePlaceholderProducts = (count = 50) => {
+    const categories = ["Camera AI", "WiFi Doanh Nghiệp", "Switch & Router", "Báo Cháy", "Access Control"];
+    const names = ["Lorem ipsum dolor sit amet", "Consectetur adipiscing elit", "Sed do eiusmod tempor", "Ut enim ad minim veniam", "Quis nostrud exercitation", "Duis aute irure dolor", "Excepteur sint occaecat", "Cupidatat non proident"];
+
+    return Array.from({ length: count }, (_, i) => ({
+        id: `placeholder-${i + 1}`,
+        name: `${names[i % names.length]} ${i + 1}`,
+        slug: `placeholder-product-${i + 1}`,
+        category: categories[i % categories.length],
         description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-        image: "https://placehold.co/400x400/e2e8f0/94a3b8?text=400x400",
-        price: 12500000,
-        tags: [{ value: "An ninh" }, { value: "Giám sát" }],
+        image: { url: `https://placehold.co/400x400/e2e8f0/94a3b8?text=Product+${i + 1}`, alt: `Placeholder ${i + 1}` },
+        price: i % 3 === 0 ? null : (i + 1) * 1000000,
+        tags: [{ value: "Placeholder" }, { value: `Tag ${(i % 5) + 1}` }],
         isPlaceholder: true,
-    },
-    {
-        id: "placeholder-2",
-        name: "Consectetur adipiscing elit",
-        slug: "placeholder-product-2",
-        category: "WiFi Doanh Nghiệp",
-        description: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-        image: "https://placehold.co/400x400/e2e8f0/94a3b8?text=400x400",
-        price: null,
-        tags: [{ value: "Mạng" }, { value: "Doanh nghiệp" }],
-        isPlaceholder: true,
-    },
-    {
-        id: "placeholder-3",
-        name: "Sed do eiusmod tempor",
-        slug: "placeholder-product-3",
-        category: "Switch & Router",
-        description: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-        image: "https://placehold.co/400x400/e2e8f0/94a3b8?text=400x400",
-        price: 8900000,
-        tags: [{ value: "Hạ tầng" }, { value: "Mạng" }],
-        isPlaceholder: true,
-    },
-    {
-        id: "placeholder-4",
-        name: "Ut enim ad minim veniam",
-        slug: "placeholder-product-4",
-        category: "Báo Cháy",
-        description: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-        image: "https://placehold.co/400x400/e2e8f0/94a3b8?text=400x400",
-        price: 3500000,
-        tags: [{ value: "An toàn" }, { value: "Phòng cháy" }],
-        isPlaceholder: true,
-    },
-];
+    }));
+};
+
+export const PLACEHOLDER_PRODUCTS = generatePlaceholderProducts(50);
 
 export const PLACEHOLDER_SERVICES = [
     {
