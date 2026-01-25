@@ -14,7 +14,8 @@ export default defineEventHandler(async (event) => {
 
         const config = useRuntimeConfig();
         const isProd = config.public.envIsProd;
-        const indexName = isProd ? config.algoliaIndexNameProd : config.algoliaIndexNameDev;
+        const prefix = isProd ? "prod_" : "dev_";
+        const indexName = `${prefix}PRODUCT`;
         const client = algoliasearch(config.algoliaAppId, config.public.algoliaSearchKey);
 
         const { results } = await client.search({
