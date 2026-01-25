@@ -1,11 +1,9 @@
 <template>
-    <section class="contact-form-section">
+    <section class="contact-section">
         <div class="container">
             <div class="contact-grid">
                 <div class="contact-info">
-                    <h2 class="info-title">Thông Tin <span class="highlight">Liên Hệ</span></h2>
-                    <p class="info-desc">Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn. Hãy liên hệ qua các kênh dưới đây.</p>
-
+                    <h2 class="info-title">Thông Tin Liên Hệ</h2>
                     <div class="info-list">
                         <div v-for="item in contactInfo" :key="item.label" class="info-item">
                             <div class="info-icon-wrap">
@@ -25,53 +23,11 @@
                     </div>
                 </div>
 
-                <div class="form-wrapper">
-                    <h3 class="form-title">Gửi Yêu Cầu Tư Vấn</h3>
-                    <form @submit.prevent="handleSubmit" class="contact-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="name">Họ và tên *</label>
-                                <input type="text" id="name" v-model="form.name" placeholder="Nguyễn Văn A" required />
-                            </div>
-                            <div class="form-group">
-                                <label for="phone">Số điện thoại *</label>
-                                <input type="tel" id="phone" v-model="form.phone" placeholder="0901 234 567" required />
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" v-model="form.email" placeholder="email@example.com" />
-                        </div>
-                        <div class="form-group">
-                            <label for="service">Dịch vụ quan tâm</label>
-                            <select id="service" v-model="form.service">
-                                <option value="">Chọn dịch vụ</option>
-                                <option value="camera">Camera An Ninh AI</option>
-                                <option value="network">Hạ Tầng Mạng</option>
-                                <option value="wifi">WiFi & Firewall</option>
-                                <option value="access">Access Control</option>
-                                <option value="fire">Báo Cháy</option>
-                                <option value="pbx">Tổng Đài IP</option>
-                                <option value="other">Khác</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="message">Nội dung yêu cầu *</label>
-                            <textarea id="message" v-model="form.message" rows="4" placeholder="Mô tả chi tiết nhu cầu của bạn..." required></textarea>
-                        </div>
-                        <button type="submit" class="submit-btn" :disabled="isSubmitting">
-                            <span v-if="!isSubmitting">Gửi Yêu Cầu</span>
-                            <span v-else>Đang gửi...</span>
-                            <Icon name="mdi:send" />
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="map-section">
-                <h3 class="map-title">Vị Trí Văn Phòng</h3>
-                <div class="map-wrapper">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.4241674197956!2d106.69765841533417!3d10.778789792319392!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f38f9ed887b%3A0x14aded5703768989!2zUXXhuq1uIDEsIFRow6BuaCBwaOG7kSBI4buTIENow60gTWluaCwgVmnhu4d0IE5hbQ!5e0!3m2!1svi!2s!4v1704796800000" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Bản đồ SHT Security"></iframe>
+                <div class="office-location">
+                    <h2 class="location-title">Vị Trí Văn Phòng</h2>
+                    <div class="map-wrapper">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.4241674197956!2d106.69765841533417!3d10.778789792319392!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f38f9ed887b%3A0x14aded5703768989!2zUXXhuq1uIDEsIFRow6BuaCBwaOG7kSBI4buTIENow60gTWluaCwgVmnhu4d0IE5hbQ!5e0!3m2!1svi!2s!4v1704796800000" width="100%" height="350" style="border:0; border-radius: 1rem;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Bản đồ SHT Security"></iframe>
+                    </div>
                 </div>
             </div>
         </div>
@@ -79,16 +35,6 @@
 </template>
 
 <script setup>
-const form = ref({
-    name: '',
-    phone: '',
-    email: '',
-    service: '',
-    message: ''
-})
-
-const isSubmitting = ref(false)
-
 const contactInfo = [
     { label: 'Hotline', value: '0901 234 567', icon: 'mdi:phone' },
     { label: 'Email', value: 'info@sht.vn', icon: 'mdi:email' },
@@ -103,14 +49,10 @@ const socials = [
     { name: 'Zalo', icon: 'mdi:chat', url: 'https://zalo.me/0901234567' }
 ]
 
-const handleSubmit = () => {
-    isSubmitting.value = true
-    setTimeout(() => {
-        alert('Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong thời gian sớm nhất.')
-        form.value = { name: '', phone: '', email: '', service: '', message: '' }
-        isSubmitting.value = false
-    }, 1500)
-}
+useSeoMeta({
+    title: 'Liên Hệ - SHT Security',
+    description: 'Liên hệ với SHT Security để được tư vấn giải pháp an ninh tốt nhất. Hotline: 0901 234 567',
+})
 </script>
 
 <style scoped>
