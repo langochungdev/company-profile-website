@@ -118,7 +118,6 @@ export function usePreviewContext(collectionPath: string): PreviewContextResult 
         await loadPreviews({
             orderByField: currentOrderBy,
             orderDirection: currentDirection,
-            category: category || undefined,
         });
     };
 

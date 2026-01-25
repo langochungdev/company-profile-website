@@ -146,6 +146,10 @@ const allProducts = computed(() => {
         products = previews.value
     }
 
+    if (currentCategory.value && currentCategory.value !== 'Tất cả') {
+        products = products.filter(product => product.category === currentCategory.value)
+    }
+
     if (selectedTags.value.length > 0) {
         products = products.filter(product => {
             const productTags = getDisplayTags(product.tags || [])
