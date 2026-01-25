@@ -1,205 +1,157 @@
 <template>
     <NuxtLayout name="main">
-        <main v-if="loading" class="loading-wrapper">
+        <main class="category-projects-wrapper">
             <div class="container">
-                <Icon name="mdi:loading" class="spin loading-icon" />
-                <p>Đang tải dịch vụ...</p>
+                <div class="breadcrumb">
+                    <NuxtLink to="/service">Dịch vụ</NuxtLink>
+                    <Icon name="mdi:chevron-right" />
+                    <span>{{ categoryName }}</span>
+                </div>
+
+                <div class="category-header">
+                    <h1>{{ categoryName }}</h1>
+                    <p class="category-subtitle">{{ projects.length }} dự án đã hoàn thành</p>
+                </div>
+
+                <div v-if="projects.length === 0" class="empty-state">
+                    <Icon name="mdi:folder-open" class="empty-icon" />
+                    <h3>Chưa có dự án nào</h3>
+                    <p>Hạng mục này chưa có dự án được cập nhật</p>
+                </div>
+
+                <div v-else class="projects-grid">
+                    <article v-for="project in projects" :key="project.id" class="project-card" @click="openLightbox(project.images, 0)">
+                        <div class="card-thumbnail">
+                            <div class="thumbnail-grid">
+                                <div v-for="(image, idx) in project.images.slice(0, 4)" :key="idx" class="thumbnail-item">
+                                    <img :src="image.url" :alt="image.alt || `${project.name} - Hình ${idx + 1}`" loading="lazy" />
+                                </div>
+                            </div>
+                            <div class="thumbnail-overlay">
+                                <Icon name="mdi:magnify-plus" class="overlay-icon" />
+                                <span class="image-count">{{ project.images.length }} ảnh</span>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <h2 class="card-title">{{ project.name }}</h2>
+                            <p class="card-description">{{ project.description }}</p>
+                            <div class="card-meta">
+                                <span v-if="project.completedDate" class="meta-item">
+                                    <Icon name="mdi:calendar-check" />
+                                    {{ formatDate(project.completedDate) }}
+                                </span>
+                                <span v-if="project.location" class="meta-item">
+                                    <Icon name="mdi:map-marker" />
+                                    {{ project.location }}
+                                </span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
             </div>
         </main>
 
-        <main v-else class="service-detail-wrapper" :class="{ 'is-placeholder': displayService.isPlaceholder }">
-            <article class="service-detail-content">
-                <div class="container">
-                    <div class="service-grid">
-                        <div class="service-main">
-                            <div class="service-meta">
-                                <span class="meta-category">{{ displayService.category }}</span>
-                                <span class="meta-price">
-                                    <Icon name="mdi:currency-usd" />
-                                    {{ displayService.price }}
-                                </span>
-                            </div>
-
-                            <h1 class="service-title">{{ displayService.title || displayService.name }}</h1>
-
-                            <div class="service-thumbnail">
-                                <img :src="displayService.thumbnail || displayService.image" :alt="displayService.title || displayService.name" />
-                            </div>
-
-                            <div class="service-body">
-                                <p class="lead">{{ displayService.description }}</p>
-
-                                <div v-if="displayService.features?.length">
-                                    <h2>Tính Năng Nổi Bật</h2>
-                                    <div class="features-grid">
-                                        <div v-for="(feature, index) in displayService.features" :key="index" class="feature-box">
-                                            <Icon name="mdi:check-decagram" class="feature-icon" />
-                                            <span>{{ feature.text || feature }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div v-if="displayService.content" v-html="displayService.content"></div>
-
-                                <template v-else>
-                                    <h2>Giới Thiệu Dịch Vụ</h2>
-                                    <p>Chúng tôi cung cấp giải pháp chuyên nghiệp với đội ngũ kỹ thuật giàu kinh nghiệm, cam kết mang đến sự hài lòng tuyệt đối cho khách hàng.</p>
-
-                                    <h2>Quy Trình Triển Khai</h2>
-                                    <ul>
-                                        <li>Khảo sát và tư vấn giải pháp phù hợp</li>
-                                        <li>Thiết kế hệ thống chi tiết theo yêu cầu</li>
-                                        <li>Thi công lắp đặt chuyên nghiệp</li>
-                                        <li>Chạy thử và nghiệm thu hoàn thiện</li>
-                                        <li>Bảo hành và hỗ trợ kỹ thuật 24/7</li>
-                                    </ul>
-                                </template>
-                            </div>
-
-                            <div class="service-cta-box">
-                                <h3>Nhận Báo Giá Chi Tiết</h3>
-                                <p>Liên hệ ngay với chúng tôi để được tư vấn và báo giá miễn phí!</p>
-                                <NuxtLink to="/contact" class="cta-button">
-                                    <Icon name="mdi:phone-in-talk" />
-                                    Liên Hệ Tư Vấn
-                                </NuxtLink>
-                            </div>
-                        </div>
-
-                        <aside class="service-sidebar">
-                            <div class="sidebar-info">
-                                <h3>Thông Tin Dịch Vụ</h3>
-                                <div class="info-item">
-                                    <Icon name="mdi:tag" />
-                                    <div>
-                                        <span class="info-label">Danh mục:</span>
-                                        <span class="info-value">{{ displayService.category }}</span>
-                                    </div>
-                                </div>
-                                <div class="info-item">
-                                    <Icon name="mdi:cash" />
-                                    <div>
-                                        <span class="info-label">Giá:</span>
-                                        <span class="info-value">{{ displayService.price }}</span>
-                                    </div>
-                                </div>
-                                <div class="info-item">
-                                    <Icon name="mdi:shield-check" />
-                                    <div>
-                                        <span class="info-label">Bảo hành:</span>
-                                        <span class="info-value">12-60 tháng</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="sidebar-contact">
-                                <h3>Cần Hỗ Trợ?</h3>
-                                <p>Đội ngũ chuyên gia sẵn sàng tư vấn miễn phí</p>
-                                <a href="tel:0123456789" class="contact-btn">
-                                    <Icon name="mdi:phone" />
-                                    0123 456 789
-                                </a>
-                                <NuxtLink to="/contact" class="contact-btn secondary">
-                                    <Icon name="mdi:email" />
-                                    Gửi Yêu Cầu
-                                </NuxtLink>
-                            </div>
-
-                            <div class="sidebar-related" v-if="relatedServices.length">
-                                <h3>Dịch Vụ Liên Quan</h3>
-                                <div class="related-list">
-                                    <NuxtLink v-for="item in relatedServices" :key="item.id" :to="`/service/${item.slug}`" class="related-item">
-                                        <img :src="item.thumbnail || item.image" :alt="item.title || item.name" class="related-thumb" />
-                                        <div class="related-info">
-                                            <h4 class="related-title">{{ item.title || item.name }}</h4>
-                                            <span class="related-price">{{ item.price }}</span>
-                                        </div>
-                                    </NuxtLink>
-                                </div>
-                            </div>
-                        </aside>
-                    </div>
+        <Teleport to="body">
+            <div v-if="lightbox.show" class="lightbox-overlay" @click.self="closeLightbox">
+                <button class="lightbox-close" @click="closeLightbox">
+                    <Icon name="mdi:close" />
+                </button>
+                <button v-if="lightbox.images.length > 1" class="lightbox-nav prev" @click="prevImage">
+                    <Icon name="mdi:chevron-left" />
+                </button>
+                <div class="lightbox-content">
+                    <img :src="lightbox.images[lightbox.currentIndex]?.url" :alt="lightbox.images[lightbox.currentIndex]?.alt || 'Hình ảnh'" />
+                    <div class="lightbox-counter">{{ lightbox.currentIndex + 1 }} / {{ lightbox.images.length }}</div>
                 </div>
-            </article>
-        </main>
+                <button v-if="lightbox.images.length > 1" class="lightbox-nav next" @click="nextImage">
+                    <Icon name="mdi:chevron-right" />
+                </button>
+            </div>
+        </Teleport>
     </NuxtLayout>
 </template>
 
 <script setup>
 import { usePreviewContext } from '@/admin/composables/usePreviewContext'
-import { generateBreadcrumbSchema } from '@/admin/utils/schema-generator'
-import { PLACEHOLDER_SERVICE_DETAIL } from '@/constants/placeholders'
-
-const SITE_URL = 'https://sht.langochung.me'
+import { PLACEHOLDER_SERVICE_PROJECTS } from '@/constants/placeholders'
 
 const route = useRoute()
 const slug = route.params.slug
 
-const { previews, loading, loadPreviews } = usePreviewContext('collections/services/items')
+const loading = ref(true)
+const categoryName = ref('')
+const { previews, filterByCategory } = usePreviewContext('collections/services/items')
 
-const service = ref(null)
-const relatedServices = ref([])
-
-const displayService = computed(() => {
-    if (service.value) {
-        return service.value
+const projects = computed(() => {
+    if (previews.value && previews.value.length > 0) {
+        return previews.value
     }
-    return PLACEHOLDER_SERVICE_DETAIL
+    return PLACEHOLDER_SERVICE_PROJECTS
 })
 
-onMounted(async () => {
-    await loadPreviews({ limitCount: 50 })
-    service.value = previews.value.find(s => s.slug === slug)
-
-    if (service.value) {
-        relatedServices.value = previews.value.filter(s => s.category === service.value.category && s.id !== service.value.id).slice(0, 3)
-    }
+const lightbox = reactive({
+    show: false,
+    images: [],
+    currentIndex: 0,
 })
 
-const serviceSchema = computed(() => {
-    if (!service.value) return null
-    return {
-        "@context": "https://schema.org",
-        "@type": "Service",
-        name: service.value.title || service.value.name,
-        description: service.value.description,
-        image: service.value.thumbnail || service.value.image,
-        provider: {
-            "@type": "Organization",
-            name: "SHT Security",
-        },
-    }
+const formatDate = (date) => {
+    if (!date) return ''
+    const d = new Date(date)
+    return d.toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' })
+}
+
+const openLightbox = (images, startIndex) => {
+    lightbox.images = images
+    lightbox.currentIndex = startIndex
+    lightbox.show = true
+    document.body.style.overflow = 'hidden'
+}
+
+const closeLightbox = () => {
+    lightbox.show = false
+    document.body.style.overflow = ''
+}
+
+const nextImage = () => {
+    lightbox.currentIndex = (lightbox.currentIndex + 1) % lightbox.images.length
+}
+
+const prevImage = () => {
+    lightbox.currentIndex = (lightbox.currentIndex - 1 + lightbox.images.length) % lightbox.images.length
+}
+
+const handleKeydown = (e) => {
+    if (!lightbox.show) return
+    if (e.key === 'Escape') closeLightbox()
+    if (e.key === 'ArrowRight') nextImage()
+    if (e.key === 'ArrowLeft') prevImage()
+}
+
+onMounted(() => {
+    window.addEventListener('keydown', handleKeydown)
 })
 
-const breadcrumbSchema = computed(() => {
-    if (!service.value) return null
-    return generateBreadcrumbSchema([
-        { name: 'Trang Chủ', url: SITE_URL },
-        { name: 'Dịch Vụ', url: `${SITE_URL}/service` },
-        { name: service.value.title || service.value.name, url: `${SITE_URL}/service/${service.value.slug}` },
-    ])
+onUnmounted(() => {
+    window.removeEventListener('keydown', handleKeydown)
+    document.body.style.overflow = ''
 })
+
+    ; (async () => {
+        loading.value = true
+
+        categoryName.value = slug.split('-')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ')
+
+        await filterByCategory(categoryName.value)
+
+        loading.value = false
+    })()
 
 useSeoMeta({
-    title: () => service.value ? `${service.value.title || service.value.name} - SHT Security` : 'Dịch vụ không tồn tại',
-    description: () => service.value?.description || '',
-    ogTitle: () => service.value?.title || service.value?.name || '',
-    ogDescription: () => service.value?.description || '',
-    ogImage: () => service.value?.thumbnail || service.value?.image || '',
-})
-
-useHead({
-    script: computed(() => {
-        if (!service.value) return []
-        const scripts = []
-        if (serviceSchema.value) {
-            scripts.push({ type: 'application/ld+json', innerHTML: JSON.stringify(serviceSchema.value) })
-        }
-        if (breadcrumbSchema.value) {
-            scripts.push({ type: 'application/ld+json', innerHTML: JSON.stringify(breadcrumbSchema.value) })
-        }
-        return scripts
-    }),
+    title: () => `${categoryName.value} - Dịch Vụ SHT`,
+    description: () => `Các dự án ${categoryName.value} đã hoàn thành`,
 })
 </script>
 

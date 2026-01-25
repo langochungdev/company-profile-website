@@ -207,6 +207,20 @@ export const PLACEHOLDER_SERVICE_DETAIL = {
     isPlaceholder: true,
 };
 
+export const PLACEHOLDER_SERVICE_PROJECTS = Array.from({ length: 6 }, (_, i) => ({
+    id: `placeholder-${i + 1}`,
+    name: `Dự án mẫu ${i + 1}`,
+    description: `Mô tả chi tiết về dự án mẫu số ${i + 1}. Đây là dữ liệu placeholder được hiển thị khi chưa có dữ liệu thực hoặc đang tải từ Firestore.`,
+    categories: ["Danh mục mẫu"],
+    completedDate: new Date(2024, i % 12, 15).toISOString(),
+    location: `Địa điểm ${i + 1}`,
+    images: Array.from({ length: 4 + (i % 3) }, (_, j) => ({
+        url: `https://placehold.co/600x400/e2e8f0/94a3b8?text=Dự+án+${i + 1}+-+Hình+${j + 1}`,
+        alt: `Dự án mẫu ${i + 1} - Hình ${j + 1}`,
+    })),
+    isPlaceholder: true,
+}));
+
 export const PLACEHOLDER_POST_DETAIL = {
     id: "placeholder",
     title: "Bài viết mẫu",
