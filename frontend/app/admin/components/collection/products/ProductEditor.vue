@@ -148,7 +148,7 @@ const formData = ref<ProductData>({
     content: '',
 })
 
-const { config, loadConfig } = useCollectionConfig('collections/products/items')
+const { config, loadConfig } = useCollectionConfig('collections/products')
 const { hasPending, clearAll, uploadAllPending, pendingUploads } = usePendingUploads();
 const { uploadPendingImages, clearPendingImages } = useRichTextImages();
 const { addToDeleteQueue, processDeleteQueue, clearQueue } = useDeleteQueue();

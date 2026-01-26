@@ -13,15 +13,19 @@ export const serviceDetailConfig = {
 
     tableColumns: [
         { key: "name", label: "Tên dự án", type: "text-truncate", width: 250 },
-        { key: "category", label: "Danh mục", type: "badge", width: 150 },
-        { key: "location", label: "Địa điểm", type: "text", width: 180 },
+        { key: "categories", label: "Danh mục", type: "badge-list", width: 200 },
+        { key: "tags", label: "Tags", type: "badge-list", width: 180 },
+        { key: "location", label: "Địa điểm", type: "text", width: 150 },
         { key: "completedDate", label: "Ngày hoàn thành", type: "date", width: 130 },
         { key: "images", label: "Ảnh", type: "image", width: 100 },
     ] as TableColumn[],
 
     listConfig: {
         searchFields: ["name", "location", "description"],
-        filterBy: [{ field: "category", label: "Danh mục", options: [] }],
+        filterBy: [
+            { field: "categories", label: "Danh mục", options: [] },
+            { field: "tags", label: "Tags", options: [] },
+        ],
         sortOptions: [
             { field: "completedDate", label: "Ngày hoàn thành", direction: "desc" as const },
             { field: "name", label: "Tên dự án", direction: "asc" as const },
@@ -37,12 +41,21 @@ export const serviceDetailConfig = {
             isPreview: true,
         } as FieldConfig,
 
-        category: {
-            type: "dynamic-select",
+        categories: {
+            type: "dynamic-multi-select",
             label: "Danh mục",
             required: true,
             configKey: "categories",
             collectionPath: "collections/services/items",
+            isPreview: true,
+        } as FieldConfig,
+
+        tags: {
+            type: "dynamic-multi-select",
+            label: "Tags",
+            configKey: "tags",
+            collectionPath: "collections/products/items",
+            note: "Gắn tag từ danh sách sản phẩm",
             isPreview: true,
         } as FieldConfig,
 
@@ -86,7 +99,8 @@ export const serviceDetailConfig = {
 
     defaultValues: {
         name: "",
-        category: "",
+        categories: [],
+        tags: [],
         description: "",
         completedDate: new Date().toISOString().split("T")[0],
         location: "",

@@ -209,23 +209,26 @@ export const PLACEHOLDER_SERVICE_DETAIL = {
 
 const generatePlaceholderServiceProjects = (count = 160) => {
     const categories = ["Camera AI", "Mạng WiFi", "Hạ tầng mạng", "Báo cháy", "Kiểm soát ra vào", "Tổng đài IP", "Rào chắn", "Âm thanh"];
+    const tags = ["Giải pháp tổng thể", "Công nghệ mới", "Tiết kiệm chi phí", "Bảo hành dài hạn", "Lắp đặt nhanh"];
     const locations = ["Hà Nội", "TP.HCM", "Đà Nẵng", "Hải Phòng", "Cần Thơ", "Bình Dương", "Đồng Nai", "Bắc Ninh"];
     const projectTypes = ["Văn phòng", "Nhà máy", "Khu chung cư", "Trường học", "Bệnh viện", "Trung tâm thương mại", "Khách sạn", "Khu công nghiệp"];
 
     return Array.from({ length: count }, (_, i) => {
         const categoryIndex = i % categories.length;
-        const category = categories[categoryIndex] || "Camera AI";
+        const primaryCategory = categories[categoryIndex] || "Camera AI";
+        const secondaryCategory = i % 3 === 0 ? categories[(categoryIndex + 1) % categories.length] : null;
 
         return {
             id: `placeholder-${i + 1}`,
-            name: `${projectTypes[i % projectTypes.length]} ${category} ${i + 1}`,
-            category,
-            description: `Dự án lắp đặt hệ thống ${category} cho ${projectTypes[i % projectTypes.length]}. Đây là dữ liệu placeholder được hiển thị khi chưa có dữ liệu thực từ Firestore.`,
+            name: `${projectTypes[i % projectTypes.length]} ${primaryCategory} ${i + 1}`,
+            categories: secondaryCategory ? [primaryCategory, secondaryCategory] : [primaryCategory],
+            tags: Array.from({ length: (i % 3) + 1 }, (_, j) => tags[(i + j) % tags.length]),
+            description: `Dự án lắp đặt hệ thống ${primaryCategory} cho ${projectTypes[i % projectTypes.length]}. Đây là dữ liệu placeholder được hiển thị khi chưa có dữ liệu thực từ Firestore.`,
             completedDate: new Date(2024, (i * 2) % 12, ((i * 3) % 28) + 1).toISOString(),
             location: `${locations[i % locations.length]}, Việt Nam`,
             images: Array.from({ length: 4 + (i % 4) }, (_, j) => ({
-                url: `https://placehold.co/600x400/${j % 2 === 0 ? "e2e8f0/64748b" : "cbd5e1/475569"}?text=${encodeURIComponent(category)}+${i + 1}-${j + 1}`,
-                alt: `${category} - Dự án ${i + 1} - Hình ${j + 1}`,
+                url: `https://placehold.co/600x400/${j % 2 === 0 ? "e2e8f0/64748b" : "cbd5e1/475569"}?text=${encodeURIComponent(primaryCategory)}+${i + 1}-${j + 1}`,
+                alt: `${primaryCategory} - Dự án ${i + 1} - Hình ${j + 1}`,
             })),
             isPlaceholder: true,
         };

@@ -24,12 +24,8 @@
                         <label>
                             Danh mục <span class="required">*</span>
                         </label>
-                        <select v-model="formData.category" required>
-                            <option value="">-- Chọn danh mục --</option>
-                            <option v-for="cat in categories" :key="cat.id" :value="cat.name">
-                                {{ cat.name }}
-                            </option>
-                        </select>
+                        <TagSelector v-model="formData.categories" :options="categories" />
+                        <p class="hint">Có thể chọn nhiều danh mục</p>
                     </div>
 
                     <div class="field-group">
@@ -44,6 +40,12 @@
                             Địa điểm <span class="required">*</span>
                         </label>
                         <input v-model="formData.location" type="text" placeholder="VD: Hà Nội, Việt Nam" required />
+                    </div>
+
+                    <div class="field-group">
+                        <label>Tags (từ sản phẩm)</label>
+                        <TagSelector v-model="formData.tags" :options="tags" />
+                        <p class="hint">Gắn tag từ danh sách sản phẩm</p>
                     </div>
                 </div>
 
@@ -87,13 +89,15 @@
 
 <script setup lang="ts">
 import ImageGallery from '@/admin/components/shared/ImageGallery.vue'
+import TagSelector from '@/admin/components/shared/TagSelector.vue'
 import { useCollectionConfig } from '@/admin/composables/useCollectionConfig'
 import { usePendingUploads } from '@/admin/composables/usePendingUploads'
 
 interface ServiceData {
     id?: string
     name: string
-    category: string
+    categories: string[]
+    tags: string[]
     description: string
     completedDate: string
     location: string
@@ -115,12 +119,14 @@ const emit = defineEmits<{
     save: [data: ServiceData]
 }>()
 
-const { config, loadConfig } = useCollectionConfig('collections/services/items')
+const { config: serviceConfig, loadConfig: loadServiceConfig } = useCollectionConfig('collections/services')
+const { config: productConfig, loadConfig: loadProductConfig } = useCollectionConfig('collections/products')
 const { hasPending, clearAll, uploadAllPending, pendingUploads } = usePendingUploads()
 
 const formData = ref<ServiceData>({
     name: '',
-    category: '',
+    categories: [],
+    tags: [],
     description: '',
     completedDate: new Date().toISOString().split('T')[0] || '',
     location: '',
@@ -130,12 +136,13 @@ const formData = ref<ServiceData>({
 const isUploading = ref(false)
 const uploadProgress = ref({ current: 0, total: 0 })
 
-const categories = computed(() => config.value?.categories || [])
+const categories = computed(() => serviceConfig.value?.categories?.map(c => c.name) || [])
+const tags = computed(() => productConfig.value?.tags?.map(t => t.name) || [])
 
 const isValid = computed(() => {
     return (
         formData.value.name.trim() !== '' &&
-        formData.value.category !== '' &&
+        formData.value.categories.length > 0 &&
         formData.value.completedDate !== '' &&
         formData.value.location.trim() !== '' &&
         formData.value.images.length >= 4
@@ -194,11 +201,13 @@ const handleSave = async () => {
 
 watch(
     () => props.isOpen,
-    (open) => {
+    async (open) => {
         if (open) {
+            await Promise.all([loadServiceConfig(), loadProductConfig()])
             formData.value = {
                 name: props.initialData?.name || '',
-                category: props.initialData?.category || '',
+                categories: props.initialData?.categories || [],
+                tags: props.initialData?.tags || [],
                 description: props.initialData?.description || '',
                 completedDate: props.initialData?.completedDate || new Date().toISOString().split('T')[0] || '',
                 location: props.initialData?.location || '',
@@ -211,8 +220,8 @@ watch(
     { immediate: true }
 )
 
-onMounted(() => {
-    loadConfig()
+onMounted(async () => {
+    await Promise.all([loadServiceConfig(), loadProductConfig()])
 })
 </script>
 

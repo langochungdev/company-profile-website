@@ -33,7 +33,13 @@ export function useCollectionConfig(collectionPath: string): UseCollectionConfig
         return $db as Firestore;
     };
 
-    const getFullPath = () => getFirestorePath(collectionPath);
+    const getFullPath = () => {
+        let path = collectionPath;
+        if (path.endsWith("/items")) {
+            path = path.slice(0, -6);
+        }
+        return getFirestorePath(`${path}/config/settings`);
+    };
 
     const loadConfig = async () => {
         if (import.meta.server) return;

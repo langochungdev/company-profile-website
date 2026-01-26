@@ -1,4 +1,4 @@
-<!-- Chức năng: Popup quản lý Categories và Tags cho collection -->
+<!-- Chức năng: Popup quản lý Categories và Tags cho Products -->
 <template>
     <Teleport to="body">
         <div v-if="isOpen" class="config-manager-overlay" @mousedown.self="$emit('close')">
@@ -17,12 +17,12 @@
                     <button class="tab-btn" :class="{ active: activeTab === 'categories' }" @click="activeTab = 'categories'">
                         <Icon name="mdi:folder" />
                         <span>Danh mục</span>
-                        <span class="tab-count">{{ config.categories.length }}</span>
+                        <span class="tab-count">{{ categories.length }}</span>
                     </button>
                     <button class="tab-btn" :class="{ active: activeTab === 'tags' }" @click="activeTab = 'tags'">
                         <Icon name="mdi:tag" />
                         <span>Tags</span>
-                        <span class="tab-count">{{ config.tags.length }}</span>
+                        <span class="tab-count">{{ tags.length }}</span>
                     </button>
                 </div>
 
@@ -84,11 +84,14 @@
 
 <script setup lang="ts">
 import { useCollectionConfig } from "@/admin/composables/useCollectionConfig";
-import type { ConfigItem } from "@/admin/services/config.service";
+
+interface ConfigItem {
+    id: string;
+    name: string;
+}
 
 const props = defineProps<{
     isOpen: boolean;
-    collectionPath: string;
     initialTab?: "categories" | "tags";
 }>();
 
@@ -102,10 +105,13 @@ const newItemName = ref("");
 const editingId = ref<string | null>(null);
 const editingName = ref("");
 
-const { config, loading, loadConfig, addCategory, updateCategory, deleteCategory, addTag, updateTag, deleteTag } = useCollectionConfig(props.collectionPath);
+const { config, loading, loadConfig, addCategory, updateCategory, deleteCategory, addTag, updateTag, deleteTag } = useCollectionConfig("collections/products");
+
+const categories = computed(() => config.value.categories);
+const tags = computed(() => config.value.tags);
 
 const currentItems = computed(() => {
-    return activeTab.value === "categories" ? config.value.categories : config.value.tags;
+    return activeTab.value === "categories" ? categories.value : tags.value;
 });
 
 watch(
@@ -125,10 +131,7 @@ const handleAdd = async () => {
     const name = newItemName.value.trim();
     if (!name) return;
 
-    const isDuplicate = currentItems.value.some(
-        (item) => item.name.toLowerCase() === name.toLowerCase()
-    );
-
+    const isDuplicate = currentItems.value.some((item) => item.name.toLowerCase() === name.toLowerCase());
     if (isDuplicate) {
         alert(`"${name}" đã tồn tại!`);
         return;
@@ -141,7 +144,7 @@ const handleAdd = async () => {
             await addTag(name);
         }
         newItemName.value = "";
-        emit('updated');
+        emit("updated");
     } catch (error) {
         console.error("Add error:", error);
         alert("Có lỗi xảy ra khi thêm!");
@@ -157,10 +160,7 @@ const saveEdit = async () => {
     if (!editingId.value || !editingName.value.trim()) return;
 
     const name = editingName.value.trim();
-    const isDuplicate = currentItems.value.some(
-        (item) => item.id !== editingId.value && item.name.toLowerCase() === name.toLowerCase()
-    );
-
+    const isDuplicate = currentItems.value.some((item) => item.id !== editingId.value && item.name.toLowerCase() === name.toLowerCase());
     if (isDuplicate) {
         alert(`"${name}" đã tồn tại!`);
         return;
@@ -173,7 +173,7 @@ const saveEdit = async () => {
             await updateTag(editingId.value, name);
         }
         cancelEdit();
-        emit('updated');
+        emit("updated");
     } catch (error) {
         console.error("Update error:", error);
         alert("Có lỗi xảy ra khi cập nhật!");
@@ -194,7 +194,7 @@ const handleDelete = async (item: ConfigItem) => {
         } else {
             await deleteTag(item.id);
         }
-        emit('updated');
+        emit("updated");
     } catch (error) {
         console.error("Delete error:", error);
         alert("Có lỗi xảy ra khi xóa!");
@@ -203,5 +203,5 @@ const handleDelete = async (item: ConfigItem) => {
 </script>
 
 <style scoped>
-@import "../../styles/components/collection/config-manager.css";
+@import "../../../styles/components/collection/config-manager.css";
 </style>

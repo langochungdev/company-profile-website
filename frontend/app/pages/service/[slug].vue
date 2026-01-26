@@ -7,7 +7,7 @@
                     <p class="main-subtitle">Các dự án đã hoàn thành</p>
                 </div>
 
-                <div v-if="loading" class="loading-state">
+                <div v-if="previewLoading" class="loading-state">
                     <Icon name="mdi:loading" class="spin" />
                     <span>Đang tải...</span>
                 </div>
@@ -99,14 +99,14 @@ import { PLACEHOLDER_SERVICE_PROJECTS } from '@/constants/placeholders'
 const route = useRoute()
 const currentSlug = computed(() => route.params.slug)
 
-const loading = ref(false)
 const currentPage = ref(1)
 const itemsPerPage = 8
 
 const { config, loadConfig } = useCollectionConfig('collections/services/items')
-const { allPreviews, loadAll } = usePreviewContext('collections/services/items')
+const { allPreviews, loadAll, loading: previewLoading } = usePreviewContext('collections/services/items')
 
 const allProjects = computed(() => {
+    if (previewLoading.value) return []
     if (!allPreviews.value || allPreviews.value.length === 0) {
         return PLACEHOLDER_SERVICE_PROJECTS
     }
@@ -116,14 +116,14 @@ const allProjects = computed(() => {
 const categories = computed(() => {
     if (!config.value?.categories?.length) {
         return [
-            { id: '1', name: 'Camera AI', slug: 'camera-ai', projectCount: allProjects.value.filter(p => p.category === 'Camera AI').length },
-            { id: '2', name: 'Mạng WiFi', slug: 'mang-wifi', projectCount: allProjects.value.filter(p => p.category === 'Mạng WiFi').length },
-            { id: '3', name: 'Hạ tầng mạng', slug: 'ha-tang-mang', projectCount: allProjects.value.filter(p => p.category === 'Hạ tầng mạng').length },
-            { id: '4', name: 'Báo cháy', slug: 'bao-chay', projectCount: allProjects.value.filter(p => p.category === 'Báo cháy').length },
-            { id: '5', name: 'Kiểm soát ra vào', slug: 'kiem-soat-ra-vao', projectCount: allProjects.value.filter(p => p.category === 'Kiểm soát ra vào').length },
-            { id: '6', name: 'Tổng đài IP', slug: 'tong-dai-ip', projectCount: allProjects.value.filter(p => p.category === 'Tổng đài IP').length },
-            { id: '7', name: 'Rào chắn', slug: 'rao-chan', projectCount: allProjects.value.filter(p => p.category === 'Rào chắn').length },
-            { id: '8', name: 'Âm thanh', slug: 'am-thanh', projectCount: allProjects.value.filter(p => p.category === 'Âm thanh').length }
+            { id: '1', name: 'Camera AI', slug: 'camera-ai', projectCount: allProjects.value.filter(p => Array.isArray(p.categories) ? p.categories.includes('Camera AI') : p.category === 'Camera AI').length },
+            { id: '2', name: 'Mạng WiFi', slug: 'mang-wifi', projectCount: allProjects.value.filter(p => Array.isArray(p.categories) ? p.categories.includes('Mạng WiFi') : p.category === 'Mạng WiFi').length },
+            { id: '3', name: 'Hạ tầng mạng', slug: 'ha-tang-mang', projectCount: allProjects.value.filter(p => Array.isArray(p.categories) ? p.categories.includes('Hạ tầng mạng') : p.category === 'Hạ tầng mạng').length },
+            { id: '4', name: 'Báo cháy', slug: 'bao-chay', projectCount: allProjects.value.filter(p => Array.isArray(p.categories) ? p.categories.includes('Báo cháy') : p.category === 'Báo cháy').length },
+            { id: '5', name: 'Kiểm soát ra vào', slug: 'kiem-soat-ra-vao', projectCount: allProjects.value.filter(p => Array.isArray(p.categories) ? p.categories.includes('Kiểm soát ra vào') : p.category === 'Kiểm soát ra vào').length },
+            { id: '6', name: 'Tổng đài IP', slug: 'tong-dai-ip', projectCount: allProjects.value.filter(p => Array.isArray(p.categories) ? p.categories.includes('Tổng đài IP') : p.category === 'Tổng đài IP').length },
+            { id: '7', name: 'Rào chắn', slug: 'rao-chan', projectCount: allProjects.value.filter(p => Array.isArray(p.categories) ? p.categories.includes('Rào chắn') : p.category === 'Rào chắn').length },
+            { id: '8', name: 'Âm thanh', slug: 'am-thanh', projectCount: allProjects.value.filter(p => Array.isArray(p.categories) ? p.categories.includes('Âm thanh') : p.category === 'Âm thanh').length }
         ]
     }
 
@@ -136,7 +136,7 @@ const categories = computed(() => {
             .replace(/đ/g, 'd')
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/^-+|-+$/g, ''),
-        projectCount: allProjects.value.filter(p => p.category === cat.name).length
+        projectCount: allProjects.value.filter(p => Array.isArray(p.categories) ? p.categories.includes(cat.name) : p.category === cat.name).length
     }))
 })
 
@@ -146,7 +146,12 @@ const currentCategory = computed(() => {
 
 const filteredProjects = computed(() => {
     if (!currentCategory.value) return []
-    return allProjects.value.filter(p => p.category === currentCategory.value.name)
+    return allProjects.value.filter(p => {
+        if (Array.isArray(p.categories)) {
+            return p.categories.includes(currentCategory.value.name)
+        }
+        return p.category === currentCategory.value.name
+    })
 })
 
 const totalPages = computed(() => Math.ceil(filteredProjects.value.length / itemsPerPage))
@@ -223,9 +228,7 @@ watch(() => route.params.slug, () => {
 })
 
 onMounted(async () => {
-    loading.value = true
     await Promise.all([loadConfig(), loadAll()])
-    loading.value = false
     window.addEventListener('keydown', handleKeydown)
 })
 
