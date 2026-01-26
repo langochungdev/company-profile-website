@@ -52,7 +52,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="item in paginatedItems" :key="item.id" class="item-row" @click="$emit('edit', item)">
+                        <tr v-for="item in paginatedItems" :key="item.id" class="item-row" :class="{ 'is-placeholder': item.isPlaceholder }" @click="!item.isPlaceholder && $emit('edit', item)">
                             <td>
                                 <img :src="getImageUrl(item)" class="item-image" />
                             </td>
@@ -72,10 +72,10 @@
                                 <span class="item-date">{{ formatDate(item.completedDate) }}</span>
                             </td>
                             <td class="actions-cell">
-                                <button class="action-btn edit-btn" @click.stop="$emit('edit', item)" title="Sửa">
+                                <button v-if="!item.isPlaceholder" class="action-btn edit-btn" @click.stop="$emit('edit', item)" title="Sửa">
                                     <Icon name="mdi:pencil" />
                                 </button>
-                                <button class="action-btn delete-btn" @click.stop="$emit('delete', item)" title="Xóa">
+                                <button v-if="!item.isPlaceholder" class="action-btn delete-btn" @click.stop="$emit('delete', item)" title="Xóa">
                                     <Icon name="mdi:delete" />
                                 </button>
                             </td>
@@ -105,6 +105,7 @@ interface ServiceItem {
     location?: string
     completedDate?: string
     images?: Array<{ url: string; alt: string }>
+    isPlaceholder?: boolean
     [key: string]: unknown
 }
 
@@ -124,10 +125,24 @@ const searchQuery = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 10
 
+const allPlaceholders = Array.from({ length: 50 }, (_, i) => ({
+    id: `placeholder-${i + 1}`,
+    name: `Dự án mẫu ${i + 1}`,
+    categories: [['Camera AI', 'WiFi Doanh Nghiệp', 'Báo Cháy', 'Tổng Đài'][i % 4]],
+    location: ['Hà Nội', 'Hồ Chí Minh', 'Đà Nẵng', 'Cần Thơ'][i % 4] + ', Việt Nam',
+    completedDate: new Date(2024, i % 12, (i % 28) + 1).toISOString().split('T')[0],
+    images: [{ url: 'https://placehold.co/400x300/e2e8f0/94a3b8?text=No+Data', alt: 'Placeholder' }],
+    isPlaceholder: true
+} as ServiceItem))
+
+const baseItems = computed(() => {
+    return props.items.length > 0 ? props.items : allPlaceholders
+})
+
 const filteredItems = computed(() => {
-    if (!searchQuery.value) return props.items
+    if (!searchQuery.value) return baseItems.value
     const query = searchQuery.value.toLowerCase()
-    return props.items.filter(item =>
+    return baseItems.value.filter(item =>
         (item.name || '').toLowerCase().includes(query) ||
         (item.location || '').toLowerCase().includes(query) ||
         (item.categories || []).some(c => c.toLowerCase().includes(query))
@@ -362,6 +377,15 @@ const formatDate = (dateStr?: string) => {
 
 .item-row:hover {
     background: #f8fafc;
+}
+
+.item-row.is-placeholder {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.item-row.is-placeholder:hover {
+    background: transparent;
 }
 
 .item-image {
