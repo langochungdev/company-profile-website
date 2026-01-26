@@ -12,12 +12,12 @@
                     </div>
 
                     <nav class="nav-desktop" aria-label="Main navigation">
-                        <NuxtLink to="/" class="nav-link">Trang Chủ</NuxtLink>
-                        <NuxtLink to="/product" class="nav-link">Sản Phẩm</NuxtLink>
-                        <NuxtLink to="/service" class="nav-link">Dịch Vụ</NuxtLink>
-                        <NuxtLink to="/post" class="nav-link">Tin Tức</NuxtLink>
-                        <NuxtLink to="/about-us" class="nav-link">Giới Thiệu</NuxtLink>
-                        <NuxtLink to="/contact" class="nav-link">Liên Hệ</NuxtLink>
+                        <NuxtLink to="/" :class="['nav-link', isActive('/') && 'nav-link-active']">Trang Chủ</NuxtLink>
+                        <NuxtLink to="/product" :class="['nav-link', isActive('/product') && 'nav-link-active']">Sản Phẩm</NuxtLink>
+                        <NuxtLink to="/service" :class="['nav-link', isActive('/service') && 'nav-link-active']">Dịch Vụ</NuxtLink>
+                        <NuxtLink to="/post" :class="['nav-link', isActive('/post') && 'nav-link-active']">Tin Tức</NuxtLink>
+                        <NuxtLink to="/about-us" :class="['nav-link', isActive('/about-us') && 'nav-link-active']">Giới Thiệu</NuxtLink>
+                        <NuxtLink to="/contact" :class="['nav-link', isActive('/contact') && 'nav-link-active']">Liên Hệ</NuxtLink>
                     </nav>
 
                     <div class="cta-desktop">
@@ -32,12 +32,12 @@
                 <Transition enter-active-class="mobile-menu-enter-active" enter-from-class="mobile-menu-enter-from" enter-to-class="mobile-menu-enter-to" leave-active-class="mobile-menu-leave-active" leave-from-class="mobile-menu-leave-from" leave-to-class="mobile-menu-leave-to">
                     <div v-if="isMenuOpen" class="mobile-menu">
                         <nav class="mobile-nav">
-                            <NuxtLink to="/" class="mobile-nav-link" @click="isMenuOpen = false">Trang Chủ</NuxtLink>
-                            <NuxtLink to="/product" class="mobile-nav-link" @click="isMenuOpen = false">Sản Phẩm</NuxtLink>
-                            <NuxtLink to="/service" class="mobile-nav-link" @click="isMenuOpen = false">Dịch Vụ</NuxtLink>
-                            <NuxtLink to="/post" class="mobile-nav-link" @click="isMenuOpen = false">Tin Tức</NuxtLink>
-                            <NuxtLink to="/about-us" class="mobile-nav-link" @click="isMenuOpen = false">Giới Thiệu</NuxtLink>
-                            <NuxtLink to="/contact" class="mobile-nav-link" @click="isMenuOpen = false">Liên Hệ</NuxtLink>
+                            <NuxtLink to="/" :class="['mobile-nav-link', isActive('/') && 'mobile-nav-link-active']" @click="isMenuOpen = false">Trang Chủ</NuxtLink>
+                            <NuxtLink to="/product" :class="['mobile-nav-link', isActive('/product') && 'mobile-nav-link-active']" @click="isMenuOpen = false">Sản Phẩm</NuxtLink>
+                            <NuxtLink to="/service" :class="['mobile-nav-link', isActive('/service') && 'mobile-nav-link-active']" @click="isMenuOpen = false">Dịch Vụ</NuxtLink>
+                            <NuxtLink to="/post" :class="['mobile-nav-link', isActive('/post') && 'mobile-nav-link-active']" @click="isMenuOpen = false">Tin Tức</NuxtLink>
+                            <NuxtLink to="/about-us" :class="['mobile-nav-link', isActive('/about-us') && 'mobile-nav-link-active']" @click="isMenuOpen = false">Giới Thiệu</NuxtLink>
+                            <NuxtLink to="/contact" :class="['mobile-nav-link', isActive('/contact') && 'mobile-nav-link-active']" @click="isMenuOpen = false">Liên Hệ</NuxtLink>
                             <button class="cta-btn cta-mobile" @click="isMenuOpen = false">Báo Giá</button>
                         </nav>
                     </div>
@@ -60,6 +60,13 @@ const isHeaderTransparent = computed(() => {
     const isHome = route.path === '/' || route.path === '/home'
     return isHome && !scrolled.value
 })
+
+const isActive = (path) => {
+    if (path === '/') {
+        return route.path === '/' || route.path === '/home'
+    }
+    return route.path.startsWith(path)
+}
 
 const handleScroll = () => {
     const currentScrollY = window.scrollY
@@ -169,6 +176,21 @@ onUnmounted(() => {
 
 .nav-link:hover {
     color: #DC2626;
+}
+
+.nav-link-active {
+    color: #DC2626;
+    position: relative;
+}
+
+.nav-link-active::after {
+    content: '';
+    position: absolute;
+    bottom: -0.5rem;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #DC2626;
 }
 
 .dropdown {
@@ -341,7 +363,12 @@ onUnmounted(() => {
 }
 
 .mobile-nav {
-    display: flex;
+ 
+
+.mobile-nav-link-active {
+    color: #DC2626;
+    font-weight: 600;
+}   display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
