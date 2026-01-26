@@ -207,19 +207,32 @@ export const PLACEHOLDER_SERVICE_DETAIL = {
     isPlaceholder: true,
 };
 
-export const PLACEHOLDER_SERVICE_PROJECTS = Array.from({ length: 6 }, (_, i) => ({
-    id: `placeholder-${i + 1}`,
-    name: `Dự án mẫu ${i + 1}`,
-    description: `Mô tả chi tiết về dự án mẫu số ${i + 1}. Đây là dữ liệu placeholder được hiển thị khi chưa có dữ liệu thực hoặc đang tải từ Firestore.`,
-    categories: ["Danh mục mẫu"],
-    completedDate: new Date(2024, i % 12, 15).toISOString(),
-    location: `Địa điểm ${i + 1}`,
-    images: Array.from({ length: 4 + (i % 3) }, (_, j) => ({
-        url: `https://placehold.co/600x400/e2e8f0/94a3b8?text=Dự+án+${i + 1}+-+Hình+${j + 1}`,
-        alt: `Dự án mẫu ${i + 1} - Hình ${j + 1}`,
-    })),
-    isPlaceholder: true,
-}));
+const generatePlaceholderServiceProjects = (count = 160) => {
+    const categories = ["Camera AI", "Mạng WiFi", "Hạ tầng mạng", "Báo cháy", "Kiểm soát ra vào", "Tổng đài IP", "Rào chắn", "Âm thanh"];
+    const locations = ["Hà Nội", "TP.HCM", "Đà Nẵng", "Hải Phòng", "Cần Thơ", "Bình Dương", "Đồng Nai", "Bắc Ninh"];
+    const projectTypes = ["Văn phòng", "Nhà máy", "Khu chung cư", "Trường học", "Bệnh viện", "Trung tâm thương mại", "Khách sạn", "Khu công nghiệp"];
+
+    return Array.from({ length: count }, (_, i) => {
+        const categoryIndex = i % categories.length;
+        const category = categories[categoryIndex] || "Camera AI";
+
+        return {
+            id: `placeholder-${i + 1}`,
+            name: `${projectTypes[i % projectTypes.length]} ${category} ${i + 1}`,
+            category,
+            description: `Dự án lắp đặt hệ thống ${category} cho ${projectTypes[i % projectTypes.length]}. Đây là dữ liệu placeholder được hiển thị khi chưa có dữ liệu thực từ Firestore.`,
+            completedDate: new Date(2024, (i * 2) % 12, ((i * 3) % 28) + 1).toISOString(),
+            location: `${locations[i % locations.length]}, Việt Nam`,
+            images: Array.from({ length: 4 + (i % 4) }, (_, j) => ({
+                url: `https://placehold.co/600x400/${j % 2 === 0 ? "e2e8f0/64748b" : "cbd5e1/475569"}?text=${encodeURIComponent(category)}+${i + 1}-${j + 1}`,
+                alt: `${category} - Dự án ${i + 1} - Hình ${j + 1}`,
+            })),
+            isPlaceholder: true,
+        };
+    });
+};
+
+export const PLACEHOLDER_SERVICE_PROJECTS = generatePlaceholderServiceProjects(160);
 
 export const PLACEHOLDER_POST_DETAIL = {
     id: "placeholder",

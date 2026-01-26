@@ -20,11 +20,13 @@ interface LoadPreviewOptions {
 
 interface PreviewContextResult {
     previews: Ref<PreviewItem[]>;
+    allPreviews: Ref<PreviewItem[]>;
     loading: Ref<boolean>;
     error: Ref<Error | null>;
     totalPreviews: Ref<number>;
     hasMore: Ref<boolean>;
     loadPreviews: (options?: LoadPreviewOptions) => Promise<void>;
+    loadAll: () => Promise<void>;
     loadMore: () => Promise<void>;
     filterByCategory: (category: string | null) => Promise<void>;
 }
@@ -33,6 +35,7 @@ const DEFAULT_LIMIT = 10;
 
 export function usePreviewContext(collectionPath: string): PreviewContextResult {
     const previews = ref<PreviewItem[]>([]);
+    const allPreviews = ref<PreviewItem[]>([]);
     const loading = ref(false);
     const error = ref<Error | null>(null);
     const totalPreviews = ref(0);
@@ -121,13 +124,35 @@ export function usePreviewContext(collectionPath: string): PreviewContextResult 
         });
     };
 
+    const loadAll = async () => {
+        if (import.meta.server) return;
+
+        try {
+            const db = getDb();
+            const previewsPath = getPreviewsPath();
+
+            const queryOptions: PreviewQueryOptions = {
+                orderByField: "updatedAt",
+                orderDirection: "desc",
+                limitCount: 999,
+            };
+
+            const result = await PreviewService.getAll<PreviewItem>(db, previewsPath, queryOptions);
+            allPreviews.value = result.items;
+        } catch (e) {
+            console.error("[usePreviewContext] loadAll error:", e);
+        }
+    };
+
     return {
         previews,
+        allPreviews,
         loading,
         error,
         totalPreviews,
         hasMore,
         loadPreviews,
+        loadAll,
         loadMore,
         filterByCategory,
     };
