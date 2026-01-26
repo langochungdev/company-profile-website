@@ -186,7 +186,7 @@ const availableTags = computed(() => {
 const filteredItems = computed(() => {
     const baseItems = searchQuery.value.trim() ? searchResults.value : (props.items.length > 0 ? props.items : allPlaceholders)
 
-    return baseItems.filter(item => {
+    const filtered = baseItems.filter(item => {
         if (selectedCategory.value && item.category !== selectedCategory.value) {
             return false
         }
@@ -199,6 +199,8 @@ const filteredItems = computed(() => {
 
         return true
     })
+
+    return filtered.length > 0 ? filtered : allPlaceholders
 })
 
 const filteredItemsCount = computed(() => filteredItems.value.length)

@@ -20,13 +20,7 @@
                         </NuxtLink>
                     </div>
 
-                    <div v-if="filteredProjects.length === 0" class="empty-state">
-                        <Icon name="mdi:folder-open" class="empty-icon" />
-                        <h3>Chưa có dự án nào</h3>
-                        <p>Hạng mục này chưa có dự án được cập nhật</p>
-                    </div>
-
-                    <div v-else class="projects-grid">
+                    <div class="projects-grid">
                         <article v-for="project in paginatedProjects" :key="project.id" class="project-card" @click="openLightbox(project.images, 0)">
                             <div class="card-thumbnail">
                                 <div class="thumbnail-grid">
@@ -93,7 +87,6 @@
 
 <script setup>
 import { useCollectionConfig } from '@/admin/composables/useCollectionConfig'
-import { usePreviewContext } from '@/admin/composables/usePreviewContext'
 import { PLACEHOLDER_SERVICE_PROJECTS } from '@/constants/placeholders'
 
 const route = useRoute()
@@ -103,15 +96,39 @@ const currentPage = ref(1)
 const itemsPerPage = 8
 
 const { config, loadConfig } = useCollectionConfig('collections/services/items')
-const { allPreviews, loadAll, loading: previewLoading } = usePreviewContext('collections/services/items')
 
-const allProjects = computed(() => {
-    if (previewLoading.value) return []
-    if (!allPreviews.value || allPreviews.value.length === 0) {
-        return PLACEHOLDER_SERVICE_PROJECTS
+const allProjects = ref([])
+const loading = ref(false)
+
+const loadProjects = async () => {
+    loading.value = true
+    try {
+        const { $db } = useNuxtApp()
+        const { collection, getDocs } = await import('firebase/firestore')
+        const { getFirestorePath } = await import('@/admin/utils/firestore')
+
+        const path = getFirestorePath('collections/services/items')
+        const colRef = collection($db, path)
+        const snapshot = await getDocs(colRef)
+
+        const items = []
+        snapshot.forEach((doc) => {
+            items.push({
+                id: doc.id,
+                ...doc.data(),
+            })
+        })
+
+        allProjects.value = items.length > 0 ? items : PLACEHOLDER_SERVICE_PROJECTS
+    } catch (error) {
+        console.error('[Service] Load error:', error)
+        allProjects.value = PLACEHOLDER_SERVICE_PROJECTS
+    } finally {
+        loading.value = false
     }
-    return allPreviews.value
-})
+}
+
+const previewLoading = computed(() => loading.value)
 
 const categories = computed(() => {
     if (!config.value?.categories?.length) {
@@ -145,13 +162,14 @@ const currentCategory = computed(() => {
 })
 
 const filteredProjects = computed(() => {
-    if (!currentCategory.value) return []
-    return allProjects.value.filter(p => {
+    if (!currentCategory.value) return PLACEHOLDER_SERVICE_PROJECTS
+    const filtered = allProjects.value.filter(p => {
         if (Array.isArray(p.categories)) {
             return p.categories.includes(currentCategory.value.name)
         }
         return p.category === currentCategory.value.name
     })
+    return filtered.length > 0 ? filtered : PLACEHOLDER_SERVICE_PROJECTS
 })
 
 const totalPages = computed(() => Math.ceil(filteredProjects.value.length / itemsPerPage))
@@ -228,7 +246,7 @@ watch(() => route.params.slug, () => {
 })
 
 onMounted(async () => {
-    await Promise.all([loadConfig(), loadAll()])
+    await Promise.all([loadConfig(), loadProjects()])
     window.addEventListener('keydown', handleKeydown)
 })
 
