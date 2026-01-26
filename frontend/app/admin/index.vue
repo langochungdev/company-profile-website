@@ -36,9 +36,10 @@
         </main>
 
         <ProductEditor v-if="activePage === 'product'" :is-open="isEditorOpen" :is-new="isNewItem" :initial-data="editingItem" @close="closeEditor" @save="handleSaveItem" />
+        <ServiceEditor v-else-if="activePage === 'service'" :is-open="isEditorOpen" :is-new="isNewItem" :initial-data="editingItem" @close="closeEditor" @save="handleSaveItem" />
         <ItemEditor v-else-if="detailConfig" :is-open="isEditorOpen" :is-new="isNewItem" :item-name="getCollectionName" :config="detailConfig" :initial-data="editingItem" @close="closeEditor" @save="handleSaveItem" />
 
-        <ConfigManager v-if="detailConfig || activePage === 'product'" :is-open="isConfigOpen" :collection-path="activePage === 'product' ? 'collections/products/items' : detailConfig?.path || ''" :initial-tab="configTab" @close="isConfigOpen = false" @updated="handleConfigUpdated" />
+        <ConfigManager v-if="detailConfig || activePage === 'product' || activePage === 'service'" :is-open="isConfigOpen" :collection-path="activePage === 'product' ? 'collections/products/items' : activePage === 'service' ? 'collections/services/items' : detailConfig?.path || ''" :initial-tab="configTab" @close="isConfigOpen = false" @updated="handleConfigUpdated" />
         <Toast />
     </div>
 </template>
@@ -50,6 +51,7 @@ import ItemsManager from "./components/collection/ItemsManager.vue";
 import ItemEditor from "./components/collection/ItemEditor.vue";
 import ProductTable from "./components/collection/products/ProductTable.vue";
 import ProductEditor from "./components/collection/products/ProductEditor.vue";
+import ServiceEditor from "./components/collection/services/ServiceEditor.vue";
 import ConfigManager from "./components/collection/ConfigManager.vue";
 import LiveEditView from "./components/views/LiveEditView.vue";
 import SettingsView from "./components/views/SettingsView.vue";
