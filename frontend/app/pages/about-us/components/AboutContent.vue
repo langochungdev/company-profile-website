@@ -1,6 +1,16 @@
 <template>
     <section class="about-content">
         <div class="container">
+            <div class="hero-section">
+                <h1 class="hero-title">
+                    Câu Chuyện<br>
+                    <span class="highlight">SHT Security</span>
+                </h1>
+                <p class="hero-desc">
+                    Đối tác tin cậy trong lĩnh vực an ninh và hạ tầng mạng cho doanh nghiệp Việt Nam
+                </p>
+            </div>
+
             <div class="intro-section">
                 <div class="intro-image">
                     <img src="https://placehold.co/800x600/jpg?text=800x600" alt="Đội ngũ SHT Security" />
@@ -10,7 +20,7 @@
                     </div>
                 </div>
                 <div class="intro-text">
-                    <h2 class="section-title">Câu Chuyện <span class="highlight">SHT Security</span></h2>
+                    <h2 class="section-title">Về Chúng Tôi</h2>
                     <p class="intro-desc">
                         SHT Security được thành lập với sứ mệnh mang đến các giải pháp an ninh và hạ tầng mạng
                         tiên tiến nhất cho doanh nghiệp Việt Nam. Chúng tôi không chỉ cung cấp sản phẩm,
@@ -32,7 +42,10 @@
             </div>
 
             <div class="values-section">
-                <h2 class="section-title center">Giá Trị <span class="highlight">Cốt Lõi</span></h2>
+                <h2 class="section-title center">
+                    Giá Trị<br>
+                    <span class="highlight">Cốt Lõi</span>
+                </h2>
                 <div class="values-grid">
                     <div v-for="value in values" :key="value.title" class="value-card">
                         <div class="value-icon-wrap">
@@ -91,5 +104,6 @@ const values = [
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800;900&display=swap');
 @import "../styles/about-content.css";
 </style>
