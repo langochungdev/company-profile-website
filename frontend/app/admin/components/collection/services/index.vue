@@ -17,7 +17,6 @@ import ServiceEditor from './ServiceEditor.vue'
 import ServiceCategoryManager from './ServiceCategoryManager.vue'
 import ProductTagManager from '../products/ProductTagManager.vue'
 import { useCollectionContext } from '@/admin/composables/useCollectionContext'
-import { usePreviewContext } from '@/admin/composables/usePreviewContext'
 import { useDeleteQueue } from '@/admin/composables/useDeleteQueue'
 import { useToast } from '@/admin/composables/useToast'
 
@@ -29,10 +28,8 @@ const collectionContext = useCollectionContext({
     itemFields: {},
 })
 
-const previewContext = usePreviewContext('collections/services/items')
-
-const items = computed(() => previewContext.previews.value || [])
-const loading = ref(false)
+const items = computed(() => collectionContext.items.value || [])
+const loading = computed(() => collectionContext.loading.value)
 
 const isEditorOpen = ref(false)
 const isNewItem = ref(true)
@@ -41,11 +38,11 @@ const isCategoryManagerOpen = ref(false)
 const isTagManagerOpen = ref(false)
 
 const loadData = async () => {
-    loading.value = true
     try {
-        await previewContext.loadPreviews()
-    } finally {
-        loading.value = false
+        await collectionContext.loadItems()
+        console.log('[Services] Loaded items:', collectionContext.items.value)
+    } catch (error) {
+        console.error('[Services] Load error:', error)
     }
 }
 
@@ -89,7 +86,7 @@ const handleSave = async (data: any) => {
             toast.success('Đã cập nhật dự án thành công!')
         }
         closeEditor()
-        await previewContext.loadPreviews()
+        await collectionContext.loadItems()
     } catch (error: any) {
         toast.error(error.message || 'Có lỗi xảy ra!')
         console.error('[ServicePage] Save error:', error)
@@ -126,7 +123,7 @@ const handleDelete = async (item: Record<string, unknown>) => {
         await collectionContext.deleteItem(item.id as string)
         await processDeleteQueue()
         toast.success('Đã xóa dự án thành công!')
-        await previewContext.loadPreviews()
+        await collectionContext.loadItems()
     } catch (error: any) {
         toast.error(error.message || 'Có lỗi xảy ra khi xóa!')
         console.error('[ServicePage] Delete error:', error)
