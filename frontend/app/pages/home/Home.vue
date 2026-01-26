@@ -1,7 +1,7 @@
 <template>
     <NuxtLayout name="main">
         <ClientOnly>
-            <PageLoader />
+            <PageLoader v-if="shouldShowLoader" />
         </ClientOnly>
         <main>
             <HeroSection :data="(pageData?.hero as any)" />
@@ -34,7 +34,14 @@ type HomePageData = Record<string, Record<string, unknown>>
 
 const { data: pageData, loadData } = usePageData<HomePageData>('pages/home')
 
+const shouldShowLoader = ref(false)
+
 onMounted(() => {
+    const hasVisited = sessionStorage.getItem('home-visited')
+    if (!hasVisited) {
+        shouldShowLoader.value = true
+        sessionStorage.setItem('home-visited', 'true')
+    }
     loadData()
 })
 </script>
