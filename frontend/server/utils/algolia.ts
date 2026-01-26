@@ -17,16 +17,16 @@ export function getAlgoliaClient() {
     return algoliaClient;
 }
 
-function getAlgoliaIndexName(): string {
+function getAlgoliaIndexName(collection: "PRODUCT" | "SERVICE" = "PRODUCT"): string {
     const config = useRuntimeConfig();
     const isProd = config.public.envIsProd;
     const prefix = isProd ? "prod_" : "dev_";
-    return `${prefix}PRODUCT`;
+    return `${prefix}${collection}`;
 }
 
-export async function saveToAlgolia(objectID: string, data: Record<string, any>) {
+export async function saveToAlgolia(objectID: string, data: Record<string, any>, collection: "PRODUCT" | "SERVICE" = "PRODUCT") {
     const client = getAlgoliaClient();
-    const indexName = getAlgoliaIndexName();
+    const indexName = getAlgoliaIndexName(collection);
 
     await client.saveObject({
         indexName,
@@ -37,9 +37,9 @@ export async function saveToAlgolia(objectID: string, data: Record<string, any>)
     });
 }
 
-export async function updateInAlgolia(objectID: string, data: Record<string, any>) {
+export async function updateInAlgolia(objectID: string, data: Record<string, any>, collection: "PRODUCT" | "SERVICE" = "PRODUCT") {
     const client = getAlgoliaClient();
-    const indexName = getAlgoliaIndexName();
+    const indexName = getAlgoliaIndexName(collection);
 
     await client.partialUpdateObject({
         indexName,
@@ -48,9 +48,9 @@ export async function updateInAlgolia(objectID: string, data: Record<string, any
     });
 }
 
-export async function deleteFromAlgolia(objectID: string) {
+export async function deleteFromAlgolia(objectID: string, collection: "PRODUCT" | "SERVICE" = "PRODUCT") {
     const client = getAlgoliaClient();
-    const indexName = getAlgoliaIndexName();
+    const indexName = getAlgoliaIndexName(collection);
 
     await client.deleteObject({
         indexName,

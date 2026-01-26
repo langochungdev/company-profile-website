@@ -69,7 +69,7 @@
                     <label>
                         Danh sách ảnh
                     </label>
-                    <ImageGallery v-model="formData.images" :min="0" :max="10" />
+                    <ImageGallery v-model="formData.images" :min="0" :max="10" folder="products" />
                     <p class="hint">Ảnh đầu tiên sẽ làm ảnh chính hiển thị ở danh sách</p>
                 </div>
 

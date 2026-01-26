@@ -56,11 +56,9 @@
                 </div>
 
                 <div class="field-group">
-                    <label>
-                        Hình ảnh dự án <span class="required">*</span>
-                    </label>
-                    <ImageGallery v-model="formData.images" :min="4" :max="20" simple />
-                    <p class="hint">Tối thiểu 4 ảnh. Ảnh đầu tiên sẽ làm ảnh đại diện.</p>
+                    <label>Hình ảnh dự án</label>
+                    <ImageGallery v-model="formData.images" :min="0" :max="20" folder="services" simple />
+                    <p class="hint">Tối đa 20 ảnh. Ảnh đầu tiên sẽ làm ảnh đại diện.</p>
                 </div>
 
                 <div v-if="isUploading" class="upload-progress">
@@ -144,8 +142,7 @@ const isValid = computed(() => {
         formData.value.name.trim() !== '' &&
         formData.value.categories.length > 0 &&
         formData.value.completedDate !== '' &&
-        formData.value.location.trim() !== '' &&
-        formData.value.images.length >= 4
+        formData.value.location.trim() !== ''
     )
 })
 

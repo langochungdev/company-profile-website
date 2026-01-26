@@ -49,9 +49,11 @@ const props = withDefaults(defineProps<{
     modelValue: ImageItem[]
     min?: number
     max?: number
+    folder?: string
 }>(), {
     min: 1,
-    max: 10
+    max: 10,
+    folder: 'products'
 })
 
 const emit = defineEmits<{
@@ -79,7 +81,7 @@ const handleUpload = async (event: Event) => {
         const uniqueFieldPath = `images.${Date.now()}.${Math.random().toString(36).substring(7)}`
         const oldUrl = props.modelValue.length > 0 ? props.modelValue[props.modelValue.length - 1]?.url : undefined
 
-        const previewUrl = addPending(uniqueFieldPath, resizedFile, oldUrl, 'products')
+        const previewUrl = addPending(uniqueFieldPath, resizedFile, oldUrl, props.folder)
 
         const newImages = [...props.modelValue, {
             url: previewUrl,

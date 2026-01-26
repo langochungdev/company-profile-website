@@ -19,6 +19,7 @@ import ProductTagManager from '../products/ProductTagManager.vue'
 import { useCollectionContext } from '@/admin/composables/useCollectionContext'
 import { useDeleteQueue } from '@/admin/composables/useDeleteQueue'
 import { useToast } from '@/admin/composables/useToast'
+import { ServicesApiService } from '@/admin/services/services-api.service'
 
 const toast = useToast()
 const { addToDeleteQueue, processDeleteQueue, clearQueue } = useDeleteQueue()
@@ -29,7 +30,6 @@ const collectionContext = useCollectionContext({
 })
 
 const items = computed(() => collectionContext.items.value || [])
-const loading = computed(() => collectionContext.loading.value)
 
 const isEditorOpen = ref(false)
 const isNewItem = ref(true)
@@ -54,7 +54,6 @@ const openAddModal = () => {
 
 const openEditModal = async (item: Record<string, unknown>) => {
     isNewItem.value = false
-    loading.value = true
     try {
         const fullItem = await collectionContext.getItem(item.id as string)
         editingItem.value = fullItem ? { ...fullItem } : { ...item }
@@ -63,8 +62,6 @@ const openEditModal = async (item: Record<string, unknown>) => {
         console.error('[ServicePage] Load item error:', error)
         editingItem.value = { ...item }
         isEditorOpen.value = true
-    } finally {
-        loading.value = false
     }
 }
 
@@ -74,15 +71,18 @@ const closeEditor = () => {
 }
 
 const handleSave = async (data: any) => {
-    loading.value = true
     try {
         if (isNewItem.value) {
-            await collectionContext.addItem(data)
+            const newId = await collectionContext.addItem(data)
+            if (newId) {
+                await ServicesApiService.syncCreate(newId, data)
+            }
             toast.success('Đã thêm dự án thành công!')
         } else {
             const id = data.id as string
             const { id: _, ...updateData } = data
             await collectionContext.updateItem(id, updateData)
+            await ServicesApiService.syncUpdate(id, updateData)
             toast.success('Đã cập nhật dự án thành công!')
         }
         closeEditor()
@@ -90,11 +90,8 @@ const handleSave = async (data: any) => {
     } catch (error: any) {
         toast.error(error.message || 'Có lỗi xảy ra!')
         console.error('[ServicePage] Save error:', error)
-    } finally {
-        loading.value = false
     }
 }
-
 const extractCloudinaryUrls = (html: string): string[] => {
     if (!html) return []
     const regex = /https?:\/\/res\.cloudinary\.com\/[^"\s<>)]+/gi
@@ -104,7 +101,6 @@ const extractCloudinaryUrls = (html: string): string[] => {
 const handleDelete = async (item: Record<string, unknown>) => {
     if (!confirm(`Xóa "${item.name}"?`)) return
 
-    loading.value = true
     clearQueue()
 
     try {
@@ -121,14 +117,13 @@ const handleDelete = async (item: Record<string, unknown>) => {
         }
 
         await collectionContext.deleteItem(item.id as string)
+        await ServicesApiService.syncDelete(item.id as string)
         await processDeleteQueue()
         toast.success('Đã xóa dự án thành công!')
         await collectionContext.loadItems()
     } catch (error: any) {
         toast.error(error.message || 'Có lỗi xảy ra khi xóa!')
         console.error('[ServicePage] Delete error:', error)
-    } finally {
-        loading.value = false
     }
 }
 
@@ -141,7 +136,7 @@ onMounted(() => {
 })
 
 defineExpose({
-    loading,
+    loading: collectionContext.loading,
     refresh: loadData,
 })
 </script>

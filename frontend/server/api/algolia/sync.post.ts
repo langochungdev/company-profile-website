@@ -5,19 +5,20 @@ const SyncSchema = z.object({
     action: z.enum(["create", "update", "delete"]),
     objectID: z.string(),
     data: z.any().optional(),
+    collection: z.enum(["PRODUCT", "SERVICE"]).optional(),
 });
 
 export default defineEventHandler(async (event) => {
     try {
         const body = await readBody(event);
-        const { action, objectID, data } = SyncSchema.parse(body);
+        const { action, objectID, data, collection } = SyncSchema.parse(body);
 
         if (action === "create" && data) {
-            await saveToAlgolia(objectID, data);
+            await saveToAlgolia(objectID, data, collection);
         } else if (action === "update" && data) {
-            await updateInAlgolia(objectID, data);
+            await updateInAlgolia(objectID, data, collection);
         } else if (action === "delete") {
-            await deleteFromAlgolia(objectID);
+            await deleteFromAlgolia(objectID, collection);
         }
 
         return {
