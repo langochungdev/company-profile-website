@@ -7,6 +7,14 @@
                 <input v-model="searchQuery" type="text" placeholder="Tìm kiếm dự án..." class="search-input" />
             </div>
 
+            <div class="filter-select-wrapper">
+                <Icon name="mdi:folder" class="filter-icon" />
+                <select v-model="selectedCategory" class="filter-select">
+                    <option :value="null">Tất cả danh mục</option>
+                    <option v-for="cat in availableCategories" :key="cat" :value="cat">{{ cat }}</option>
+                </select>
+            </div>
+
             <div class="toolbar-actions">
                 <button class="config-btn categories-btn" @click="$emit('manage-categories')">
                     <Icon name="mdi:folder-multiple" />
@@ -125,6 +133,7 @@ const emit = defineEmits<{
 }>()
 
 const searchQuery = ref('')
+const selectedCategory = ref<string | null>(null)
 const currentPage = ref(1)
 const itemsPerPage = 10
 
@@ -142,14 +151,35 @@ const baseItems = computed(() => {
     return props.items.length > 0 ? props.items : allPlaceholders
 })
 
+const availableCategories = computed(() => {
+    const categories = new Set<string>()
+    baseItems.value.forEach(item => {
+        if (Array.isArray(item.categories)) {
+            item.categories.forEach(cat => categories.add(cat))
+        }
+    })
+    return Array.from(categories).sort()
+})
+
 const filteredItems = computed(() => {
-    if (!searchQuery.value) return baseItems.value
-    const query = searchQuery.value.toLowerCase()
-    return baseItems.value.filter(item =>
-        (item.name || '').toLowerCase().includes(query) ||
-        (item.location || '').toLowerCase().includes(query) ||
-        (item.categories || []).some(c => c.toLowerCase().includes(query))
-    )
+    let items = baseItems.value
+
+    if (selectedCategory.value) {
+        items = items.filter(item => 
+            Array.isArray(item.categories) && item.categories.includes(selectedCategory.value!)
+        )
+    }
+
+    if (searchQuery.value) {
+        const query = searchQuery.value.toLowerCase()
+        items = items.filter(item =>
+            (item.name || '').toLowerCase().includes(query) ||
+            (item.location || '').toLowerCase().includes(query) ||
+            (item.categories || []).some(c => c.toLowerCase().includes(query))
+        )
+    }
+
+    return items
 })
 
 const totalPages = computed(() => Math.ceil(filteredItems.value.length / itemsPerPage) || 1)
@@ -159,7 +189,7 @@ const paginatedItems = computed(() => {
     return filteredItems.value.slice(start, start + itemsPerPage)
 })
 
-watch(searchQuery, () => {
+watch([searchQuery, selectedCategory], () => {
     currentPage.value = 1
 })
 
@@ -236,6 +266,51 @@ const formatDate = (dateStr?: string) => {
     outline: none;
     font-size: 14px;
     width: 100%;
+}
+
+.filter-select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 200px;
+}
+
+.filter-icon {
+    position: absolute;
+    left: 12px;
+    color: #64748b;
+    font-size: 18px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.filter-select {
+    width: 100%;
+    padding: 8px 14px 8px 38px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1e293b;
+    cursor: pointer;
+    transition: all 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+}
+
+.filter-select:hover {
+    border-color: #cbd5e1;
+    background-color: #f8fafc;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .toolbar-actions {
