@@ -24,7 +24,16 @@ const { addToDeleteQueue, processDeleteQueue, clearQueue } = useDeleteQueue()
 
 const collectionContext = useCollectionContext({
     path: 'collections/products/items',
-    itemFields: {},
+    itemFields: {
+        name: { type: 'text', label: 'Tên', isPreview: true },
+        slug: { type: 'text', label: 'Slug', isPreview: true },
+        category: { type: 'text', label: 'Danh mục', isPreview: true },
+        tags: { type: 'dynamic-multi-select', label: 'Tags', isPreview: true },
+        description: { type: 'richtext', label: 'Mô tả', isPreview: true, previewMaxLength: 150 },
+        price: { type: 'number', label: 'Giá', isPreview: true },
+        image: { type: 'image', label: 'Ảnh', isPreview: true },
+        images: { type: 'array', label: 'Ảnh', isPreview: true, previewCount: 1 },
+    },
 })
 
 const previewContext = usePreviewContext('collections/products/items')
