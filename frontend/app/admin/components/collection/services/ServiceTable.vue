@@ -1,4 +1,4 @@
-<!-- Chức năng: Bảng danh sách dự án (Services) -->
+<!-- Chức năng: Bảng danh sách dự án (Services) - Card Layout -->
 <template>
     <div class="service-content">
         <div class="service-toolbar">
@@ -39,49 +39,51 @@
                 </button>
             </div>
 
-            <div v-else class="table-wrapper">
-                <table class="service-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 80px">Ảnh</th>
-                            <th>Tên dự án</th>
-                            <th style="width: 180px">Danh mục</th>
-                            <th style="width: 150px">Địa điểm</th>
-                            <th style="width: 120px">Ngày hoàn thành</th>
-                            <th style="width: 100px">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="item in paginatedItems" :key="item.id" class="item-row" :class="{ 'is-placeholder': item.isPlaceholder }" @click="!item.isPlaceholder && $emit('edit', item)">
-                            <td>
-                                <img :src="getImageUrl(item)" class="item-image" />
-                            </td>
-                            <td>
-                                <span class="item-name">{{ item.name }}</span>
-                            </td>
-                            <td>
-                                <div class="category-tags">
-                                    <span v-for="(cat, idx) in getCategoriesDisplay(item)" :key="idx" class="category-badge">{{ cat }}</span>
-                                    <span v-if="hasMoreCategories(item)" class="more-badge">+{{ getMoreCategoriesCount(item) }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="item-location">{{ item.location }}</span>
-                            </td>
-                            <td>
-                                <span class="item-date">{{ formatDate(item.completedDate) }}</span>
-                            </td>
-                            <td class="actions-cell">
-                                <button v-if="!item.isPlaceholder" class="action-btn edit-btn" @click.stop="$emit('edit', item)" title="Sửa">
-                                    <Icon name="mdi:pencil" />
-                                </button>
-                                <button v-if="!item.isPlaceholder" class="action-btn delete-btn" @click.stop="$emit('delete', item)" title="Xóa">
-                                    <Icon name="mdi:delete" />
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div v-else class="projects-grid">
+                <article v-for="item in paginatedItems" :key="item.id" class="project-card" :class="{ 'is-placeholder': item.isPlaceholder }">
+                    <div class="card-thumbnail">
+                        <div class="thumbnail-grid">
+                            <div v-for="(image, idx) in getDisplayImages(item)" :key="idx" class="thumbnail-item">
+                                <img :src="image.url" :alt="image.alt || `${item.name} - Hình ${idx + 1}`" />
+                            </div>
+                        </div>
+                        <div v-if="item.images && item.images.length > 4" class="image-count-badge">
+                            +{{ item.images.length - 4 }}
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">{{ item.name }}</h3>
+
+                        <div v-if="getDisplayCategories(item).length > 0" class="card-categories">
+                            <span v-for="(cat, idx) in getDisplayCategories(item)" :key="idx" class="category-badge">{{ cat }}</span>
+                            <span v-if="hasMoreCategories(item)" class="more-badge">+{{ getMoreCategoriesCount(item) }}</span>
+                        </div>
+
+                        <p v-if="item.description" class="card-description">{{ truncateText(item.description, 120) }}</p>
+
+                        <div class="card-meta">
+                            <span v-if="item.completedDate" class="meta-item">
+                                <Icon name="mdi:calendar-check" />
+                                {{ formatDate(item.completedDate) }}
+                            </span>
+                            <span v-if="item.location" class="meta-item">
+                                <Icon name="mdi:map-marker" />
+                                {{ item.location }}
+                            </span>
+                        </div>
+
+                        <div v-if="!item.isPlaceholder" class="card-actions">
+                            <button class="action-btn edit-btn" @click.stop="$emit('edit', item)" title="Sửa">
+                                <Icon name="mdi:pencil" />
+                                <span>Sửa</span>
+                            </button>
+                            <button class="action-btn delete-btn" @click.stop="$emit('delete', item)" title="Xóa">
+                                <Icon name="mdi:delete" />
+                                <span>Xóa</span>
+                            </button>
+                        </div>
+                    </div>
+                </article>
             </div>
 
             <div v-if="totalPages > 1" class="pagination">
@@ -101,6 +103,7 @@
 interface ServiceItem {
     id: string
     name?: string
+    description?: string
     categories?: string[]
     location?: string
     completedDate?: string
@@ -160,23 +163,31 @@ watch(searchQuery, () => {
     currentPage.value = 1
 })
 
-const getImageUrl = (item: ServiceItem) => {
-    if (item.images && item.images.length > 0 && item.images[0]?.url) {
-        return item.images[0].url
+const getDisplayImages = (item: ServiceItem) => {
+    if (!item.images || item.images.length === 0) {
+        return [{ url: '/images/placeholder.png', alt: 'Placeholder' }]
     }
-    return '/images/placeholder.png'
+    return item.images.slice(0, 4)
 }
 
-const getCategoriesDisplay = (item: ServiceItem) => {
-    return (item.categories || []).slice(0, 2)
+const getDisplayCategories = (item: ServiceItem) => {
+    if (!Array.isArray(item.categories)) return []
+    return item.categories.slice(0, 3)
 }
 
 const hasMoreCategories = (item: ServiceItem) => {
-    return item.categories && item.categories.length > 2
+    return Array.isArray(item.categories) && item.categories.length > 3
 }
 
 const getMoreCategoriesCount = (item: ServiceItem) => {
-    return item.categories ? item.categories.length - 2 : 0
+    if (!Array.isArray(item.categories)) return 0
+    return item.categories.length - 3
+}
+
+const truncateText = (text: string, maxLength: number) => {
+    if (!text) return ''
+    if (text.length <= maxLength) return text
+    return text.slice(0, maxLength) + '...'
 }
 
 const formatDate = (dateStr?: string) => {
@@ -256,27 +267,25 @@ const formatDate = (dateStr?: string) => {
 }
 
 .tags-btn {
-    background: #dbeafe;
-    color: #2563eb;
+    background: #ddd6fe;
+    color: #7c3aed;
 }
 
 .tags-btn:hover {
-    background: #bfdbfe;
+    background: #c4b5fd;
 }
 
 .service-list {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .list-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 20px;
-    border-bottom: 1px solid #e2e8f0;
+    padding: 0 4px;
 }
 
 .items-count {
@@ -289,20 +298,19 @@ const formatDate = (dateStr?: string) => {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 16px;
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    padding: 10px 18px;
+    background: #3b82f6;
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .add-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    background: #2563eb;
 }
 
 .empty-state {
@@ -310,18 +318,20 @@ const formatDate = (dateStr?: string) => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 60px 20px;
-    text-align: center;
+    padding: 80px 20px;
+    background: white;
+    border-radius: 12px;
+    border: 2px dashed #e2e8f0;
 }
 
 .empty-icon {
-    font-size: 48px;
+    font-size: 64px;
     color: #cbd5e1;
     margin-bottom: 16px;
 }
 
 .empty-state p {
-    color: #64748b;
+    color: #94a3b8;
     margin-bottom: 20px;
 }
 
@@ -329,145 +339,192 @@ const formatDate = (dateStr?: string) => {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 10px 20px;
-    background: #f1f5f9;
-    color: #475569;
-    border: 2px dashed #cbd5e1;
+    padding: 10px 18px;
+    background: #3b82f6;
+    color: white;
+    border: none;
     border-radius: 8px;
     font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s;
 }
 
-.add-first-btn:hover {
-    background: #e2e8f0;
-    border-color: #94a3b8;
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
 }
 
-.table-wrapper {
-    overflow-x: auto;
+.project-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s;
+    border: 1px solid #e2e8f0;
 }
 
-.service-table {
+.project-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+}
+
+.project-card.is-placeholder {
+    opacity: 0.6;
+}
+
+.card-thumbnail {
+    position: relative;
     width: 100%;
-    border-collapse: collapse;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: #f1f5f9;
 }
 
-.service-table th {
-    text-align: left;
-    padding: 12px 16px;
+.thumbnail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    width: 100%;
+    height: 100%;
+    gap: 2px;
+}
+
+.thumbnail-item {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.thumbnail-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-count-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
     font-size: 12px;
     font-weight: 600;
-    color: #64748b;
-    text-transform: uppercase;
-    background: #f8fafc;
-    border-bottom: 1px solid #e2e8f0;
 }
 
-.service-table td {
-    padding: 12px 16px;
-    border-bottom: 1px solid #f1f5f9;
-    vertical-align: middle;
+.card-content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.item-row {
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.item-row:hover {
-    background: #f8fafc;
-}
-
-.item-row.is-placeholder {
-    opacity: 0.6;
-    cursor: default;
-}
-
-.item-row.is-placeholder:hover {
-    background: transparent;
-}
-
-.item-image {
-    width: 56px;
-    height: 56px;
-    object-fit: cover;
-    border-radius: 8px;
-}
-
-.item-name {
-    font-weight: 500;
+.card-title {
+    font-size: 16px;
+    font-weight: 600;
     color: #1e293b;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-.category-tags {
+.card-categories {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 6px;
 }
 
 .category-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    background: #fef3c7;
-    color: #d97706;
+    padding: 4px 10px;
+    background: #dbeafe;
+    color: #1e40af;
+    border-radius: 12px;
     font-size: 11px;
     font-weight: 500;
-    border-radius: 4px;
 }
 
 .more-badge {
-    display: inline-block;
-    padding: 2px 6px;
-    background: #e2e8f0;
+    padding: 4px 8px;
+    background: #f1f5f9;
     color: #64748b;
+    border-radius: 12px;
     font-size: 11px;
-    border-radius: 4px;
+    font-weight: 500;
 }
 
-.item-location {
-    color: #64748b;
+.card-description {
     font-size: 13px;
-}
-
-.item-date {
     color: #64748b;
-    font-size: 13px;
+    line-height: 1.5;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-.actions-cell {
+.card-meta {
     display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: 8px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
     gap: 4px;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.meta-item .iconify {
+    font-size: 14px;
+}
+
+.card-actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 8px;
 }
 
 .action-btn {
-    width: 32px;
-    height: 32px;
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: none;
+    gap: 6px;
+    padding: 8px;
+    border: 1px solid #e2e8f0;
+    background: white;
     border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .edit-btn {
-    background: #dbeafe;
-    color: #2563eb;
+    color: #3b82f6;
 }
 
 .edit-btn:hover {
-    background: #bfdbfe;
+    background: #eff6ff;
+    border-color: #3b82f6;
 }
 
 .delete-btn {
-    background: #fee2e2;
-    color: #dc2626;
+    color: #ef4444;
 }
 
 .delete-btn:hover {
-    background: #fecaca;
+    background: #fef2f2;
+    border-color: #ef4444;
 }
 
 .pagination {
@@ -475,34 +532,35 @@ const formatDate = (dateStr?: string) => {
     align-items: center;
     justify-content: center;
     gap: 12px;
-    padding: 16px;
-    border-top: 1px solid #e2e8f0;
+    padding: 20px;
 }
 
 .pagination button {
-    width: 32px;
-    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 36px;
+    height: 36px;
     border: 1px solid #e2e8f0;
     background: white;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .pagination button:hover:not(:disabled) {
-    background: #f1f5f9;
+    background: #f8fafc;
+    border-color: #3b82f6;
 }
 
 .pagination button:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
 }
 
 .pagination span {
-    font-size: 13px;
+    font-size: 14px;
     color: #64748b;
+    font-weight: 500;
 }
 </style>
