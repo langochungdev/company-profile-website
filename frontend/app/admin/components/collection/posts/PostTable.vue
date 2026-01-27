@@ -56,10 +56,29 @@
 
             <div class="filter-group">
                 <label>Tags</label>
-                <div class="tags-filter">
-                    <button v-for="tag in availableTags.slice(0, 5)" :key="tag" @click="toggleTag(tag)" class="tag-filter-btn" :class="{ active: selectedTags.includes(tag) }">
-                        {{ tag }}
-                    </button>
+                <div class="multi-select-wrapper">
+                    <div class="multi-select-input" @click="toggleTagsDropdown">
+                        <span v-if="selectedTags.length === 0" class="placeholder">Chọn tags...</span>
+                        <div v-else class="selected-tags-display">
+                            <span v-for="tag in selectedTags.slice(0, 2)" :key="tag" class="selected-tag-chip">
+                                {{ tag }}
+                            </span>
+                            <span v-if="selectedTags.length > 2" class="tag-count">+{{ selectedTags.length - 2 }}</span>
+                        </div>
+                        <Icon name="mdi:chevron-down" class="dropdown-icon" />
+                    </div>
+                    <div v-if="showTagsDropdown" class="multi-select-dropdown">
+                        <div class="dropdown-search">
+                            <Icon name="mdi:magnify" class="search-icon-small" />
+                            <input v-model="tagSearchQuery" type="text" placeholder="Tìm tag..." class="dropdown-search-input" />
+                        </div>
+                        <div class="dropdown-options">
+                            <label v-for="tag in filteredAvailableTags" :key="tag" class="dropdown-option">
+                                <input type="checkbox" :value="tag" :checked="selectedTags.includes(tag)" @change="toggleTag(tag)" />
+                                <span>{{ tag }}</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -181,6 +200,8 @@ const selectedTags = ref<string[]>([])
 const searchQuery = ref('')
 const searchResults = ref<any[]>([])
 const isSearching = ref(false)
+const showTagsDropdown = ref(false)
+const tagSearchQuery = ref('')
 let searchTimeout: NodeJS.Timeout | null = null
 
 const allPlaceholders = Array.from({ length: 30 }, (_, i) => ({
@@ -214,6 +235,14 @@ const availableTags = computed(() => {
         }
     })
     return Array.from(tags).sort()
+})
+
+const filteredAvailableTags = computed(() => {
+    if (!tagSearchQuery.value.trim()) {
+        return availableTags.value
+    }
+    const search = tagSearchQuery.value.toLowerCase()
+    return availableTags.value.filter(tag => tag.toLowerCase().includes(search))
 })
 
 const filteredItems = computed(() => {
@@ -294,6 +323,13 @@ const toggleTag = (tag: string) => {
     currentPage.value = 1
 }
 
+const toggleTagsDropdown = () => {
+    showTagsDropdown.value = !showTagsDropdown.value
+    if (!showTagsDropdown.value) {
+        tagSearchQuery.value = ''
+    }
+}
+
 const clearFilters = () => {
     selectedCategory.value = ''
     selectedStatus.value = ''
@@ -334,6 +370,22 @@ const clearSearch = () => {
 watch([selectedCategory, selectedStatus, selectedFeatured], () => {
     currentPage.value = 1
 })
+
+onMounted(() => {
+    document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+    document.removeEventListener('click', handleClickOutside)
+})
+
+const handleClickOutside = (event: MouseEvent) => {
+    const target = event.target as HTMLElement
+    if (!target.closest('.multi-select-wrapper')) {
+        showTagsDropdown.value = false
+        tagSearchQuery.value = ''
+    }
+}
 
 function formatDate(dateString: string): string {
     if (!dateString) return 'N/A'
@@ -522,32 +574,133 @@ function getDisplayTags(tags: any[]): string[] {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.tags-filter {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+.multi-select-wrapper {
+    position: relative;
+    min-width: 250px;
 }
 
-.tag-filter-btn {
-    padding: 6px 12px;
+.multi-select-input {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
     border: 1px solid #d1d5db;
     border-radius: 6px;
-    font-size: 13px;
-    color: #374151;
     background: white;
     cursor: pointer;
+    min-height: 38px;
     transition: all 0.2s;
 }
 
-.tag-filter-btn:hover {
-    border-color: #3b82f6;
-    background: #eff6ff;
+.multi-select-input:hover {
+    border-color: #9ca3af;
 }
 
-.tag-filter-btn.active {
+.multi-select-input .placeholder {
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+.selected-tags-display {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+}
+
+.selected-tag-chip {
+    padding: 3px 8px;
+    background: #dbeafe;
+    color: #1e40af;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.tag-count {
+    padding: 3px 8px;
+    background: #e5e7eb;
+    color: #6b7280;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.dropdown-icon {
+    color: #9ca3af;
+    font-size: 18px;
+    transition: transform 0.2s;
+}
+
+.multi-select-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    max-height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.dropdown-search {
+    position: relative;
+    padding: 8px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.search-icon-small {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-size: 16px;
+    pointer-events: none;
+}
+
+.dropdown-search-input {
+    width: 100%;
+    padding: 6px 12px 6px 32px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.dropdown-search-input:focus {
+    outline: none;
     border-color: #3b82f6;
-    background: #3b82f6;
-    color: white;
+}
+
+.dropdown-options {
+    overflow-y: auto;
+    max-height: 250px;
+}
+
+.dropdown-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.dropdown-option:hover {
+    background: #f9fafb;
+}
+
+.dropdown-option input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.dropdown-option span {
+    font-size: 14px;
+    color: #374151;
 }
 
 .btn-clear-filters {

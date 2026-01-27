@@ -1,7 +1,7 @@
 <template>
     <NuxtLink :to="`/post/${post.slug}`" class="post-card group">
         <div class="card-image-wrapper">
-            <img :src="post.thumbnail" :alt="post.title" class="card-image" loading="lazy" />
+            <img :src="thumbnailUrl" :alt="thumbnailAlt" class="card-image" loading="lazy" />
             <div class="card-overlay">
                 <span class="read-more">Đọc Tiếp</span>
             </div>
@@ -21,7 +21,7 @@
             </div>
 
             <h3 class="card-title">{{ post.title }}</h3>
-            <p class="card-desc">{{ post.description }}</p>
+            <p class="card-desc">{{ post.excerpt || post.description }}</p>
 
             <div class="card-footer">
                 <span class="link-text">
@@ -34,11 +34,33 @@
 </template>
 
 <script setup>
-defineProps({
+const props = defineProps({
     post: {
         type: Object,
         required: true
     }
+})
+
+const thumbnailUrl = computed(() => {
+    if (!props.post.thumbnail) return '/images/placeholder.jpg'
+
+    if (typeof props.post.thumbnail === 'object' && props.post.thumbnail.url) {
+        return props.post.thumbnail.url
+    }
+
+    if (typeof props.post.thumbnail === 'string') {
+        return props.post.thumbnail
+    }
+
+    return '/images/placeholder.jpg'
+})
+
+const thumbnailAlt = computed(() => {
+    if (typeof props.post.thumbnail === 'object' && props.post.thumbnail.alt) {
+        return props.post.thumbnail.alt
+    }
+
+    return props.post.title
 })
 </script>
 

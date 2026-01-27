@@ -26,7 +26,7 @@
                         <h1 class="post-title">{{ displayPost.title }}</h1>
 
                         <div class="post-thumbnail">
-                            <img :src="displayPost.thumbnail || displayPost.image" :alt="displayPost.title" />
+                            <img :src="thumbnailUrl" :alt="displayPost.title" />
                         </div>
 
                         <div class="post-body" v-html="displayPost.content || defaultContent"></div>
@@ -66,7 +66,7 @@
                             <div class="related-grid">
                                 <NuxtLink v-for="item in relatedPosts" :key="item.id" :to="`/post/${item.slug}`" class="related-card">
                                     <div class="related-thumb-wrapper">
-                                        <img :src="item.thumbnail || item.image" :alt="item.title" class="related-thumb" />
+                                        <img :src="getRelatedThumbnail(item)" :alt="item.title" class="related-thumb" />
                                     </div>
                                     <div class="related-info">
                                         <span class="related-date">{{ item.publishedAt }}</span>
@@ -104,6 +104,20 @@ const displayPost = computed(() => {
     return PLACEHOLDER_POST_DETAIL
 })
 
+const thumbnailUrl = computed(() => {
+    if (!displayPost.value.thumbnail) return PLACEHOLDER_POST_DETAIL.thumbnail
+
+    if (typeof displayPost.value.thumbnail === 'object' && displayPost.value.thumbnail.url) {
+        return displayPost.value.thumbnail.url
+    }
+
+    if (typeof displayPost.value.thumbnail === 'string') {
+        return displayPost.value.thumbnail
+    }
+
+    return PLACEHOLDER_POST_DETAIL.thumbnail
+})
+
 const defaultContent = `
     <p class="lead">Bài viết đang được cập nhật nội dung...</p>
     <h2>Giới thiệu</h2>
@@ -112,17 +126,33 @@ const defaultContent = `
 
 onMounted(async () => {
     await loadPreviews({ limitCount: 50 })
-    post.value = previews.value.find(p => p.slug === slug)
+
+    const publishedPosts = previews.value.filter(p => p.status === 'published')
+    post.value = publishedPosts.find(p => p.slug === slug)
 
     if (post.value) {
-        relatedPosts.value = previews.value.filter(p => p.category === post.value.category && p.id !== post.value.id).slice(0, 3)
+        relatedPosts.value = publishedPosts
+            .filter(p => p.category === post.value.category && p.id !== post.value.id)
+            .slice(0, 3)
     }
 })
+
+const getRelatedThumbnail = (item) => {
+    if (!item.thumbnail) return '/images/placeholder.jpg'
+    if (typeof item.thumbnail === 'object' && item.thumbnail.url) {
+        return item.thumbnail.url
+    }
+    if (typeof item.thumbnail === 'string') {
+        return item.thumbnail
+    }
+    return '/images/placeholder.jpg'
+}
 
 const postSchema = computed(() => {
     if (!post.value) return null
     return generatePostSchema(post.value, SITE_URL)
 })
+
 
 const breadcrumbSchema = computed(() => {
     if (!post.value) return null

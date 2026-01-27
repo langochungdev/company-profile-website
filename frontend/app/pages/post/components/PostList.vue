@@ -2,7 +2,7 @@
     <section class="post-list-wrapper">
         <div class="container">
             <div class="filter-bar">
-                <button v-for="cat in categories" :key="cat" class="filter-btn" :class="{ active: currentCategory === cat }" @click="setCategory(cat)">
+                <button v-for="cat in displayCategories" :key="cat" class="filter-btn" :class="{ active: currentCategory === cat }" @click="setCategory(cat)">
                     {{ cat }}
                 </button>
             </div>
@@ -31,25 +31,38 @@
     </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import PostItem from './PostItem.vue'
 import { usePreviewContext } from '@/admin/composables/usePreviewContext'
 import { PLACEHOLDER_POSTS } from '@/constants/placeholders'
+import { PageService } from '@/admin/services/page.service'
+import type { Firestore } from 'firebase/firestore'
 
-const POST_CATEGORIES = ['Tất cả', 'Công nghệ', 'Hướng dẫn', 'Tin tức', 'Sự kiện']
-
-const categories = POST_CATEGORIES
+const categories = ref<string[]>([])
 const currentCategory = ref('Tất cả')
 const currentPage = ref(1)
 const itemsPerPage = 9
 
-const { previews, loading, loadPreviews, filterByCategory } = usePreviewContext('collections/posts/items')
+const { previews, loading, loadPreviews } = usePreviewContext('collections/posts/items')
+
+const displayCategories = computed(() => {
+    return ['Tất cả', ...categories.value]
+})
+
+const publishedPosts = computed(() => {
+    return previews.value.filter(post => post.status === 'published')
+})
 
 const displayPosts = computed(() => {
-    if (previews.value.length === 0 && !loading.value) {
+    if (publishedPosts.value.length === 0 && !loading.value) {
         return PLACEHOLDER_POSTS
     }
-    return previews.value
+
+    if (currentCategory.value === 'Tất cả') {
+        return publishedPosts.value
+    }
+
+    return publishedPosts.value.filter(post => post.category === currentCategory.value)
 })
 
 const totalPages = computed(() => Math.ceil(displayPosts.value.length / itemsPerPage) || 1)
@@ -76,24 +89,35 @@ const displayedPages = computed(() => {
     return pages
 })
 
-const goToPage = (page) => {
+const goToPage = (page: number) => {
     if (page < 1 || page > totalPages.value) return
     currentPage.value = page
     window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-onMounted(() => {
-    loadPreviews({ limitCount: 100 })
+const loadCategories = async () => {
+    try {
+        const { $db } = useNuxtApp()
+        const db = $db as Firestore
+        const configData = await PageService.get(db, 'collections/posts/config/settings')
+
+        if (configData?.categories && Array.isArray(configData.categories)) {
+            categories.value = configData.categories.map((cat: any) => cat.name || cat)
+        }
+    } catch (error) {
+        console.error('[PostList] Failed to load categories:', error)
+    }
+}
+
+onMounted(async () => {
+    await loadCategories()
+    await loadPreviews({ limitCount: 100 })
 })
 
-const setCategory = async (cat) => {
+const setCategory = (cat: string) => {
     currentCategory.value = cat
     currentPage.value = 1
-    if (cat === 'Tất cả') {
-        await filterByCategory(null)
-    } else {
-        await filterByCategory(cat)
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 watch(() => currentCategory.value, () => {
