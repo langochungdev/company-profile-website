@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, defineAsyncComponent, computed } from "vue";
+import { ref, watch, onMounted, defineAsyncComponent, computed, toRef } from "vue";
 import EditableSection from "./EditableSection.vue";
 import FieldPopupEditor from "./FieldPopupEditor.vue";
 import { useLiveEdit } from "../../composables/useLiveEdit";
@@ -54,7 +54,8 @@ const emit = defineEmits<{
     "saving-change": [isSaving: boolean];
 }>();
 
-const { config, isDirty, isSaving, isLoading, editTarget, isPopupOpen, loadData, getSectionData, getFieldValue, updateField, openEditor, closeEditor, applyEdit, save, discard } = useLiveEdit(props.pageKey);
+const pageKeyRef = toRef(props, "pageKey");
+const { config, isDirty, isSaving, isLoading, editTarget, isPopupOpen, loadData, getSectionData, getFieldValue, updateField, openEditor, closeEditor, applyEdit, save, discard } = useLiveEdit(pageKeyRef);
 
 const sectionVisibility = ref<Record<string, boolean>>({});
 const isCollectionOpen = ref(false);
@@ -154,12 +155,23 @@ const handleFieldEdit = (sectionId: string, fieldPath: string) => {
     openEditor(sectionId, fieldPath);
 };
 
+type ComponentModule = () => Promise<{ default: unknown }>;
+const pageComponentModules: Record<string, ComponentModule> = {
+    "home/HeroSection": () => import("../../../pages/home/(components)/HeroSection.vue"),
+    "home/ServicesSection": () => import("../../../pages/home/(components)/ServicesSection.vue"),
+    "home/ProjectSection": () => import("../../../pages/home/(components)/ProjectSection.vue"),
+    "home/BlogSection": () => import("../../../pages/home/(components)/BlogSection.vue"),
+    "home/NewsSection": () => import("../../../pages/home/(components)/NewsSection.vue"),
+    "home/CertSection": () => import("../../../pages/home/(components)/CertSection.vue"),
+    "home/PartnerSection": () => import("../../../pages/home/(components)/PartnerSection.vue"),
+    "about-us/AboutContent": () => import("../../../pages/about-us/(components)/AboutContent.vue"),
+    "contact/ContactForm": () => import("../../../pages/contact/(components)/ContactForm.vue"),
+};
+
 const sectionComponents = computed(() => {
     if (!config.value?.sections) return {};
 
-    const cfg = config.value as { componentBase?: string; sections: Record<string, { component?: string }> };
-    const componentBase = cfg.componentBase || "components";
-    const pageKey = props.pageKey;
+    const pageKey = pageKeyRef.value;
 
     return Object.fromEntries(
         Object.entries(config.value.sections)
@@ -169,13 +181,20 @@ const sectionComponents = computed(() => {
             })
             .map(([key, section]) => {
                 const s = section as { component?: string };
+                const componentKey = `${pageKey}/${s.component}`;
+                const loader = pageComponentModules[componentKey];
+
+                if (!loader) {
+                    console.warn(`Component not found: ${componentKey}`);
+                    return [key, null];
+                }
+
                 return [
                     key,
-                    defineAsyncComponent(() =>
-                        import(`@/pages/${pageKey}/${componentBase}/${s.component}.vue`)
-                    )
+                    defineAsyncComponent(loader)
                 ];
             })
+            .filter(([, comp]) => comp !== null)
     );
 });
 
@@ -214,7 +233,7 @@ watch(isSaving, (val) => {
 });
 
 watch(
-    () => props.pageKey,
+    pageKeyRef,
     () => {
         loadData();
         if (config.value?.sections) {

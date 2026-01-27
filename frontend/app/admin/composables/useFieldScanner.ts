@@ -154,10 +154,13 @@ export const useFieldScanner = (options: FieldScannerOptions) => {
 
         element.classList.add("link-edit-wrapper");
 
-        const card = element.closest(".news-card, .project-card, .service-card, .cert-card, .partner-card, [class*='-card']");
-        const buttonContainer = card || element;
+        const computedPosition = window.getComputedStyle(element).position;
+        if (computedPosition === "static") {
+            element.style.position = "relative";
+            (element as any).__originalLinkPosition = "static";
+        }
 
-        if (buttonContainer.querySelector(`.link-edit-button[data-for="${fieldPath}"]`)) return;
+        if (element.querySelector(`.link-edit-button[data-for="${fieldPath}"]`)) return;
 
         const button = document.createElement("button");
         button.className = "link-edit-button";
@@ -174,8 +177,8 @@ export const useFieldScanner = (options: FieldScannerOptions) => {
         (button as any).__fieldClickHandler = clickHandler;
         button.addEventListener("click", clickHandler, { capture: true });
 
-        buttonContainer.appendChild(button);
-        (element as any).__linkButtonContainer = buttonContainer;
+        element.appendChild(button);
+        (element as any).__linkButtonContainer = element;
     };
 
     const cleanup = () => {

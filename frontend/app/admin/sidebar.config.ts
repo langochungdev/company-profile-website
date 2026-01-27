@@ -1,1 +1,1 @@
-export const SIDEBAR_ORDER = ["home", "product", "service", "post"];
+export const SIDEBAR_ORDER = ["home", "about-us", "contact", "product", "service", "post"];

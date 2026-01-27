@@ -6,12 +6,11 @@
                 <div class="footer-brand">
                     <div class="brand-logo">
                         <div class="brand-name">
-                            <span class="text-primary">SHT</span> Security
+                            <span class="text-primary" :data-field="'footer.brandHighlight'">{{ displayBrandHighlight }}</span> <span :data-field="'footer.brandName'">{{ displayBrandName }}</span>
                         </div>
                     </div>
-                    <p class="brand-desc">
-                        Chuyên cung cấp giải pháp an ninh và hạ tầng mạng cho gia đình, doanh nghiệp.
-                        Camera AI, mạng LAN, WiFi, Access Control, Báo cháy, Tổng đài IP.
+                    <p class="brand-desc" :data-field="'footer.brandDescription'">
+                        {{ displayBrandDescription }}
                     </p>
                     <NuxtLink to="/about-us" class="brand-btn">
                         Về Chúng Tôi
@@ -25,8 +24,8 @@
                     <h3 class="footer-title">Liên Kết</h3>
                     <nav aria-label="Footer navigation">
                         <ul class="links-list">
-                            <li v-for="link in quickLinks" :key="link.name">
-                                <NuxtLink :to="link.path" class="link-item">
+                            <li v-for="(link, index) in displayQuickLinks" :key="link.name">
+                                <NuxtLink :to="link.path" class="link-item" :data-field="`footer.quickLinks.${index}.name`">
                                     <Icon name="mdi:chevron-right" class="link-icon" />
                                     {{ link.name }}
                                 </NuxtLink>
@@ -38,34 +37,10 @@
                 <div class="footer-contact">
                     <h3 class="footer-title">Liên Hệ</h3>
                     <ul class="contact-list">
-                        <li>
-                            <div class="contact-item">
-                                <Icon name="mdi:phone" class="contact-icon" />
-                                0901 234 567
-                            </div>
-                        </li>
-                        <li>
-                            <div class="contact-item">
-                                <Icon name="mdi:phone-classic" class="contact-icon" />
-                                028 7654 321
-                            </div>
-                        </li>
-                        <li>
-                            <div class="contact-item">
-                                <Icon name="mdi:email" class="contact-icon" />
-                                info@sht.vn
-                            </div>
-                        </li>
-                        <li>
-                            <div class="contact-item">
-                                <Icon name="mdi:facebook" class="contact-icon" />
-                                facebook.com/SHT.security
-                            </div>
-                        </li>
-                        <li>
-                            <div class="contact-item">
-                                <Icon name="mdi:chat" class="contact-icon" />
-                                Zalo: 0901 234 567
+                        <li v-for="(item, index) in displayContactInfo" :key="index">
+                            <div class="contact-item" :data-field="`footer.contactInfo.${index}.value`">
+                                <Icon :name="item.icon" class="contact-icon" />
+                                {{ item.value }}
                             </div>
                         </li>
                         <li class="bct-mobile-item">
@@ -75,7 +50,7 @@
                         </li>
                     </ul>
                     <div class="social-icons social-desktop">
-                        <div v-for="social in socials" :key="social.name" :aria-label="social.name" class="social-icon">
+                        <div v-for="social in displaySocials" :key="social.name" :aria-label="social.name" class="social-icon">
                             <Icon :name="social.icon" class="social-icon-svg" />
                         </div>
                     </div>
@@ -85,13 +60,13 @@
                     <h3 class="footer-title">Bản Đồ</h3>
                     <div class="map-address">
                         <Icon name="mdi:map-marker" class="map-icon" />
-                        <span>123 Đường ABC, Phường XYZ, Quận 1, TP. Hồ Chí Minh</span>
+                        <span :data-field="'footer.mapAddress'">{{ displayMapAddress }}</span>
                     </div>
                     <div class="map-wrapper">
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.4241674197956!2d106.69765841533417!3d10.778789792319392!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f38f9ed887b%3A0x14aded5703768989!2zUXXhuq1uIDEsIFRow6BuaCBwaOG7kSBI4buTIENow60gTWluaCwgVmnhu4d0IE5hbQ!5e0!3m2!1svi!2s!4v1704796800000" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Bản đồ địa chỉ SHT Security"></iframe>
+                        <iframe :src="displayMapEmbedUrl" width="100%" height="100%" style="border:0;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Bản đồ địa chỉ SHT Security"></iframe>
                     </div>
                     <div class="social-icons social-mobile">
-                        <div v-for="social in socials" :key="social.name" :aria-label="social.name" class="social-icon">
+                        <div v-for="social in displaySocials" :key="social.name" :aria-label="social.name" class="social-icon">
                             <Icon :name="social.icon" class="social-icon-svg" />
                         </div>
                     </div>
@@ -99,28 +74,96 @@
             </div>
 
             <div class="footer-bottom">
-                <p class="copyright">
-                    © 2024 SHT Security. All rights reserved.
+                <p class="copyright" :data-field="'footer.copyright'">
+                    {{ displayCopyright }}
                 </p>
             </div>
         </div>
     </footer>
 </template>
 
-<script setup>
-const quickLinks = [
+<script setup lang="ts">
+import { computed } from 'vue'
+
+interface QuickLink {
+    name: string
+    path: string
+}
+
+interface ContactInfo {
+    icon: string
+    value: string
+}
+
+interface SocialItem {
+    name: string
+    icon: string
+    url: string
+}
+
+interface FooterData {
+    brandName?: string
+    brandHighlight?: string
+    brandDescription?: string
+    quickLinks?: QuickLink[]
+    contactInfo?: ContactInfo[]
+    socials?: SocialItem[]
+    mapAddress?: string
+    mapEmbedUrl?: string
+    copyright?: string
+}
+
+const props = defineProps<{
+    data?: FooterData | null
+}>()
+
+const defaultQuickLinks: QuickLink[] = [
     { name: 'Giới Thiệu', path: '/about-us' },
     { name: 'Sản Phẩm', path: '/product' },
     { name: 'Tin Tức', path: '/post' },
     { name: 'Liên Hệ', path: '/contact' }
 ]
 
-const socials = [
+const defaultContactInfo: ContactInfo[] = [
+    { icon: 'mdi:phone', value: '0901 234 567' },
+    { icon: 'mdi:phone-classic', value: '028 7654 321' },
+    { icon: 'mdi:email', value: 'info@sht.vn' },
+    { icon: 'mdi:facebook', value: 'facebook.com/SHT.security' },
+    { icon: 'mdi:chat', value: 'Zalo: 0901 234 567' }
+]
+
+const defaultSocials: SocialItem[] = [
     { name: 'Facebook', icon: 'mdi:facebook', url: 'https://facebook.com/SHT.security' },
     { name: 'TikTok', icon: 'mdi:music-note', url: 'https://tiktok.com/@sht.security' },
     { name: 'YouTube', icon: 'mdi:youtube', url: 'https://youtube.com/@SHTsecurity' },
     { name: 'Zalo', icon: 'mdi:chat', url: 'https://zalo.me/0901234567' }
 ]
+
+const displayBrandHighlight = computed(() => props.data?.brandHighlight || 'SHT')
+const displayBrandName = computed(() => props.data?.brandName || 'Security')
+const displayBrandDescription = computed(() => props.data?.brandDescription || 'Chuyên cung cấp giải pháp an ninh và hạ tầng mạng cho gia đình, doanh nghiệp. Camera AI, mạng LAN, WiFi, Access Control, Báo cháy, Tổng đài IP.')
+
+const displayQuickLinks = computed(() => {
+    const edited = props.data?.quickLinks
+    if (!edited || edited.length === 0) return defaultQuickLinks
+    return defaultQuickLinks.map((base, index) => ({ ...base, ...(edited[index] || {}) }))
+})
+
+const displayContactInfo = computed(() => {
+    const edited = props.data?.contactInfo
+    if (!edited || edited.length === 0) return defaultContactInfo
+    return defaultContactInfo.map((base, index) => ({ ...base, ...(edited[index] || {}) }))
+})
+
+const displaySocials = computed(() => {
+    const edited = props.data?.socials
+    if (!edited || edited.length === 0) return defaultSocials
+    return defaultSocials.map((base, index) => ({ ...base, ...(edited[index] || {}) }))
+})
+
+const displayMapAddress = computed(() => props.data?.mapAddress || '123 Đường ABC, Phường XYZ, Quận 1, TP. Hồ Chí Minh')
+const displayMapEmbedUrl = computed(() => props.data?.mapEmbedUrl || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.4241674197956!2d106.69765841533417!3d10.778789792319392!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f38f9ed887b%3A0x14aded5703768989!2zUXXhuq1uIDEsIFRow6BuaCBwaOG7kSBI4buTIENow60gTWluaCwgVmnhu4d0IE5hbQ!5e0!3m2!1svi!2s!4v1704796800000')
+const displayCopyright = computed(() => props.data?.copyright || '© 2024 SHT Security. All rights reserved.')
 </script>
 
 <style scoped>

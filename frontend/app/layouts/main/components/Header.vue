@@ -7,21 +7,16 @@
                 <div class="header-content">
                     <div class="header-left">
                         <NuxtLink to="/" class="logo" aria-label="Trang chủ SHT Security">
-                            <img src="/images/logo.png" alt="SHT Security Logo" class="logo-img" />
+                            <img :src="displayLogo" alt="SHT Security Logo" class="logo-img" :data-field="'header.logoUrl'" data-field-type="image" />
                         </NuxtLink>
                     </div>
 
                     <nav class="nav-desktop" aria-label="Main navigation">
-                        <NuxtLink to="/" :class="['nav-link', isActive('/') && 'nav-link-active']">Trang Chủ</NuxtLink>
-                        <NuxtLink to="/product" :class="['nav-link', isActive('/product') && 'nav-link-active']">Sản Phẩm</NuxtLink>
-                        <NuxtLink to="/service" :class="['nav-link', isActive('/service') && 'nav-link-active']">Dịch Vụ</NuxtLink>
-                        <NuxtLink to="/post" :class="['nav-link', isActive('/post') && 'nav-link-active']">Tin Tức</NuxtLink>
-                        <NuxtLink to="/about-us" :class="['nav-link', isActive('/about-us') && 'nav-link-active']">Giới Thiệu</NuxtLink>
-                        <NuxtLink to="/contact" :class="['nav-link', isActive('/contact') && 'nav-link-active']">Liên Hệ</NuxtLink>
+                        <NuxtLink v-for="(item, index) in displayNavigation" :key="item.path" :to="item.path" :class="['nav-link', isActive(item.path) && 'nav-link-active']" :data-field="`header.navigation.${index}.label`">{{ item.label }}</NuxtLink>
                     </nav>
 
                     <div class="cta-desktop">
-                        <button class="cta-btn">Báo Giá</button>
+                        <button class="cta-btn" :data-field="'header.ctaText'">{{ displayCtaText }}</button>
                     </div>
 
                     <button @click="isMenuOpen = !isMenuOpen" class="menu-toggle" aria-label="Menu">
@@ -32,13 +27,8 @@
                 <Transition enter-active-class="mobile-menu-enter-active" enter-from-class="mobile-menu-enter-from" enter-to-class="mobile-menu-enter-to" leave-active-class="mobile-menu-leave-active" leave-from-class="mobile-menu-leave-from" leave-to-class="mobile-menu-leave-to">
                     <div v-if="isMenuOpen" class="mobile-menu">
                         <nav class="mobile-nav">
-                            <NuxtLink to="/" :class="['mobile-nav-link', isActive('/') && 'mobile-nav-link-active']" @click="isMenuOpen = false">Trang Chủ</NuxtLink>
-                            <NuxtLink to="/product" :class="['mobile-nav-link', isActive('/product') && 'mobile-nav-link-active']" @click="isMenuOpen = false">Sản Phẩm</NuxtLink>
-                            <NuxtLink to="/service" :class="['mobile-nav-link', isActive('/service') && 'mobile-nav-link-active']" @click="isMenuOpen = false">Dịch Vụ</NuxtLink>
-                            <NuxtLink to="/post" :class="['mobile-nav-link', isActive('/post') && 'mobile-nav-link-active']" @click="isMenuOpen = false">Tin Tức</NuxtLink>
-                            <NuxtLink to="/about-us" :class="['mobile-nav-link', isActive('/about-us') && 'mobile-nav-link-active']" @click="isMenuOpen = false">Giới Thiệu</NuxtLink>
-                            <NuxtLink to="/contact" :class="['mobile-nav-link', isActive('/contact') && 'mobile-nav-link-active']" @click="isMenuOpen = false">Liên Hệ</NuxtLink>
-                            <button class="cta-btn cta-mobile" @click="isMenuOpen = false">Báo Giá</button>
+                            <NuxtLink v-for="(item, index) in displayNavigation" :key="item.path" :to="item.path" :class="['mobile-nav-link', isActive(item.path) && 'mobile-nav-link-active']" @click="isMenuOpen = false" :data-field="`header.navigation.${index}.label`">{{ item.label }}</NuxtLink>
+                            <button class="cta-btn cta-mobile" @click="isMenuOpen = false">{{ displayCtaText }}</button>
                         </nav>
                     </div>
                 </Transition>
@@ -47,8 +37,42 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import TopBar from './TopBar.vue'
+
+interface NavItem {
+    label: string
+    path: string
+}
+
+interface HeaderData {
+    logoUrl?: string
+    ctaText?: string
+    navigation?: NavItem[]
+}
+
+const props = defineProps<{
+    data?: HeaderData | null
+}>()
+
+const defaultNavigation: NavItem[] = [
+    { label: 'Trang Chủ', path: '/' },
+    { label: 'Sản Phẩm', path: '/product' },
+    { label: 'Dịch Vụ', path: '/service' },
+    { label: 'Tin Tức', path: '/post' },
+    { label: 'Giới Thiệu', path: '/about-us' },
+    { label: 'Liên Hệ', path: '/contact' }
+]
+
+const displayNavigation = computed(() => {
+    const edited = props.data?.navigation
+    if (!edited || edited.length === 0) return defaultNavigation
+    return defaultNavigation.map((base, index) => ({ ...base, ...(edited[index] || {}) }))
+})
+
+const displayLogo = computed(() => props.data?.logoUrl || '/images/logo.png')
+const displayCtaText = computed(() => props.data?.ctaText || 'Báo Giá')
 
 const route = useRoute()
 const isMenuOpen = ref(false)
@@ -61,7 +85,7 @@ const isHeaderTransparent = computed(() => {
     return isHome && !scrolled.value
 })
 
-const isActive = (path) => {
+const isActive = (path: string) => {
     if (path === '/') {
         return route.path === '/' || route.path === '/home'
     }
@@ -363,12 +387,14 @@ onUnmounted(() => {
 }
 
 .mobile-nav {
- 
 
-.mobile-nav-link-active {
-    color: #DC2626;
-    font-weight: 600;
-}   display: flex;
+
+    .mobile-nav-link-active {
+        color: #DC2626;
+        font-weight: 600;
+    }
+
+    display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }

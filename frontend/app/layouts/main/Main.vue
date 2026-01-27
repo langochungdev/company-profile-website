@@ -1,21 +1,62 @@
 <template>
     <div class="main-layout">
-        <Header />
+        <Header :data="(layoutData?.header as HeaderData)" />
 
         <slot />
 
-        <Footer />
+        <Footer :data="(layoutData?.footer as FooterData)" />
 
-        <a href="https://zalo.me/0373763354" target="_blank" rel="noopener noreferrer" class="zalo-button" aria-label="Chat qua Zalo">
+        <a :href="zaloUrl" target="_blank" rel="noopener noreferrer" class="zalo-button" aria-label="Chat qua Zalo">
             <span class="zalo-ping"></span>
-            <img src="/images/zalo-icon.webp" alt="Zalo" class="zalo-icon" />
+            <img :src="zaloIcon" alt="Zalo" class="zalo-icon" />
         </a>
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { onMounted, computed } from 'vue'
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
+import { usePageData } from '@/admin/composables/usePageData'
+
+interface HeaderData {
+    logoUrl?: string
+    ctaText?: string
+    navigation?: { label: string; path: string }[]
+}
+
+interface FooterData {
+    brandName?: string
+    brandHighlight?: string
+    brandDescription?: string
+    quickLinks?: { name: string; path: string }[]
+    contactInfo?: { icon: string; value: string }[]
+    socials?: { name: string; icon: string; url: string }[]
+    mapAddress?: string
+    mapEmbedUrl?: string
+    copyright?: string
+}
+
+interface LayoutData {
+    [key: string]: unknown
+    topBar?: { address?: string; email?: string; phone?: string }
+    header?: HeaderData
+    footer?: FooterData
+    zaloButton?: { phoneNumber?: string; imageUrl?: string }
+}
+
+const { data: layoutData, loadData } = usePageData<LayoutData>('layout/main')
+
+const zaloUrl = computed(() => {
+    const phone = layoutData.value?.zaloButton?.phoneNumber || '0373763354'
+    return `https://zalo.me/${phone.replace(/\s/g, '')}`
+})
+
+const zaloIcon = computed(() => layoutData.value?.zaloButton?.imageUrl || '/images/zalo-icon.webp')
+
+onMounted(() => {
+    loadData()
+})
 </script>
 
 <style scoped>

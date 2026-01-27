@@ -78,8 +78,8 @@
 }
 
 .link-edit-button {
-    bottom: 8px;
-    right: 48px;
+    top: 8px;
+    right: 8px;
 }
 
 .image-edit-button svg,
@@ -137,8 +137,8 @@
     }
 
     .link-edit-button {
-        bottom: 6px;
-        right: 40px;
+        top: 6px;
+        right: 6px;
     }
 
     .image-edit-button svg,

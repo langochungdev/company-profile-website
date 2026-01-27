@@ -1,34 +1,32 @@
 <template>
     <NuxtLayout name="main">
         <main>
-            <AboutContent />
+            <AboutContent :data="contentData" />
         </main>
     </NuxtLayout>
 </template>
 
-<script setup>
-import AboutContent from './components/AboutContent.vue'
+<script setup lang="ts">
+import { computed, onMounted } from 'vue'
+import AboutContent from './(components)/AboutContent.vue'
+import { usePageData } from '@/admin/composables/usePageData'
 
-// useSeoMeta({
-//     title: 'Giới Thiệu - SHT Security',
-//     description: 'Tìm hiểu về SHT Security - Công ty chuyên cung cấp giải pháp an ninh camera AI, hạ tầng mạng, WiFi doanh nghiệp với hơn 10 năm kinh nghiệm.',
-//     ogTitle: 'Về SHT Security - Đối Tác Tin Cậy Của Doanh Nghiệp',
-//     ogDescription: 'Với đội ngũ kỹ sư chuyên nghiệp và hơn 500 dự án hoàn thành, SHT Security là lựa chọn hàng đầu cho giải pháp an ninh.',
-//     ogType: 'website',
-// })
+interface AboutPageData {
+    content?: {
+        hero?: { title?: string; highlight?: string; description?: string }
+        intro?: { image?: string; experienceYears?: string; experienceText?: string; sectionTitle?: string; descriptions?: Array<{ text: string }> }
+        stats?: { items?: Array<{ value: string; label: string; icon: string }> }
+        values?: { sectionTitle?: string; highlightText?: string; items?: Array<{ title: string; description: string; icon: string }> }
+        cta?: { title?: string; description?: string; buttonText?: string; buttonLink?: string }
+    }
+    [key: string]: unknown
+}
 
-// useHead({
-//     script: [
-//         {
-//             type: 'application/ld+json',
-//             innerHTML: JSON.stringify({
-//                 '@context': 'https://schema.org',
-//                 '@type': 'AboutPage',
-//                 name: 'Giới Thiệu SHT Security',
-//                 description: 'Thông tin về công ty SHT Security',
-//                 url: 'https://sht.langochung.me/about-us'
-//             })
-//         }
-//     ]
-// })
+const { data: pageData, loadData } = usePageData<AboutPageData>('pages/about-us')
+
+const contentData = computed(() => pageData.value?.content || null)
+
+onMounted(() => {
+    loadData()
+})
 </script>

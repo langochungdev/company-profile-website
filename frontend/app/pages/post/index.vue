@@ -7,7 +7,7 @@
 </template>
 
 <script setup>
-import PostList from './components/PostList.vue'
+import PostList from './(components)/PostList.vue'
 
 useSeoMeta({
     title: 'Tin Tức & Sự Kiện - SHT Security',

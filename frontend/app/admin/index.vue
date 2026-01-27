@@ -16,7 +16,7 @@
 
                 <template v-else-if="!isCollectionPage">
                     <ClientOnly v-if="activeContentTab === 'live'">
-                        <LiveEditView ref="liveEditRef" :page-key="activePage" @dirty-change="liveEditDirty = $event" @saving-change="isSaving = $event" />
+                        <LiveEditView :key="activePage" ref="liveEditRef" :page-key="activePage" @dirty-change="liveEditDirty = $event" @saving-change="isSaving = $event" />
                     </ClientOnly>
 
                     <SettingsView v-else ref="settingsRef" :key="activePage" :page-key="activePage" :page-name="currentPageName" :config-path="currentConfigPath" :schema-type="currentSchemaType" :readonly="false" @dirty-change="settingsDirty = $event" @saving-change="isSaving = $event" />
