@@ -26,15 +26,30 @@ export function useDeleteQueue() {
     const processDeleteQueue = async (): Promise<void> => {
         const urls = Array.from(deleteQueue.value);
 
+        if (urls.length === 0) {
+            console.log("[DeleteQueue] No images to delete");
+            return;
+        }
+
+        console.log(`[DeleteQueue] Deleting ${urls.length} images:`, urls);
+
         const deletePromises = urls.map(async (url) => {
             const publicId = extractPublicId(url);
             if (publicId) {
-                await CloudinaryService.deleteAsset(publicId).catch(() => {});
+                try {
+                    const result = await CloudinaryService.deleteAsset(publicId);
+                    console.log(`[DeleteQueue] Deleted ${publicId}:`, result);
+                } catch (error) {
+                    console.error(`[DeleteQueue] Failed to delete ${publicId}:`, error);
+                }
+            } else {
+                console.warn(`[DeleteQueue] Could not extract publicId from:`, url);
             }
         });
 
         await Promise.all(deletePromises);
         clearQueue();
+        console.log("[DeleteQueue] Cleanup complete");
     };
 
     return {

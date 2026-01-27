@@ -130,11 +130,16 @@ const handleDelete = async (item: Record<string, unknown>) => {
         const fullItem = await collectionContext.getItem(item.id as string)
         const itemToDelete = fullItem || item
 
+        console.log('[PostsPage] Deleting item:', itemToDelete)
+
         if (itemToDelete.thumbnail && typeof itemToDelete.thumbnail === 'object' && (itemToDelete.thumbnail as any)?.url) {
+            console.log('[PostsPage] Adding thumbnail to delete queue:', (itemToDelete.thumbnail as any).url)
             addToDeleteQueue((itemToDelete.thumbnail as any).url)
         }
         if (itemToDelete.content && typeof itemToDelete.content === 'string') {
-            extractCloudinaryUrls(itemToDelete.content).forEach(url => addToDeleteQueue(url))
+            const contentUrls = extractCloudinaryUrls(itemToDelete.content)
+            console.log('[PostsPage] Adding content images to delete queue:', contentUrls)
+            contentUrls.forEach(url => addToDeleteQueue(url))
         }
 
         await collectionContext.deleteItem(item.id as string)
