@@ -143,13 +143,36 @@
     color: #64748b;
     font-size: 15px;
     line-height: 1.6;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     flex-grow: 1;
+}
+
+.card-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.tag-chip {
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    color: #dc2626;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid #fecaca;
+    transition: all 0.3s ease;
+}
+
+.post-card:hover .tag-chip {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    transform: translateY(-1px);
 }
 
 .card-footer {

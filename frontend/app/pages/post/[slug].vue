@@ -1,9 +1,9 @@
 <template>
     <NuxtLayout name="main">
-        <main v-if="loading" class="loading-wrapper">
+        <main v-if="loading" class="loading-wrapper" role="status" aria-live="polite">
             <div class="container">
-                <Icon name="mdi:loading" class="spin loading-icon" />
-                <p>Đang tải bài viết...</p>
+                <Icon name="mdi:loading" class="spin loading-icon" aria-hidden="true" />
+                <p>Đang Tải Bài Viết…</p>
             </div>
         </main>
 
@@ -14,67 +14,69 @@
                         <div class="post-meta">
                             <span class="meta-category">{{ displayPost.category }}</span>
                             <span class="meta-date">
-                                <Icon name="mdi:calendar-blank" />
+                                <Icon name="mdi:calendar-blank" aria-hidden="true" />
                                 {{ displayPost.publishedAt || displayPost.date }}
                             </span>
                             <span class="meta-author">
-                                <Icon name="mdi:account" />
+                                <Icon name="mdi:account" aria-hidden="true" />
                                 {{ displayPost.author }}
                             </span>
                         </div>
 
                         <h1 class="post-title">{{ displayPost.title }}</h1>
 
-                        <div class="post-thumbnail">
-                            <img :src="thumbnailUrl" :alt="displayPost.title" />
-                        </div>
+                        <figure class="post-thumbnail">
+                            <img :src="thumbnailUrl" :alt="`Hình ảnh minh họa cho bài viết: ${displayPost.title}`" width="1200" height="675" loading="eager" />
+                        </figure>
 
                         <div class="post-body" v-html="displayPost.content || defaultContent"></div>
 
-                        <div class="post-tags">
-                            <span class="tag">{{ displayPost.category }}</span>
-                            <span class="tag">SHT Security</span>
-                            <span class="tag">Giải pháp</span>
+                        <div v-if="displayTags.length > 0" class="post-tags" role="list">
+                            <span v-for="(tag, idx) in displayTags" :key="idx" class="tag" role="listitem">
+                                {{ tag }}
+                            </span>
                         </div>
 
                         <div class="post-share">
-                            <span class="share-label">Chia sẻ:</span>
-                            <a href="#" class="share-btn facebook">
-                                <Icon name="mdi:facebook" />
+                            <span class="share-label">Chia Sẻ:</span>
+                            <a :href="shareUrls.facebook" class="share-btn facebook" target="_blank" rel="noopener noreferrer" aria-label="Chia sẻ trên Facebook">
+                                <Icon name="mdi:facebook" aria-hidden="true" />
                             </a>
-                            <a href="#" class="share-btn twitter">
-                                <Icon name="mdi:twitter" />
+                            <a :href="shareUrls.twitter" class="share-btn twitter" target="_blank" rel="noopener noreferrer" aria-label="Chia sẻ trên Twitter">
+                                <Icon name="mdi:twitter" aria-hidden="true" />
                             </a>
-                            <a href="#" class="share-btn linkedin">
-                                <Icon name="mdi:linkedin" />
+                            <a :href="shareUrls.linkedin" class="share-btn linkedin" target="_blank" rel="noopener noreferrer" aria-label="Chia sẻ trên LinkedIn">
+                                <Icon name="mdi:linkedin" aria-hidden="true" />
                             </a>
                         </div>
 
-                        <div class="cta-section">
+                        <section class="cta-section">
                             <div class="cta-content">
-                                <h3>Cần Tư Vấn Giải Pháp?</h3>
+                                <h2>Cần Tư Vấn Giải Pháp?</h2>
                                 <p>Liên hệ ngay để được hỗ trợ miễn phí từ chuyên gia của chúng tôi!</p>
                                 <NuxtLink to="/contact" class="cta-btn">
-                                    <Icon name="mdi:phone" />
+                                    <Icon name="mdi:phone" aria-hidden="true" />
                                     Liên Hệ Ngay
                                 </NuxtLink>
                             </div>
-                        </div>
+                        </section>
 
-                        <div class="related-section" v-if="relatedPosts.length">
+                        <section class="related-section" v-if="relatedPosts.length">
                             <h2 class="related-heading">Bài Viết Liên Quan</h2>
                             <div class="related-grid">
                                 <NuxtLink v-for="item in relatedPosts" :key="item.id" :to="`/post/${item.slug}`" class="related-card">
                                     <div class="related-thumb-wrapper">
-                                        <img :src="getRelatedThumbnail(item)" :alt="item.title" class="related-thumb" />
+                                        <img :src="getRelatedThumbnail(item)" :alt="`Hình ảnh cho bài viết: ${item.title}`" class="related-thumb" width="400" height="225" loading="lazy" />
                                     </div>
                                     <div class="related-info">
-                                        <span class="related-date">{{ item.publishedAt }}</span>
+                                        <time class="related-date" :datetime="item.publishedAt">
+                                            {{ item.publishedAt }}
+                                        </time>
                                         <h3 class="related-title">{{ item.title }}</h3>
                                     </div>
                                 </NuxtLink>
                             </div>
-                        </div>
+                        </section>
                     </div>
                 </div>
             </article>
@@ -147,6 +149,31 @@ const getRelatedThumbnail = (item) => {
     }
     return '/images/placeholder.jpg'
 }
+
+const displayTags = computed(() => {
+    if (!displayPost.value?.tags || !Array.isArray(displayPost.value.tags)) return []
+
+    return displayPost.value.tags.map(tag => {
+        if (typeof tag === 'string') return tag
+        if (typeof tag === 'object' && tag !== null && 'value' in tag) return tag.value
+        if (typeof tag === 'object' && tag !== null && 'name' in tag) return tag.name
+        return String(tag)
+    })
+})
+
+const shareUrls = computed(() => {
+    if (!post.value) return { facebook: '', twitter: '', linkedin: '' }
+
+    const url = `${SITE_URL}/post/${post.value.slug}`
+    const title = encodeURIComponent(post.value.title)
+    const description = encodeURIComponent(post.value.description || post.value.excerpt || '')
+
+    return {
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+        twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${title}`,
+        linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`
+    }
+})
 
 const postSchema = computed(() => {
     if (!post.value) return null

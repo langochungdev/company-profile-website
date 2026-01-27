@@ -23,6 +23,12 @@
             <h3 class="card-title">{{ post.title }}</h3>
             <p class="card-desc">{{ post.excerpt || post.description }}</p>
 
+            <div v-if="displayTags.length > 0" class="card-tags">
+                <span v-for="(tag, idx) in displayTags.slice(0, 3)" :key="idx" class="tag-chip">
+                    {{ tag }}
+                </span>
+            </div>
+
             <div class="card-footer">
                 <span class="link-text">
                     Xem chi tiết
@@ -61,6 +67,17 @@ const thumbnailAlt = computed(() => {
     }
 
     return props.post.title
+})
+
+const displayTags = computed(() => {
+    if (!props.post.tags || !Array.isArray(props.post.tags)) return []
+
+    return props.post.tags.map(tag => {
+        if (typeof tag === 'string') return tag
+        if (typeof tag === 'object' && tag !== null && 'value' in tag) return tag.value
+        if (typeof tag === 'object' && tag !== null && 'name' in tag) return tag.name
+        return String(tag)
+    })
 })
 </script>
 
