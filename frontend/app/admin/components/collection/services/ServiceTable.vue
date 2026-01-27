@@ -67,6 +67,11 @@
                             <span v-if="hasMoreCategories(item)" class="more-badge">+{{ getMoreCategoriesCount(item) }}</span>
                         </div>
 
+                        <div v-if="getDisplayTags(item).length > 0" class="card-tags">
+                            <span v-for="(tag, idx) in getDisplayTags(item)" :key="idx" class="tag-badge">{{ tag }}</span>
+                            <span v-if="hasMoreTags(item)" class="more-badge">+{{ getMoreTagsCount(item) }}</span>
+                        </div>
+
                         <p v-if="item.description" class="card-description">{{ truncateText(item.description, 120) }}</p>
 
                         <div class="card-meta">
@@ -108,11 +113,14 @@
 </template>
 
 <script setup lang="ts">
+import { useCollectionConfig } from '@/admin/composables/useCollectionConfig'
+
 interface ServiceItem {
     id: string
     name?: string
     description?: string
     categories?: string[]
+    tags?: string[]
     location?: string
     completedDate?: string
     images?: Array<{ url: string; alt: string }>
@@ -137,10 +145,26 @@ const selectedCategory = ref<string | null>(null)
 const currentPage = ref(1)
 const itemsPerPage = 10
 
+const { config: serviceConfig, loadConfig: loadServiceConfig } = useCollectionConfig('collections/services')
+const { config: productConfig, loadConfig: loadProductConfig } = useCollectionConfig('collections/products')
+
+const availableCategories = computed(() => {
+    return serviceConfig.value?.categories?.map(c => c.name) || []
+})
+
+const tagNameMap = computed(() => {
+    const map = new Map<string, string>()
+    productConfig.value?.tags?.forEach(tag => {
+        map.set(tag.name, tag.name)
+    })
+    return map
+})
+
 const allPlaceholders = Array.from({ length: 50 }, (_, i) => ({
     id: `placeholder-${i + 1}`,
     name: `Dự án mẫu ${i + 1}`,
     categories: [['Camera AI', 'WiFi Doanh Nghiệp', 'Báo Cháy', 'Tổng Đài'][i % 4]],
+    tags: [['IP Camera', 'NVR', 'Access Point'][i % 3]],
     location: ['Hà Nội', 'Hồ Chí Minh', 'Đà Nẵng', 'Cần Thơ'][i % 4] + ', Việt Nam',
     completedDate: new Date(2024, i % 12, (i % 28) + 1).toISOString().split('T')[0],
     images: [{ url: 'https://placehold.co/400x300/e2e8f0/94a3b8?text=No+Data', alt: 'Placeholder' }],
@@ -149,16 +173,6 @@ const allPlaceholders = Array.from({ length: 50 }, (_, i) => ({
 
 const baseItems = computed(() => {
     return props.items.length > 0 ? props.items : allPlaceholders
-})
-
-const availableCategories = computed(() => {
-    const categories = new Set<string>()
-    baseItems.value.forEach(item => {
-        if (Array.isArray(item.categories)) {
-            item.categories.forEach(cat => categories.add(cat))
-        }
-    })
-    return Array.from(categories).sort()
 })
 
 const filteredItems = computed(() => {
@@ -175,7 +189,8 @@ const filteredItems = computed(() => {
         items = items.filter(item =>
             (item.name || '').toLowerCase().includes(query) ||
             (item.location || '').toLowerCase().includes(query) ||
-            (item.categories || []).some(c => c.toLowerCase().includes(query))
+            (item.categories || []).some(c => c.toLowerCase().includes(query)) ||
+            (item.tags || []).some(t => t.toLowerCase().includes(query))
         )
     }
 
@@ -214,6 +229,20 @@ const getMoreCategoriesCount = (item: ServiceItem) => {
     return item.categories.length - 3
 }
 
+const getDisplayTags = (item: ServiceItem) => {
+    if (!Array.isArray(item.tags)) return []
+    return item.tags.slice(0, 3)
+}
+
+const hasMoreTags = (item: ServiceItem) => {
+    return Array.isArray(item.tags) && item.tags.length > 3
+}
+
+const getMoreTagsCount = (item: ServiceItem) => {
+    if (!Array.isArray(item.tags)) return 0
+    return item.tags.length - 3
+}
+
 const truncateText = (text: string, maxLength: number) => {
     if (!text) return ''
     if (text.length <= maxLength) return text
@@ -225,6 +254,10 @@ const formatDate = (dateStr?: string) => {
     const date = new Date(dateStr)
     return date.toLocaleDateString('vi-VN')
 }
+
+onMounted(async () => {
+    await Promise.all([loadServiceConfig(), loadProductConfig()])
+})
 </script>
 
 <style scoped>
@@ -518,6 +551,21 @@ const formatDate = (dateStr?: string) => {
     padding: 4px 10px;
     background: #dbeafe;
     color: #1e40af;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tag-badge {
+    padding: 4px 10px;
+    background: #e9d5ff;
+    color: #7c3aed;
     border-radius: 12px;
     font-size: 11px;
     font-weight: 500;

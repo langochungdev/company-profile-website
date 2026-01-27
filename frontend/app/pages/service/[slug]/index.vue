@@ -35,6 +35,10 @@
                             </div>
                             <div class="card-info" @click="navigateToProject(project)">
                                 <h2 class="card-title">{{ project.name }}</h2>
+                                <div v-if="project.tags && project.tags.length > 0" class="card-tags">
+                                    <span v-for="(tag, idx) in project.tags.slice(0, 3)" :key="idx" class="tag-badge">{{ tag }}</span>
+                                    <span v-if="project.tags.length > 3" class="more-badge">+{{ project.tags.length - 3 }}</span>
+                                </div>
                                 <p class="card-description">{{ project.description }}</p>
                                 <div class="card-meta">
                                     <span v-if="project.completedDate" class="meta-item">
