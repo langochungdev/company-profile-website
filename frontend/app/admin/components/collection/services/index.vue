@@ -26,7 +26,9 @@ const { addToDeleteQueue, processDeleteQueue, clearQueue } = useDeleteQueue()
 
 const collectionContext = useCollectionContext({
     path: 'collections/services/items',
-    itemFields: {},
+    itemFields: {
+        slug: { type: 'text', label: 'Slug', isPreview: true },
+    },
 })
 
 const items = computed(() => collectionContext.items.value || [])

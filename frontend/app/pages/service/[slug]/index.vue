@@ -21,8 +21,8 @@
                     </div>
 
                     <div class="projects-grid">
-                        <article v-for="project in paginatedProjects" :key="project.id" class="project-card" @click="openLightbox(project.images, 0)">
-                            <div class="card-thumbnail">
+                        <article v-for="project in paginatedProjects" :key="project.id" class="project-card">
+                            <div class="card-thumbnail" @click.stop="openLightbox(project.images, 0)">
                                 <div class="thumbnail-grid">
                                     <div v-for="(image, idx) in project.images.slice(0, 4)" :key="idx" class="thumbnail-item">
                                         <img :src="image.url" :alt="image.alt || `${project.name} - Hình ${idx + 1}`" loading="lazy" />
@@ -33,7 +33,7 @@
                                     <span class="image-count">{{ project.images.length }} ảnh</span>
                                 </div>
                             </div>
-                            <div class="card-info">
+                            <div class="card-info" @click="navigateToProject(project)">
                                 <h2 class="card-title">{{ project.name }}</h2>
                                 <p class="card-description">{{ project.description }}</p>
                                 <div class="card-meta">
@@ -90,6 +90,7 @@ import { useCollectionConfig } from '@/admin/composables/useCollectionConfig'
 import { PLACEHOLDER_SERVICE_PROJECTS } from '@/constants/placeholders'
 
 const route = useRoute()
+const router = useRouter()
 const currentSlug = computed(() => route.params.slug)
 
 const currentPage = ref(1)
@@ -196,12 +197,6 @@ const displayedPages = computed(() => {
     return pages
 })
 
-const lightbox = reactive({
-    show: false,
-    images: [],
-    currentIndex: 0,
-})
-
 const goToPage = (page) => {
     if (page < 1 || page > totalPages.value) return
     currentPage.value = page
@@ -213,6 +208,12 @@ const formatDate = (date) => {
     const d = new Date(date)
     return d.toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' })
 }
+
+const lightbox = reactive({
+    show: false,
+    images: [],
+    currentIndex: 0,
+})
 
 const openLightbox = (images, startIndex) => {
     lightbox.images = images
@@ -241,6 +242,11 @@ const handleKeydown = (e) => {
     if (e.key === 'ArrowLeft') prevImage()
 }
 
+const navigateToProject = (project) => {
+    if (!project.slug) return
+    router.push(`/service/${currentSlug.value}/${project.slug}`)
+}
+
 watch(() => route.params.slug, () => {
     currentPage.value = 1
 })
@@ -262,5 +268,5 @@ useSeoMeta({
 </script>
 
 <style scoped>
-@import "./styles/service-slug.css";
+@import "../styles/service-slug.css";
 </style>

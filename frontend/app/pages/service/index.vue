@@ -1,3 +1,7 @@
+<template>
+    <div></div>
+</template>
+
 <script setup>
 import { useCollectionConfig } from '@/admin/composables/useCollectionConfig'
 
@@ -19,5 +23,5 @@ const firstCategorySlug = computed(() => {
     return 'camera-ai'
 })
 
-navigateTo(`/service/${firstCategorySlug.value}`)
+navigateTo(`/service/${firstCategorySlug.value}`, { replace: true })
 </script>

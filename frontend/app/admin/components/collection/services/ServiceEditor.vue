@@ -22,6 +22,14 @@
 
                     <div class="field-group">
                         <label>
+                            URL Slug <span class="required">*</span>
+                        </label>
+                        <input v-model="formData.slug" type="text" pattern="^[a-z0-9-]+$" placeholder="VD: lap-dat-camera-ai" required />
+                        <p class="hint">Tự động tạo từ tên dự án. Chỉ chấp nhận a-z, 0-9, dấu gạch ngang.</p>
+                    </div>
+
+                    <div class="field-group">
+                        <label>
                             Danh mục <span class="required">*</span>
                         </label>
                         <TagSelector v-model="formData.categories" :options="categories" />
@@ -90,10 +98,13 @@ import ImageGallery from '@/admin/components/shared/ImageGallery.vue'
 import TagSelector from '@/admin/components/shared/TagSelector.vue'
 import { useCollectionConfig } from '@/admin/composables/useCollectionConfig'
 import { usePendingUploads } from '@/admin/composables/usePendingUploads'
+import { useCollectionContext } from '@/admin/composables/useCollectionContext'
+import { generateSlug } from '@/admin/utils/slugify'
 
 interface ServiceData {
     id?: string
     name: string
+    slug: string
     categories: string[]
     tags: string[]
     description: string
@@ -120,9 +131,11 @@ const emit = defineEmits<{
 const { config: serviceConfig, loadConfig: loadServiceConfig } = useCollectionConfig('collections/services')
 const { config: productConfig, loadConfig: loadProductConfig } = useCollectionConfig('collections/products')
 const { hasPending, clearAll, uploadAllPending, pendingUploads } = usePendingUploads()
+const { checkDuplicateSlug } = useCollectionContext({ path: 'collections/services/items' })
 
 const formData = ref<ServiceData>({
     name: '',
+    slug: '',
     categories: [],
     tags: [],
     description: '',
@@ -140,6 +153,8 @@ const tags = computed(() => productConfig.value?.tags?.map(t => t.name) || [])
 const isValid = computed(() => {
     return (
         formData.value.name.trim() !== '' &&
+        formData.value.slug.trim() !== '' &&
+        /^[a-z0-9-]+$/.test(formData.value.slug) &&
         formData.value.categories.length > 0 &&
         formData.value.completedDate !== '' &&
         formData.value.location.trim() !== ''
@@ -148,6 +163,11 @@ const isValid = computed(() => {
 
 const handleSave = async () => {
     if (!isValid.value || isUploading.value) return
+
+    if (checkDuplicateSlug(formData.value.slug, props.initialData?.id as string | undefined)) {
+        alert(`Slug "${formData.value.slug}" đã tồn tại! Vui lòng chọn slug khác.`)
+        return
+    }
 
     isUploading.value = true
     const totalUploads = pendingUploads.value.length
@@ -197,12 +217,22 @@ const handleSave = async () => {
 }
 
 watch(
+    () => formData.value.name,
+    (newName) => {
+        if (props.isNew && newName) {
+            formData.value.slug = generateSlug(newName)
+        }
+    }
+)
+
+watch(
     () => props.isOpen,
     async (open) => {
         if (open) {
             await Promise.all([loadServiceConfig(), loadProductConfig()])
             formData.value = {
                 name: props.initialData?.name || '',
+                slug: props.initialData?.slug || '',
                 categories: props.initialData?.categories || [],
                 tags: props.initialData?.tags || [],
                 description: props.initialData?.description || '',

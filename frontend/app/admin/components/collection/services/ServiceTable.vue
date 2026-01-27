@@ -165,7 +165,7 @@ const filteredItems = computed(() => {
     let items = baseItems.value
 
     if (selectedCategory.value) {
-        items = items.filter(item => 
+        items = items.filter(item =>
             Array.isArray(item.categories) && item.categories.includes(selectedCategory.value!)
         )
     }
@@ -195,7 +195,7 @@ watch([searchQuery, selectedCategory], () => {
 
 const getDisplayImages = (item: ServiceItem) => {
     if (!item.images || item.images.length === 0) {
-        return [{ url: '/images/placeholder.png', alt: 'Placeholder' }]
+        return [{ url: 'https://placehold.co/400x300/f1f5f9/94a3b8?text=No+Image', alt: 'No Image' }]
     }
     return item.images.slice(0, 4)
 }
@@ -503,6 +503,7 @@ const formatDate = (dateStr?: string) => {
     margin: 0;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -538,6 +539,7 @@ const formatDate = (dateStr?: string) => {
     margin: 0;
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
