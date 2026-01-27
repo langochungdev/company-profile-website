@@ -10,71 +10,71 @@
         <main v-else class="post-detail-wrapper" :class="{ 'is-placeholder': displayPost.isPlaceholder }">
             <article class="post-detail-content">
                 <div class="container">
-                    <div class="post-grid">
-                        <div class="post-main">
-                            <div class="post-meta">
-                                <span class="meta-category">{{ displayPost.category }}</span>
-                                <span class="meta-date">
-                                    <Icon name="mdi:calendar-blank" />
-                                    {{ displayPost.publishedAt || displayPost.date }}
-                                </span>
-                                <span class="meta-author">
-                                    <Icon name="mdi:account" />
-                                    {{ displayPost.author }}
-                                </span>
-                            </div>
-
-                            <h1 class="post-title">{{ displayPost.title }}</h1>
-
-                            <div class="post-thumbnail">
-                                <img :src="displayPost.thumbnail || displayPost.image" :alt="displayPost.title" />
-                            </div>
-
-                            <div class="post-body" v-html="displayPost.content || defaultContent"></div>
-
-                            <div class="post-tags">
-                                <span class="tag">{{ displayPost.category }}</span>
-                                <span class="tag">SHT Security</span>
-                                <span class="tag">Giải pháp</span>
-                            </div>
-
-                            <div class="post-share">
-                                <span class="share-label">Chia sẻ:</span>
-                                <a href="#" class="share-btn facebook">
-                                    <Icon name="mdi:facebook" />
-                                </a>
-                                <a href="#" class="share-btn twitter">
-                                    <Icon name="mdi:twitter" />
-                                </a>
-                                <a href="#" class="share-btn linkedin">
-                                    <Icon name="mdi:linkedin" />
-                                </a>
-                            </div>
+                    <div class="post-container">
+                        <div class="post-meta">
+                            <span class="meta-category">{{ displayPost.category }}</span>
+                            <span class="meta-date">
+                                <Icon name="mdi:calendar-blank" />
+                                {{ displayPost.publishedAt || displayPost.date }}
+                            </span>
+                            <span class="meta-author">
+                                <Icon name="mdi:account" />
+                                {{ displayPost.author }}
+                            </span>
                         </div>
 
-                        <aside class="post-sidebar">
-                            <div class="sidebar-cta">
-                                <h3>Cần Tư Vấn?</h3>
-                                <p>Liên hệ ngay để được hỗ trợ miễn phí!</p>
+                        <h1 class="post-title">{{ displayPost.title }}</h1>
+
+                        <div class="post-thumbnail">
+                            <img :src="displayPost.thumbnail || displayPost.image" :alt="displayPost.title" />
+                        </div>
+
+                        <div class="post-body" v-html="displayPost.content || defaultContent"></div>
+
+                        <div class="post-tags">
+                            <span class="tag">{{ displayPost.category }}</span>
+                            <span class="tag">SHT Security</span>
+                            <span class="tag">Giải pháp</span>
+                        </div>
+
+                        <div class="post-share">
+                            <span class="share-label">Chia sẻ:</span>
+                            <a href="#" class="share-btn facebook">
+                                <Icon name="mdi:facebook" />
+                            </a>
+                            <a href="#" class="share-btn twitter">
+                                <Icon name="mdi:twitter" />
+                            </a>
+                            <a href="#" class="share-btn linkedin">
+                                <Icon name="mdi:linkedin" />
+                            </a>
+                        </div>
+
+                        <div class="cta-section">
+                            <div class="cta-content">
+                                <h3>Cần Tư Vấn Giải Pháp?</h3>
+                                <p>Liên hệ ngay để được hỗ trợ miễn phí từ chuyên gia của chúng tôi!</p>
                                 <NuxtLink to="/contact" class="cta-btn">
                                     <Icon name="mdi:phone" />
                                     Liên Hệ Ngay
                                 </NuxtLink>
                             </div>
+                        </div>
 
-                            <div class="sidebar-related" v-if="relatedPosts.length">
-                                <h3>Bài Viết Liên Quan</h3>
-                                <div class="related-list">
-                                    <NuxtLink v-for="item in relatedPosts" :key="item.id" :to="`/post/${item.slug}`" class="related-item">
+                        <div class="related-section" v-if="relatedPosts.length">
+                            <h2 class="related-heading">Bài Viết Liên Quan</h2>
+                            <div class="related-grid">
+                                <NuxtLink v-for="item in relatedPosts" :key="item.id" :to="`/post/${item.slug}`" class="related-card">
+                                    <div class="related-thumb-wrapper">
                                         <img :src="item.thumbnail || item.image" :alt="item.title" class="related-thumb" />
-                                        <div class="related-info">
-                                            <span class="related-date">{{ item.publishedAt }}</span>
-                                            <h4 class="related-title">{{ item.title }}</h4>
-                                        </div>
-                                    </NuxtLink>
-                                </div>
+                                    </div>
+                                    <div class="related-info">
+                                        <span class="related-date">{{ item.publishedAt }}</span>
+                                        <h3 class="related-title">{{ item.title }}</h3>
+                                    </div>
+                                </NuxtLink>
                             </div>
-                        </aside>
+                        </div>
                     </div>
                 </div>
             </article>

@@ -13,13 +13,18 @@
             </div>
 
             <transition-group v-else name="fade" tag="div" class="post-grid">
-                <PostItem v-for="post in displayPosts" :key="post.id" :post="post" :class="{ 'is-placeholder': post.isPlaceholder }" />
+                <PostItem v-for="post in paginatedPosts" :key="post.id" :post="post" :class="{ 'is-placeholder': post.isPlaceholder }" />
             </transition-group>
 
-            <div v-if="hasMore && !loading && previews.length > 0" class="load-more-wrapper">
-                <button class="load-more-btn" @click="loadMore">
-                    <Icon name="mdi:plus" />
-                    Xem thêm bài viết
+            <div v-if="totalPages > 1 && !loading" class="pagination">
+                <button :disabled="currentPage === 1" class="pagination-btn" @click="goToPage(currentPage - 1)">
+                    <Icon name="mdi:chevron-left" />
+                </button>
+                <button v-for="page in displayedPages" :key="page" :class="['page-btn', { active: currentPage === page }]" @click="goToPage(page)">
+                    {{ page }}
+                </button>
+                <button :disabled="currentPage === totalPages" class="pagination-btn" @click="goToPage(currentPage + 1)">
+                    <Icon name="mdi:chevron-right" />
                 </button>
             </div>
         </div>
@@ -35,8 +40,10 @@ const POST_CATEGORIES = ['Tất cả', 'Công nghệ', 'Hướng dẫn', 'Tin t�
 
 const categories = POST_CATEGORIES
 const currentCategory = ref('Tất cả')
+const currentPage = ref(1)
+const itemsPerPage = 9
 
-const { previews, loading, hasMore, loadPreviews, loadMore: loadMorePreviews, filterByCategory } = usePreviewContext('collections/posts/items')
+const { previews, loading, loadPreviews, filterByCategory } = usePreviewContext('collections/posts/items')
 
 const displayPosts = computed(() => {
     if (previews.value.length === 0 && !loading.value) {
@@ -45,12 +52,43 @@ const displayPosts = computed(() => {
     return previews.value
 })
 
+const totalPages = computed(() => Math.ceil(displayPosts.value.length / itemsPerPage) || 1)
+
+const paginatedPosts = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage
+    const end = start + itemsPerPage
+    return displayPosts.value.slice(start, end)
+})
+
+const displayedPages = computed(() => {
+    const pages = []
+    const maxVisible = 5
+    let start = Math.max(1, currentPage.value - Math.floor(maxVisible / 2))
+    let end = Math.min(totalPages.value, start + maxVisible - 1)
+
+    if (end - start < maxVisible - 1) {
+        start = Math.max(1, end - maxVisible + 1)
+    }
+
+    for (let i = start; i <= end; i++) {
+        pages.push(i)
+    }
+    return pages
+})
+
+const goToPage = (page) => {
+    if (page < 1 || page > totalPages.value) return
+    currentPage.value = page
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
 onMounted(() => {
-    loadPreviews({ limitCount: 12 })
+    loadPreviews({ limitCount: 100 })
 })
 
 const setCategory = async (cat) => {
     currentCategory.value = cat
+    currentPage.value = 1
     if (cat === 'Tất cả') {
         await filterByCategory(null)
     } else {
@@ -58,9 +96,9 @@ const setCategory = async (cat) => {
     }
 }
 
-const loadMore = () => {
-    loadMorePreviews()
-}
+watch(() => currentCategory.value, () => {
+    currentPage.value = 1
+})
 </script>
 
 <style scoped>

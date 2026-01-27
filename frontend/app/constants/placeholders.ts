@@ -61,50 +61,29 @@ export const PLACEHOLDER_SERVICES = [
     },
 ];
 
-export const PLACEHOLDER_POSTS = [
-    {
-        id: "placeholder-1",
-        title: "Bài viết mẫu",
-        slug: "placeholder-post-1",
-        category: "Danh mục mẫu",
-        description: "Mô tả bài viết mẫu.",
-        excerpt: "Tóm tắt bài viết mẫu. Đây là dữ liệu placeholder được hiển thị khi chưa có bài viết thực.",
-        image: "https://placehold.co/600x400/e2e8f0/94a3b8?text=Bài+viết",
-        thumbnail: "https://placehold.co/600x400/e2e8f0/94a3b8?text=Bài+viết",
-        publishedAt: "Đang cập nhật",
-        date: new Date().toISOString(),
-        author: "Tác giả",
+const generatePlaceholderPosts = (count = 25) => {
+    const categories = ["Công nghệ", "Hướng dẫn", "Tin tức", "Sự kiện", "Giải pháp"];
+    const titles = ["Xu hướng công nghệ bảo mật", "Hướng dẫn cài đặt hệ thống", "Tin tức công nghệ mới nhất", "Sự kiện ra mắt sản phẩm", "Giải pháp an ninh toàn diện", "Camera AI thông minh", "Mạng WiFi doanh nghiệp", "Hệ thống báo cháy hiện đại", "Kiểm soát ra vào tự động", "Tổng đài IP cho văn phòng", "Giải pháp smarthome", "An ninh mạng doanh nghiệp"];
+    const excerpts = ["Khám phá những xu hướng công nghệ bảo mật mới nhất trong ngành an ninh và giám sát.", "Hướng dẫn chi tiết từng bước để cài đặt và cấu hình hệ thống an ninh chuyên nghiệp.", "Cập nhật tin tức công nghệ mới nhất về camera AI, IoT và hệ thống thông minh.", "Tham gia sự kiện ra mắt sản phẩm mới với nhiều ưu đãi đặc biệt dành cho khách hàng.", "Giải pháp an ninh tích hợp toàn diện cho doanh nghiệp vừa và lớn."];
+    const authors = ["Nguyễn Văn A", "Trần Thị B", "Lê Văn C", "Phạm Thị D"];
+
+    return Array.from({ length: count }, (_, i) => ({
+        id: `placeholder-${i + 1}`,
+        title: `${titles[i % titles.length]} ${i + 1}`,
+        slug: `placeholder-post-${i + 1}`,
+        category: categories[i % categories.length],
+        description: excerpts[i % excerpts.length],
+        excerpt: excerpts[i % excerpts.length],
+        image: `https://placehold.co/600x400/${i % 2 === 0 ? "fecaca/991b1b" : "fee2e2/b91c1c"}?text=Blog+${i + 1}`,
+        thumbnail: `https://placehold.co/600x400/${i % 2 === 0 ? "fecaca/991b1b" : "fee2e2/b91c1c"}?text=Blog+${i + 1}`,
+        publishedAt: new Date(2024, (i * 2) % 12, ((i * 3) % 28) + 1).toLocaleDateString("vi-VN"),
+        date: new Date(2024, (i * 2) % 12, ((i * 3) % 28) + 1).toISOString(),
+        author: authors[i % authors.length],
         isPlaceholder: true,
-    },
-    {
-        id: "placeholder-2",
-        title: "Bài viết mẫu 2",
-        slug: "placeholder-post-2",
-        category: "Danh mục mẫu",
-        description: "Mô tả bài viết mẫu.",
-        excerpt: "Tóm tắt bài viết mẫu. Đây là dữ liệu placeholder được hiển thị khi chưa có bài viết thực.",
-        image: "https://placehold.co/600x400/e2e8f0/94a3b8?text=Bài+viết",
-        thumbnail: "https://placehold.co/600x400/e2e8f0/94a3b8?text=Bài+viết",
-        publishedAt: "Đang cập nhật",
-        date: new Date().toISOString(),
-        author: "Tác giả",
-        isPlaceholder: true,
-    },
-    {
-        id: "placeholder-3",
-        title: "Bài viết mẫu 3",
-        slug: "placeholder-post-3",
-        category: "Danh mục mẫu",
-        description: "Mô tả bài viết mẫu.",
-        excerpt: "Tóm tắt bài viết mẫu. Đây là dữ liệu placeholder được hiển thị khi chưa có bài viết thực.",
-        image: "https://placehold.co/600x400/e2e8f0/94a3b8?text=Bài+viết",
-        thumbnail: "https://placehold.co/600x400/e2e8f0/94a3b8?text=Bài+viết",
-        publishedAt: "Đang cập nhật",
-        date: new Date().toISOString(),
-        author: "Tác giả",
-        isPlaceholder: true,
-    },
-];
+    }));
+};
+
+export const PLACEHOLDER_POSTS = generatePlaceholderPosts(25);
 
 export const PLACEHOLDER_PRODUCT_DETAIL = {
     id: "placeholder",
