@@ -108,7 +108,9 @@ const emit = defineEmits<{
 const editor = useEditor({
     content: props.modelValue,
     extensions: [
-        StarterKit,
+        StarterKit.configure({
+            link: false,
+        }),
         Underline,
         TextAlign.configure({
             types: ['heading', 'paragraph'],

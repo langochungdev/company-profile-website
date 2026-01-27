@@ -1,5 +1,5 @@
 <template>
-    <div v-if="isOpen" class="post-editor-modal">
+    <div v-if="isOpen" class="product-editor-modal">
         <div class="modal-overlay" @click="$emit('close')" />
 
         <div class="modal-content">
@@ -85,9 +85,9 @@
                 </div>
 
                 <div class="field-group">
-                    <label>Ảnh đại diện <span class="required">*</span></label>
-                    <ImageGallery v-model="formData.thumbnails" :min="1" :max="1" folder="posts/thumbnails" />
-                    <p class="hint">Ảnh thumbnail hiển thị trong danh sách bài viết</p>
+                    <label>Ảnh đại diện</label>
+                    <ImageGallery v-model="formData.thumbnails" :min="0" :max="1" folder="posts/thumbnails" />
+                    <p class="hint">Ảnh thumbnail hiển thị trong danh sách bài viết (không bắt buộc)</p>
                 </div>
 
                 <div class="field-group">
@@ -128,6 +128,7 @@ import { usePendingUploads } from '@/admin/composables/usePendingUploads'
 import { useRichTextImages } from '@/admin/composables/useRichTextImages'
 import { useDeleteQueue } from '@/admin/composables/useDeleteQueue'
 import { CollectionService } from '@/admin/services/collection.service'
+import { generateSlug } from '@/admin/utils/slugify'
 import type { Firestore } from 'firebase/firestore'
 
 interface PostData {
@@ -172,16 +173,14 @@ const formData = ref<PostData>({
 })
 
 const { config, loadConfig } = useCollectionConfig('collections/posts')
+const productConfig = useCollectionConfig('collections/products')
 const { hasPending, clearAll, uploadAllPending } = usePendingUploads()
 const { uploadPendingImages, clearPendingImages } = useRichTextImages()
 const { addToDeleteQueue, processDeleteQueue, clearQueue } = useDeleteQueue()
 const { $db } = useNuxtApp()
 
 const categories = computed(() => config.value.categories.map(c => c.name))
-const tags = computed(() => {
-    const productConfig = useCollectionConfig('collections/products')
-    return productConfig.config.value.tags.map(t => t.name)
-})
+const tags = computed(() => productConfig.config.value.tags.map(t => t.name))
 
 const isUploading = ref(false)
 const uploadProgress = ref({ current: 0, total: 0 })
@@ -191,6 +190,7 @@ const manualSlugEdit = ref(false)
 
 onMounted(async () => {
     await loadConfig()
+    await productConfig.loadConfig()
 })
 
 watch(
@@ -198,6 +198,7 @@ watch(
     async newVal => {
         if (newVal) {
             await loadConfig()
+            await productConfig.loadConfig()
             clearAll()
             clearPendingImages()
             clearQueue()
@@ -272,15 +273,7 @@ watch(
     },
 )
 
-const generateSlug = (text: string) => {
-    return text
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/đ/g, 'd')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '')
-}
+
 
 const validateSlug = async (slug: string) => {
     if (!slug) {
@@ -339,14 +332,52 @@ const handleSave = async () => {
             })
         }
 
+        let processedThumbnail: any = null
+
+        if (hasPending.value) {
+            const results = await uploadAllPending((current, total) => {
+                uploadProgress.value = { current, total }
+            })
+
+            if (formData.value.thumbnails.length > 0) {
+                const thumbnailImg = formData.value.thumbnails[0]
+                if (thumbnailImg) {
+                    const pendingImg = thumbnailImg as any
+                    if (pendingImg.pending && pendingImg.fieldPath) {
+                        const result = results.get(pendingImg.fieldPath)
+                        if (result) {
+                            processedThumbnail = {
+                                url: result.secure_url,
+                                alt: thumbnailImg.alt || formData.value.title,
+                                width: result.width,
+                                height: result.height,
+                            }
+                        }
+                    } else {
+                        processedThumbnail = thumbnailImg
+                    }
+                }
+            }
+        } else if (formData.value.thumbnails.length > 0 && formData.value.thumbnails[0]) {
+            processedThumbnail = formData.value.thumbnails[0]
+        }
+
         processedContent = await uploadPendingImages(formData.value.content, 'posts/content')
 
-        const finalData = {
+        const finalData: any = {
             ...formData.value,
             content: processedContent,
             author: formData.value.author || 'shtcam.vn',
-            thumbnail: formData.value.thumbnails[0] || undefined,
+            thumbnail: processedThumbnail,
         }
+
+        Object.keys(finalData).forEach(key => {
+            if (finalData[key] === undefined || finalData[key] === null) {
+                delete finalData[key]
+            }
+        })
+
+        delete finalData.thumbnails
 
         emit('save', finalData)
 
