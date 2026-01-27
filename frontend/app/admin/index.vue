@@ -27,6 +27,7 @@
                         <template v-if="activeTab === 'items'">
                             <ProductPage v-if="activePage === 'product'" ref="productPageRef" />
                             <ServicePage v-else-if="activePage === 'service'" ref="servicePageRef" />
+                            <PostPage v-else-if="activePage === 'post'" ref="postPageRef" />
                         </template>
 
                         <SettingsView v-else ref="collectionSettingsRef" :key="activePage" :page-key="activePage" :page-name="currentPageName" :config-path="currentConfigPath" :schema-type="currentSchemaType" :readonly="true" @dirty-change="settingsDirty = $event" @saving-change="isSaving = $event" />
@@ -40,14 +41,15 @@
 </template>
 
 <script setup lang="ts">
-import AdminSidebar from "./components/layouts/AdminSidebar.vue";
-import AdminHeader from "./components/layouts/AdminHeader.vue";
-import ProductPage from "./components/collection/products/index.vue";
-import ServicePage from "./components/collection/services/index.vue";
-import LiveEditView from "./components/views/LiveEditView.vue";
-import SettingsView from "./components/views/SettingsView.vue";
-import { PAGE_CONFIGS, getAllPages, getPageConfig, isCollectionPage as checkIsCollection } from "./config/page.config";
-import Toast from "./components/Toast.vue";
+import AdminSidebar from './components/layouts/AdminSidebar.vue'
+import AdminHeader from './components/layouts/AdminHeader.vue'
+import ProductPage from './components/collection/products/index.vue'
+import ServicePage from './components/collection/services/index.vue'
+import PostPage from './components/collection/posts/index.vue'
+import LiveEditView from './components/views/LiveEditView.vue'
+import SettingsView from './components/views/SettingsView.vue'
+import { PAGE_CONFIGS, getAllPages, getPageConfig, isCollectionPage as checkIsCollection } from './config/page.config'
+import Toast from './components/Toast.vue'
 
 const route = useRoute();
 const router = useRouter();
@@ -97,8 +99,9 @@ const hasChanges = computed(() => {
 const liveEditRef = ref<{ handleSave: () => Promise<void>; handleDiscard: () => void } | null>(null);
 const settingsRef = ref<{ handleSave: () => Promise<void>; handleDiscard: () => Promise<void> } | null>(null);
 const collectionSettingsRef = ref<{ handleSave: () => Promise<void>; handleDiscard: () => Promise<void> } | null>(null);
-const productPageRef = ref<{ loading: boolean; refresh: () => Promise<void> } | null>(null);
-const servicePageRef = ref<{ loading: boolean; refresh: () => Promise<void> } | null>(null);
+const productPageRef = ref<{ loading: boolean; refresh: () => Promise<void> } | null>(null)
+const servicePageRef = ref<{ loading: boolean; refresh: () => Promise<void> } | null>(null)
+const postPageRef = ref<{ loading: boolean; refresh: () => Promise<void> } | null>(null)
 
 const firstKey = Object.keys(PAGE_CONFIGS)[0] as string;
 const currentConfig = computed(() => getPageConfig(activePage.value) || PAGE_CONFIGS[firstKey]);
