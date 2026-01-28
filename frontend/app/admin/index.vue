@@ -131,6 +131,9 @@ const headerTabs = computed<TabItem[]>(() => {
     if (activePage.value === 'dashboard') {
         return [];
     }
+    if (activePage.value === 'home') {
+        return [];
+    }
     if (isCollectionPage.value) {
         return [
             { key: "items", label: getCollectionName.value, icon: currentConfig.value?.icon || "mdi:view-list" },
