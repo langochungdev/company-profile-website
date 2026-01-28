@@ -10,6 +10,7 @@
         <div class="tab-content">
             <AnalyticsView v-if="activeTab === 'analytics'" />
             <StorageView v-else-if="activeTab === 'storage'" />
+            <SearchReportView v-else-if="activeTab === 'search'" />
         </div>
     </div>
 </template>
@@ -18,6 +19,7 @@
 import { ref, watch } from 'vue'
 import AnalyticsView from './viewer/AnalyticsView.vue'
 import StorageView from './storage/StorageView.vue'
+import SearchReportView from './search-report/SearchReportView.vue'
 
 interface Tab {
     id: string
@@ -27,7 +29,8 @@ interface Tab {
 
 const tabs: Tab[] = [
     { id: 'analytics', label: 'Analytics', icon: 'mdi:chart-line' },
-    { id: 'storage', label: 'Storage', icon: 'mdi:database' }
+    { id: 'storage', label: 'Storage', icon: 'mdi:database' },
+    { id: 'search', label: 'Search Report', icon: 'mdi:magnify' }
 ]
 
 const route = useRoute()

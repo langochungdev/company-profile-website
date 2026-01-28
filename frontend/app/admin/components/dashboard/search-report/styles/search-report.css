@@ -1,0 +1,156 @@
+.search-report-wrapper {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.last-updated {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    font-size: 0.875rem;
+    color: #999;
+    text-align: right;
+}
+
+.env-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.env-filter label {
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.env-filter select {
+    padding: 0.5rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.filters-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.search-terms-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.search-terms-section h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #111;
+}
+
+.section-subtitle {
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.search-terms-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.search-terms-table thead {
+    background: #f9fafb;
+}
+
+.search-terms-table th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.search-terms-table th:first-child {
+    width: 50px;
+    text-align: center;
+}
+
+.search-terms-table th:last-child {
+    width: 120px;
+    text-align: right;
+}
+
+.search-terms-table tbody tr {
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.search-terms-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+.search-terms-table td {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+}
+
+.search-terms-table td:first-child {
+    text-align: center;
+    color: #999;
+    font-weight: 500;
+}
+
+.search-terms-table .search-term {
+    font-weight: 500;
+    color: #111;
+}
+
+.search-terms-table .count {
+    text-align: right;
+    font-weight: 600;
+    color: #3b82f6;
+}
+
+.empty-state {
+    padding: 2rem;
+    text-align: center;
+    color: #999;
+    font-size: 0.875rem;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    .search-report-wrapper {
+        padding: 1rem;
+    }
+
+    .search-terms-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .search-terms-table {
+        font-size: 0.813rem;
+    }
+
+    .search-terms-table th,
+    .search-terms-table td {
+        padding: 0.5rem 0.75rem;
+    }
+}
