@@ -15,11 +15,15 @@
                 </div>
 
                 <template v-else-if="!isCollectionPage">
-                    <ClientOnly v-if="activeContentTab === 'live'">
-                        <LiveEditView :key="activePage" ref="liveEditRef" :page-key="activePage" @dirty-change="liveEditDirty = $event" @saving-change="isSaving = $event" />
-                    </ClientOnly>
+                    <DashboardView v-if="activePage === 'dashboard'" />
 
-                    <SettingsView v-else ref="settingsRef" :key="activePage" :page-key="activePage" :page-name="currentPageName" :config-path="currentConfigPath" :schema-type="currentSchemaType" :readonly="false" @dirty-change="settingsDirty = $event" @saving-change="isSaving = $event" />
+                    <template v-else>
+                        <ClientOnly v-if="activeContentTab === 'live'">
+                            <LiveEditView :key="activePage" ref="liveEditRef" :page-key="activePage" @dirty-change="liveEditDirty = $event" @saving-change="isSaving = $event" />
+                        </ClientOnly>
+
+                        <SettingsView v-else ref="settingsRef" :key="activePage" :page-key="activePage" :page-name="currentPageName" :config-path="currentConfigPath" :schema-type="currentSchemaType" :readonly="false" @dirty-change="settingsDirty = $event" @saving-change="isSaving = $event" />
+                    </template>
                 </template>
 
                 <div v-else-if="currentConfig" class="editor-container">
@@ -48,6 +52,7 @@ import ServicePage from './components/collection/services/index.vue'
 import PostPage from './components/collection/posts/index.vue'
 import LiveEditView from './components/views/LiveEditView.vue'
 import SettingsView from './components/views/SettingsView.vue'
+import DashboardView from './components/dashboard/DashboardView.vue'
 import { PAGE_CONFIGS, getAllPages, getPageConfig, isCollectionPage as checkIsCollection } from './config/page.config'
 import Toast from './components/Toast.vue'
 
@@ -66,7 +71,7 @@ const sidebarPages = computed(() => {
 const getInitialPage = (): string => {
     const urlPage = route.query.page as string;
     if (urlPage && PAGE_CONFIGS[urlPage]) return urlPage;
-    return "home";
+    return "dashboard";
 };
 
 const getInitialTab = (pageKey: string): "items" | "settings" => {
@@ -123,6 +128,9 @@ interface TabItem {
 }
 
 const headerTabs = computed<TabItem[]>(() => {
+    if (activePage.value === 'dashboard') {
+        return [];
+    }
     if (isCollectionPage.value) {
         return [
             { key: "items", label: getCollectionName.value, icon: currentConfig.value?.icon || "mdi:view-list" },
@@ -138,11 +146,13 @@ const headerTabs = computed<TabItem[]>(() => {
 const currentActiveTab = computed(() => (isCollectionPage.value ? activeTab.value : activeContentTab.value));
 
 const showHeaderSaveButton = computed(() => {
+    if (activePage.value === 'dashboard') return false;
     if (isCollectionPage.value) return false;
     return true;
 });
 
 const showHeaderDiscardButton = computed(() => {
+    if (activePage.value === 'dashboard') return false;
     if (isCollectionPage.value) return false;
     return true;
 });

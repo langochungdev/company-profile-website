@@ -1,0 +1,41 @@
+.page-filter-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.page-filter-wrapper label {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+}
+
+.page-select {
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: white;
+    font-size: 0.9375rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    min-width: 200px;
+}
+
+.page-select:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: hsl(200, 90%, 50%);
+}
+
+.page-select option {
+    background: hsl(220, 20%, 15%);
+    color: white;
+    padding: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .page-select {
+        min-width: 100%;
+    }
+}
