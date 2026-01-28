@@ -28,7 +28,36 @@ export const useDashboardAnalytics = () => {
         try {
             const collectionPath = getFirestorePath("daily-stats");
             const stats = await AnalyticsService.getDailyStats($db as Firestore, collectionPath, startDate.value, endDate.value);
-            dailyStats.value = stats;
+
+            const filledStats: DailyStats[] = [];
+            const statsMap = new Map(stats.map((s) => [s.date, s]));
+
+            let currentDate = new Date(startDate.value);
+            const end = new Date(endDate.value);
+
+            while (currentDate <= end) {
+                const dateStr = format(currentDate, "yyyy-MM-dd");
+                const existingStat = statsMap.get(dateStr);
+
+                filledStats.push(
+                    existingStat || {
+                        date: dateStr,
+                        totalViews: 0,
+                        pages: {
+                            home: 0,
+                            "about-us": 0,
+                            contact: 0,
+                            products: 0,
+                            services: 0,
+                            posts: 0,
+                        },
+                    },
+                );
+
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            dailyStats.value = filledStats;
         } catch (e) {
             error.value = e as Error;
             console.error("Failed to load daily stats:", e);
