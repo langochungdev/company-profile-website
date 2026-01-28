@@ -240,6 +240,10 @@ const toggleSidebar = () => {
 };
 
 const syncUrlState = () => {
+    if (activePage.value === 'dashboard') {
+        return;
+    }
+
     const currentTab = isCollectionPage.value ? activeTab.value : activeContentTab.value;
     router.replace({
         query: {

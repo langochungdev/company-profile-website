@@ -61,10 +61,7 @@
                             <span class="bar-percent">{{ usage.storage.usedPercent }}%</span>
                         </div>
                         <div class="bar-track">
-                            <div 
-                                class="bar-fill storage-fill"
-                                :style="{ width: `${usage.storage.usedPercent}%` }"
-                            />
+                            <div class="bar-fill storage-fill" :style="storageWidthStyle" />
                         </div>
                         <div class="bar-footer">
                             <span>{{ formatBytes(usage.storage.used) }} / {{ formatBytes(usage.storage.limit) }}</span>
@@ -77,10 +74,7 @@
                             <span class="bar-percent">{{ usage.bandwidth.usedPercent }}%</span>
                         </div>
                         <div class="bar-track">
-                            <div 
-                                class="bar-fill bandwidth-fill"
-                                :style="{ width: `${usage.bandwidth.usedPercent}%` }"
-                            />
+                            <div class="bar-fill bandwidth-fill" :style="bandwidthWidthStyle" />
                         </div>
                         <div class="bar-footer">
                             <span>{{ formatBytes(usage.bandwidth.used) }} / {{ formatBytes(usage.bandwidth.limit) }}</span>
@@ -97,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import type { CloudinaryUsageResponse } from '@/admin/types/cloudinary.type'
 
 const loading = ref(true)
@@ -109,20 +103,73 @@ const usage = ref<CloudinaryUsageResponse>({
     lastUpdated: new Date().toISOString()
 })
 
+const DEV_MODE = ref(false)
+
+const getMockData = (): CloudinaryUsageResponse => {
+    return {
+        storage: {
+            used: 3750000000,
+            limit: 25000000000,
+            usedPercent: 15
+        },
+        bandwidth: {
+            used: 12500000000,
+            limit: 25000000000,
+            usedPercent: 50
+        },
+        resources: 1250,
+        lastUpdated: new Date().toISOString()
+    }
+}
+
 const fetchUsage = async () => {
     loading.value = true
     error.value = null
-    
+
+    if (DEV_MODE.value) {
+        console.warn('[StorageView] DEV MODE: Using mock data')
+        setTimeout(() => {
+            const mockData = getMockData()
+            console.log('[StorageView] Mock data:', mockData)
+            usage.value = mockData
+            loading.value = false
+        }, 500)
+        return
+    }
+
     try {
         const data = await $fetch<CloudinaryUsageResponse>('/api/cloudinary-usage')
+        console.log('[StorageView] Received data:', data)
+        console.log('[StorageView] Storage percent:', data.storage.usedPercent)
+        console.log('[StorageView] Bandwidth percent:', data.bandwidth.usedPercent)
         usage.value = data
     } catch (err: any) {
+        console.error('[StorageView] Fetch error:', err)
+        console.error('[StorageView] Error details:', {
+            status: err?.statusCode,
+            message: err?.data?.message || err?.message,
+            data: err?.data
+        })
+
         error.value = err?.data?.message || 'Không thể tải dữ liệu usage'
-        console.error('Cloudinary usage fetch error:', err)
+
+        console.warn('[StorageView] API failed. To test UI, open console and run: window.toggleStorageMockData()')
     } finally {
         loading.value = false
     }
 }
+
+const storageWidthStyle = computed(() => {
+    const width = `${usage.value.storage.usedPercent}%`
+    console.log('[StorageView] Storage width style:', width)
+    return { width }
+})
+
+const bandwidthWidthStyle = computed(() => {
+    const width = `${usage.value.bandwidth.usedPercent}%`
+    console.log('[StorageView] Bandwidth width style:', width)
+    return { width }
+})
 
 const formatBytes = (bytes: number): string => {
     if (bytes === 0) return '0 B'
@@ -139,7 +186,17 @@ const formatDate = (dateString: string): string => {
 
 onMounted(() => {
     fetchUsage()
+
+    if (typeof window !== 'undefined') {
+        (window as any).toggleStorageMockData = () => {
+            DEV_MODE.value = !DEV_MODE.value
+            console.log(`[StorageView] Mock data ${DEV_MODE.value ? 'ENABLED' : 'DISABLED'}`)
+            fetchUsage()
+        }
+        console.log('[StorageView] Debug helper available: window.toggleStorageMockData()')
+    }
 })
+
 </script>
 
 <style scoped>
