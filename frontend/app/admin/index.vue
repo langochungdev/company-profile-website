@@ -15,7 +15,7 @@
                 </div>
 
                 <template v-else-if="!isCollectionPage">
-                    <DashboardView v-if="activePage === 'dashboard'" />
+                    <DashboardTabs v-if="activePage === 'dashboard'" />
 
                     <template v-else>
                         <ClientOnly v-if="activeContentTab === 'live'">
@@ -52,7 +52,7 @@ import ServicePage from './components/collection/services/index.vue'
 import PostPage from './components/collection/posts/index.vue'
 import LiveEditView from './components/views/LiveEditView.vue'
 import SettingsView from './components/views/SettingsView.vue'
-import DashboardView from './components/dashboard/DashboardView.vue'
+import DashboardTabs from './components/dashboard/DashboardTabs.vue'
 import { PAGE_CONFIGS, getAllPages, getPageConfig, isCollectionPage as checkIsCollection } from './config/page.config'
 import Toast from './components/Toast.vue'
 

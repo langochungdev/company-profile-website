@@ -45,5 +45,5 @@ watch(() => props.endDate, (val) => { localEnd.value = val })
 </script>
 
 <style scoped>
-@import "./styles/date-range-picker.css";
+@import "../styles/date-range-picker.css";
 </style>

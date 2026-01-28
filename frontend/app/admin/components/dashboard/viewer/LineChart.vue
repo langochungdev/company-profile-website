@@ -123,5 +123,5 @@ const chartOptions = {
 </script>
 
 <style scoped>
-@import "./styles/line-chart.css";
+@import "../styles/line-chart.css";
 </style>

@@ -28,5 +28,5 @@ const formattedValue = computed(() => {
 </script>
 
 <style scoped>
-@import "./styles/stats-card.css";
+@import "../styles/stats-card.css";
 </style>

@@ -41,7 +41,9 @@ export class AnalyticsService {
                 {
                     date,
                     totalViews: increment(1),
-                    [`pages.${pageKey}`]: increment(1),
+                    pages: {
+                        [pageKey]: increment(1),
+                    },
                     updatedAt: serverTimestamp(),
                 },
                 { merge: true },

@@ -1,5 +1,5 @@
 <template>
-    <div class="dashboard-view-wrapper">
+    <div class="analytics-view-wrapper">
         <div class="dashboard-header">
             <h1>Dashboard Analytics</h1>
             <p>Thống kê lượt truy cập website</p>
@@ -66,5 +66,5 @@ const getPageLabel = (key: PageKey) => {
 </script>
 
 <style scoped>
-@import "./styles/dashboard.css";
+@import "../styles/dashboard.css";
 </style>

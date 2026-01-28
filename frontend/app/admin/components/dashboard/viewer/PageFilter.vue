@@ -31,5 +31,5 @@ const handleChange = (e: Event) => {
 </script>
 
 <style scoped>
-@import "./styles/page-filter.css";
+@import "../styles/page-filter.css";
 </style>

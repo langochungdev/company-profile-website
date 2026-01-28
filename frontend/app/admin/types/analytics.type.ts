@@ -12,7 +12,7 @@ export interface PageStats {
 export interface DailyStats {
     date: string;
     totalViews: number;
-    pages: PageStats;
+    pages?: PageStats;
 }
 
 export interface RealtimeStats {

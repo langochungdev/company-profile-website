@@ -3,7 +3,7 @@ import { format, subDays } from "date-fns";
 import type { Firestore } from "firebase/firestore";
 import { getFirestorePath } from "@/admin/utils/firestore";
 import { AnalyticsService } from "@/admin/services/analytics.service";
-import type { PageKey, DailyStats, WeeklyStats } from "@/admin/types/analytics.type";
+import type { PageKey, DailyStats, WeeklyStats, PageStats } from "@/admin/types/analytics.type";
 
 export const useDashboardAnalytics = () => {
     const { $db } = useNuxtApp();
@@ -32,6 +32,15 @@ export const useDashboardAnalytics = () => {
             const filledStats: DailyStats[] = [];
             const statsMap = new Map(stats.map((s) => [s.date, s]));
 
+            const defaultPages: PageStats = {
+                home: 0,
+                "about-us": 0,
+                contact: 0,
+                products: 0,
+                services: 0,
+                posts: 0,
+            };
+
             let currentDate = new Date(startDate.value);
             const end = new Date(endDate.value);
 
@@ -39,24 +48,21 @@ export const useDashboardAnalytics = () => {
                 const dateStr = format(currentDate, "yyyy-MM-dd");
                 const existingStat = statsMap.get(dateStr);
 
-                filledStats.push(
-                    existingStat || {
-                        date: dateStr,
-                        totalViews: 0,
-                        pages: {
-                            home: 0,
-                            "about-us": 0,
-                            contact: 0,
-                            products: 0,
-                            services: 0,
-                            posts: 0,
-                        },
-                    },
-                );
+                filledStats.push({
+                    date: dateStr,
+                    totalViews: existingStat?.totalViews || 0,
+                    pages: existingStat?.pages
+                        ? {
+                              ...defaultPages,
+                              ...existingStat.pages,
+                          }
+                        : defaultPages,
+                });
 
                 currentDate.setDate(currentDate.getDate() + 1);
             }
 
+            console.log("📊 Final dailyStats:", filledStats);
             dailyStats.value = filledStats;
         } catch (e) {
             error.value = e as Error;
@@ -82,7 +88,9 @@ export const useDashboardAnalytics = () => {
         if (selectedPage.value === "all") {
             return dailyStats.value.map((stat) => stat.totalViews || 0);
         }
-        return dailyStats.value.map((stat) => stat.pages?.[selectedPage.value as PageKey] || 0);
+
+        const pageKey = selectedPage.value as PageKey;
+        return dailyStats.value.map((stat) => stat.pages?.[pageKey] || 0);
     });
 
     const weeklyStats = computed<WeeklyStats>(() => {
