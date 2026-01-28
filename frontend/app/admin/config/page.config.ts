@@ -167,6 +167,7 @@ export interface SidebarGroupConfig {
 
 export const SIDEBAR_GROUPS: SidebarGroupConfig[] = [
     { name: "Trang", visible: true },
+    { name: "Layout", visible: true },
     { name: "Cài đặt", visible: true },
     { name: "Dev Tools", visible: true },
 ];

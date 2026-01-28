@@ -106,6 +106,7 @@ export const useFieldScanner = (options: FieldScannerOptions) => {
             }
             e.preventDefault();
             e.stopPropagation();
+            console.log("[FieldScanner] Field clicked:", { sectionId, fieldPath, element });
             onFieldClick(sectionId, fieldPath);
         };
 

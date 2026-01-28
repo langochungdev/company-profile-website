@@ -5,20 +5,39 @@
             <div class="top-bar__content">
                 <div class="address-wrapper">
                     <Icon name="mdi:map-marker" class="icon icon--sm flex-shrink-0" />
-                    <span class="text-truncate">123 Đường ABC, Quận 1, TP.HCM</span>
+                    <span class="text-truncate" data-field="address">{{ displayAddress }}</span>
                 </div>
-                <a href="mailto:info@sht.vn" class="contact-link email-link">
+                <a :href="`mailto:${displayEmail}`" class="contact-link email-link">
                     <Icon name="mdi:email" class="icon" />
-                    <span>info@sht.vn</span>
+                    <span data-field="email">{{ displayEmail }}</span>
                 </a>
-                <a href="tel:0901234567" class="contact-link phone-link phone-blink">
+                <a :href="`tel:${displayPhone.replace(/\s/g, '')}`" class="contact-link phone-link phone-blink">
                     <Icon name="mdi:phone" class="icon icon--sm flex-shrink-0" />
-                    <span class="nowrap">0901 234 567</span>
+                    <span class="nowrap" data-field="phone">{{ displayPhone }}</span>
                 </a>
             </div>
         </div>
     </div>
 </template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+
+interface TopBarData {
+    address?: string
+    email?: string
+    phone?: string
+}
+
+const props = defineProps<{
+    data?: TopBarData | null
+    editMode?: boolean
+}>()
+
+const displayAddress = computed(() => props.data?.address || '123 Đường ABC, Quận 1, TP.HCM')
+const displayEmail = computed(() => props.data?.email || 'info@sht.vn')
+const displayPhone = computed(() => props.data?.phone || '0901 234 567')
+</script>
 
 <style scoped>
 /* TopBar - Desktop styles */

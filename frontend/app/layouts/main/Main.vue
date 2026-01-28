@@ -6,9 +6,9 @@
 
         <Footer :data="(layoutData?.footer as FooterData)" />
 
-        <a :href="zaloUrl" target="_blank" rel="noopener noreferrer" class="zalo-button" aria-label="Chat qua Zalo">
+        <a :href="zaloUrl" target="_blank" rel="noopener noreferrer" class="zalo-button" aria-label="Chat qua Zalo" :data-field-link="'zaloButton.phoneNumber'">
             <span class="zalo-ping"></span>
-            <img :src="zaloIcon" alt="Zalo" class="zalo-icon" />
+            <img :src="zaloIcon" alt="Zalo" class="zalo-icon" :data-field="'zaloButton.imageUrl'" data-field-type="image" />
         </a>
     </div>
 </template>

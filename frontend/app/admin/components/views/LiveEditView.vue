@@ -166,6 +166,11 @@ const pageComponentModules: Record<string, ComponentModule> = {
     "home/PartnerSection": () => import("../../../pages/home/(components)/PartnerSection.vue"),
     "about-us/AboutContent": () => import("../../../pages/about-us/(components)/AboutContent.vue"),
     "contact/ContactForm": () => import("../../../pages/contact/(components)/ContactForm.vue"),
+    "main/TopBar": () => import("../../../layouts/main/components/TopBar.vue"),
+    "main/Header": () => import("../../../layouts/main/components/Header.vue"),
+    "main/Footer": () => import("../../../layouts/main/components/Footer.vue"),
+    "main/ZaloButton": () => import("../../../layouts/main/components/ZaloButton.vue"),
+    "main/Main": () => import("../../../layouts/main/Main.vue"),
 };
 
 const sectionComponents = computed(() => {

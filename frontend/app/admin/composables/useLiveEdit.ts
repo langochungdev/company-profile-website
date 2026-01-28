@@ -202,14 +202,19 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
     };
 
     const openEditor = (sectionId: string, fieldPath: string) => {
+        console.log("[useLiveEdit] openEditor called:", { sectionId, fieldPath });
         const section = config.value?.sections[sectionId];
-        if (!section) return;
+        if (!section) {
+            console.warn("[useLiveEdit] Section not found:", sectionId);
+            return;
+        }
 
         const parts = fieldPath.split(".");
         const firstPart = parts[0];
         if (!firstPart) return;
 
         let fieldConfig: FieldConfig | undefined = section.fields[firstPart];
+        console.log("[useLiveEdit] Initial fieldConfig:", { firstPart, fieldConfig });
 
         for (let i = 1; i < parts.length && fieldConfig; i++) {
             const part = parts[i];
@@ -226,9 +231,13 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
             }
         }
 
-        if (!fieldConfig) return;
+        if (!fieldConfig) {
+            console.warn("[useLiveEdit] FieldConfig not found after traversal");
+            return;
+        }
 
         const currentValue = getFieldValue(sectionId, fieldPath);
+        console.log("[useLiveEdit] Opening editor with:", { fieldConfig, currentValue });
 
         editTarget.value = {
             sectionId,
@@ -237,6 +246,7 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
             currentValue,
         };
         isPopupOpen.value = true;
+        console.log("[useLiveEdit] isPopupOpen set to true");
     };
 
     const closeEditor = () => {

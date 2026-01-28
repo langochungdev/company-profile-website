@@ -1,6 +1,6 @@
 export const mainLayoutConfig = {
-    layout: "main",
-    layoutName: "Layout Chính",
+    page: "main",
+    pageName: "Layout Chính",
     path: "layout/main",
     icon: "mdi:page-layout-header-footer",
     order: 1,
@@ -95,7 +95,7 @@ export const mainLayoutConfig = {
 
         zaloButton: {
             label: "Nút Zalo",
-            component: "Main",
+            component: "ZaloButton",
             enabled: true,
             collapsed: true,
             visible: true,

@@ -6,10 +6,10 @@
                 <div class="footer-brand">
                     <div class="brand-logo">
                         <div class="brand-name">
-                            <span class="text-primary" :data-field="'footer.brandHighlight'">{{ displayBrandHighlight }}</span> <span :data-field="'footer.brandName'">{{ displayBrandName }}</span>
+                            <span class="text-primary" data-field="brandHighlight">{{ displayBrandHighlight }}</span> <span data-field="brandName">{{ displayBrandName }}</span>
                         </div>
                     </div>
-                    <p class="brand-desc" :data-field="'footer.brandDescription'">
+                    <p class="brand-desc" data-field="brandDescription">
                         {{ displayBrandDescription }}
                     </p>
                     <NuxtLink to="/about-us" class="brand-btn">
@@ -25,7 +25,7 @@
                     <nav aria-label="Footer navigation">
                         <ul class="links-list">
                             <li v-for="(link, index) in displayQuickLinks" :key="link.name">
-                                <NuxtLink :to="link.path" class="link-item" :data-field="`footer.quickLinks.${index}.name`">
+                                <NuxtLink :to="link.path" class="link-item" :data-field="`quickLinks.${index}.name`">
                                     <Icon name="mdi:chevron-right" class="link-icon" />
                                     {{ link.name }}
                                 </NuxtLink>
@@ -38,7 +38,7 @@
                     <h3 class="footer-title">Liên Hệ</h3>
                     <ul class="contact-list">
                         <li v-for="(item, index) in displayContactInfo" :key="index">
-                            <div class="contact-item" :data-field="`footer.contactInfo.${index}.value`">
+                            <div class="contact-item" :data-field="`contactInfo.${index}.value`">
                                 <Icon :name="item.icon" class="contact-icon" />
                                 {{ item.value }}
                             </div>
@@ -60,10 +60,16 @@
                     <h3 class="footer-title">Bản Đồ</h3>
                     <div class="map-address">
                         <Icon name="mdi:map-marker" class="map-icon" />
-                        <span :data-field="'footer.mapAddress'">{{ displayMapAddress }}</span>
+                        <span data-field="mapAddress">{{ displayMapAddress }}</span>
                     </div>
-                    <div class="map-wrapper">
-                        <iframe :src="displayMapEmbedUrl" width="100%" height="100%" style="border:0;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Bản đồ địa chỉ SHT Security"></iframe>
+                    <div class="map-container">
+                        <button class="map-edit-btn" data-field="mapEmbedUrl" data-field-type="text" title="Chỉnh sửa URL bản đồ">
+                            <Icon name="mdi:map-marker-plus" />
+                            <span>Đổi vị trí</span>
+                        </button>
+                        <div class="map-wrapper">
+                            <iframe :src="displayMapEmbedUrl" width="100%" height="100%" style="border:0;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Bản đồ địa chỉ SHT Security"></iframe>
+                        </div>
                     </div>
                     <div class="social-icons social-mobile">
                         <div v-for="social in displaySocials" :key="social.name" :aria-label="social.name" class="social-icon">
@@ -74,7 +80,7 @@
             </div>
 
             <div class="footer-bottom">
-                <p class="copyright" :data-field="'footer.copyright'">
+                <p class="copyright" data-field="copyright">
                     {{ displayCopyright }}
                 </p>
             </div>
@@ -379,6 +385,36 @@ const displayCopyright = computed(() => props.data?.copyright || '© 2024 SHT Se
     color: #DC2626;
     margin-top: 0.125rem;
     flex-shrink: 0;
+}
+
+.map-container {
+    position: relative;
+}
+
+.map-edit-btn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(220, 38, 38, 0.95);
+    color: #ffffff;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.map-edit-btn:hover {
+    background: #DC2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
 }
 
 .map-wrapper {

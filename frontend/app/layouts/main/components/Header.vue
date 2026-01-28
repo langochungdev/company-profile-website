@@ -1,22 +1,22 @@
 <!-- Chức năng: Header chính với navigation và dropdown menu -->
 <template>
-    <div>
-        <TopBar class="top-bar" />
+    <div :class="{ 'edit-mode': editMode }">
+        <TopBar v-if="!editMode" class="top-bar" :data="data?.topBar" :edit-mode="editMode" />
         <header :class="['header', isHeaderTransparent ? 'header-transparent' : 'header-scrolled', navVisible ? 'header-visible' : 'header-hidden']">
             <div class="header-container">
                 <div class="header-content">
                     <div class="header-left">
                         <NuxtLink to="/" class="logo" aria-label="Trang chủ SHT Security">
-                            <img :src="displayLogo" alt="SHT Security Logo" class="logo-img" :data-field="'header.logoUrl'" data-field-type="image" />
+                            <img :src="displayLogo" alt="SHT Security Logo" class="logo-img" data-field="logoUrl" data-field-type="image" />
                         </NuxtLink>
                     </div>
 
                     <nav class="nav-desktop" aria-label="Main navigation">
-                        <NuxtLink v-for="(item, index) in displayNavigation" :key="item.path" :to="item.path" :class="['nav-link', isActive(item.path) && 'nav-link-active']" :data-field="`header.navigation.${index}.label`">{{ item.label }}</NuxtLink>
+                        <NuxtLink v-for="(item, index) in displayNavigation" :key="item.path" :to="item.path" :class="['nav-link', isActive(item.path) && 'nav-link-active']" :data-field="`navigation.${index}.label`">{{ item.label }}</NuxtLink>
                     </nav>
 
                     <div class="cta-desktop">
-                        <button class="cta-btn" :data-field="'header.ctaText'">{{ displayCtaText }}</button>
+                        <button class="cta-btn" data-field="ctaText">{{ displayCtaText }}</button>
                     </div>
 
                     <button @click="isMenuOpen = !isMenuOpen" class="menu-toggle" aria-label="Menu">
@@ -27,7 +27,7 @@
                 <Transition enter-active-class="mobile-menu-enter-active" enter-from-class="mobile-menu-enter-from" enter-to-class="mobile-menu-enter-to" leave-active-class="mobile-menu-leave-active" leave-from-class="mobile-menu-leave-from" leave-to-class="mobile-menu-leave-to">
                     <div v-if="isMenuOpen" class="mobile-menu">
                         <nav class="mobile-nav">
-                            <NuxtLink v-for="(item, index) in displayNavigation" :key="item.path" :to="item.path" :class="['mobile-nav-link', isActive(item.path) && 'mobile-nav-link-active']" @click="isMenuOpen = false" :data-field="`header.navigation.${index}.label`">{{ item.label }}</NuxtLink>
+                            <NuxtLink v-for="(item, index) in displayNavigation" :key="item.path" :to="item.path" :class="['mobile-nav-link', isActive(item.path) && 'mobile-nav-link-active']" @click="isMenuOpen = false" :data-field="`navigation.${index}.label`">{{ item.label }}</NuxtLink>
                             <button class="cta-btn cta-mobile" @click="isMenuOpen = false">{{ displayCtaText }}</button>
                         </nav>
                     </div>
@@ -46,14 +46,22 @@ interface NavItem {
     path: string
 }
 
+interface TopBarData {
+    address?: string
+    email?: string
+    phone?: string
+}
+
 interface HeaderData {
     logoUrl?: string
     ctaText?: string
     navigation?: NavItem[]
+    topBar?: TopBarData
 }
 
 const props = defineProps<{
     data?: HeaderData | null
+    editMode?: boolean
 }>()
 
 const defaultNavigation: NavItem[] = [
@@ -116,9 +124,23 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Header - Desktop styles */
 :root {
     --header-offset: 120px;
+}
+
+.edit-mode .top-bar {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    z-index: auto !important;
+}
+
+.edit-mode .header {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
 }
 
 .top-bar {
