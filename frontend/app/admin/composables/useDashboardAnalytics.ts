@@ -3,13 +3,12 @@ import { format, subDays } from "date-fns";
 import type { Firestore } from "firebase/firestore";
 import { getFirestorePath } from "@/admin/utils/firestore";
 import { AnalyticsService } from "@/admin/services/analytics.service";
-import type { PageKey, DailyStats, RealtimeStats, WeeklyStats } from "@/admin/types/analytics.type";
+import type { PageKey, DailyStats, WeeklyStats } from "@/admin/types/analytics.type";
 
 export const useDashboardAnalytics = () => {
     const { $db } = useNuxtApp();
 
     const dailyStats = ref<DailyStats[]>([]);
-    const realtimeStats = ref<RealtimeStats | null>(null);
     const loading = ref(false);
     const error = ref<Error | null>(null);
 
@@ -27,8 +26,8 @@ export const useDashboardAnalytics = () => {
         error.value = null;
 
         try {
-            const path = getFirestorePath("daily-stats");
-            const stats = await AnalyticsService.getDailyStats($db as Firestore, path, startDate.value, endDate.value);
+            const collectionPath = getFirestorePath("daily-stats");
+            const stats = await AnalyticsService.getDailyStats($db as Firestore, collectionPath, startDate.value, endDate.value);
             dailyStats.value = stats;
         } catch (e) {
             error.value = e as Error;
@@ -38,17 +37,10 @@ export const useDashboardAnalytics = () => {
         }
     };
 
-    const loadRealtimeStats = async () => {
-        if (import.meta.server || !$db) return;
-
-        try {
-            const path = getFirestorePath("analytics-realtime/today");
-            const stats = await AnalyticsService.getRealtimeStats($db as Firestore, path);
-            realtimeStats.value = stats;
-        } catch (e) {
-            console.error("Failed to load realtime stats:", e);
-        }
-    };
+    const todayStats = computed(() => {
+        if (dailyStats.value.length === 0) return null;
+        return dailyStats.value[dailyStats.value.length - 1];
+    });
 
     const chartLabels = computed(() => {
         return dailyStats.value.map((stat) => {
@@ -59,17 +51,17 @@ export const useDashboardAnalytics = () => {
 
     const chartData = computed(() => {
         if (selectedPage.value === "all") {
-            return dailyStats.value.map((stat) => stat.totalViews);
+            return dailyStats.value.map((stat) => stat.totalViews || 0);
         }
-        return dailyStats.value.map((stat) => stat.pages[selectedPage.value as PageKey] || 0);
+        return dailyStats.value.map((stat) => stat.pages?.[selectedPage.value as PageKey] || 0);
     });
 
     const weeklyStats = computed<WeeklyStats>(() => {
         const totalViews = dailyStats.value.reduce((sum, stat) => {
             if (selectedPage.value === "all") {
-                return sum + stat.totalViews;
+                return sum + (stat.totalViews || 0);
             }
-            return sum + (stat.pages[selectedPage.value as PageKey] || 0);
+            return sum + (stat.pages?.[selectedPage.value as PageKey] || 0);
         }, 0);
 
         let topPage: PageKey = "home";
@@ -86,10 +78,12 @@ export const useDashboardAnalytics = () => {
             };
 
             dailyStats.value.forEach((stat) => {
-                Object.keys(stat.pages).forEach((key) => {
-                    const pageKey = key as PageKey;
-                    pageTotals[pageKey] += stat.pages[pageKey];
-                });
+                if (stat.pages) {
+                    Object.keys(stat.pages).forEach((key) => {
+                        const pageKey = key as PageKey;
+                        pageTotals[pageKey] += stat.pages?.[pageKey] || 0;
+                    });
+                }
             });
 
             Object.entries(pageTotals).forEach(([key, views]) => {
@@ -112,12 +106,12 @@ export const useDashboardAnalytics = () => {
         };
     });
 
-    const realtimeCounter = computed(() => {
-        if (!realtimeStats.value) return 0;
+    const todayCounter = computed(() => {
+        if (!todayStats.value) return 0;
         if (selectedPage.value === "all") {
-            return realtimeStats.value.totalViews;
+            return todayStats.value.totalViews || 0;
         }
-        return realtimeStats.value.pages[selectedPage.value as PageKey] || 0;
+        return todayStats.value.pages?.[selectedPage.value as PageKey] || 0;
     });
 
     const updateDateRange = (range: { startDate: string; endDate: string }) => {
@@ -136,15 +130,14 @@ export const useDashboardAnalytics = () => {
 
     onMounted(() => {
         loadDailyStats();
-        loadRealtimeStats();
 
-        const interval = setInterval(loadRealtimeStats, 30000);
+        const interval = setInterval(loadDailyStats, 60000);
         onUnmounted(() => clearInterval(interval));
     });
 
     return {
         dailyStats,
-        realtimeStats,
+        todayStats,
         loading,
         error,
         startDate,
@@ -153,7 +146,7 @@ export const useDashboardAnalytics = () => {
         chartLabels,
         chartData,
         weeklyStats,
-        realtimeCounter,
+        todayCounter,
         updateDateRange,
         updatePageFilter,
     };

@@ -1,32 +1,74 @@
 .stats-card-wrapper {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1.5rem;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    transition: all 0.3s ease;
+    gap: 1.25rem;
+    padding: 2rem;
+    background: linear-gradient(135deg,
+            hsla(210, 100%, 12%, 0.7) 0%,
+            hsla(220, 95%, 15%, 0.6) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid hsla(195, 100%, 55%, 0.2);
+    border-radius: 16px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.stats-card-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+            transparent,
+            hsla(195, 100%, 55%, 0.8) 50%,
+            transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.stats-card-wrapper:hover::before {
+    opacity: 1;
 }
 
 .stats-card-wrapper:hover {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
-    border-color: rgba(255, 255, 255, 0.12);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg,
+            hsla(210, 100%, 14%, 0.8) 0%,
+            hsla(220, 95%, 17%, 0.7) 100%);
+    border-color: hsla(195, 100%, 55%, 0.4);
+    transform: translateY(-4px);
+    box-shadow:
+        0 12px 32px rgba(0, 0, 0, 0.4),
+        0 4px 12px rgba(0, 150, 255, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .stats-card-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 56px;
-    height: 56px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, hsl(200, 90%, 50%), hsl(220, 90%, 60%));
-    font-size: 28px;
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    background: linear-gradient(135deg,
+            hsl(195, 100%, 55%) 0%,
+            hsl(180, 85%, 45%) 100%);
+    font-size: 32px;
     color: white;
     flex-shrink: 0;
+    box-shadow:
+        0 4px 12px rgba(0, 150, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.stats-card-wrapper:hover .stats-card-icon {
+    transform: scale(1.05) rotate(5deg);
 }
 
 .stats-card-content {
@@ -35,35 +77,66 @@
 }
 
 .stats-card-label {
-    font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: rgba(200, 220, 255, 0.8);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .stats-card-value {
-    font-size: 2rem;
+    font-size: 2.25rem;
     font-weight: 700;
-    color: white;
+    background: linear-gradient(135deg,
+            hsl(195, 100%, 75%),
+            hsl(180, 85%, 60%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     line-height: 1.2;
+    margin-bottom: 0.25rem;
 }
 
 .stats-card-subtitle {
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.5);
-    margin-top: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: rgba(150, 180, 255, 0.7);
+    margin-top: 0.35rem;
 }
 
 @media (max-width: 768px) {
     .stats-card-wrapper {
-        padding: 1rem;
+        padding: 1.5rem;
+        gap: 1rem;
     }
-    
+
+    .stats-card-icon {
+        width: 56px;
+        height: 56px;
+        font-size: 28px;
+    }
+
+    .stats-card-value {
+        font-size: 1.75rem;
+    }
+
+    .stats-card-label {
+        font-size: 0.825rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-card-wrapper {
+        padding: 1.25rem;
+    }
+
     .stats-card-icon {
         width: 48px;
         height: 48px;
         font-size: 24px;
     }
-    
+
     .stats-card-value {
         font-size: 1.5rem;
     }

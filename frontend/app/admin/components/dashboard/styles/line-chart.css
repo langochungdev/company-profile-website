@@ -1,15 +1,100 @@
 .line-chart-wrapper {
+    position: relative;
     width: 100%;
-    height: 400px;
-    padding: 2rem;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
+    height: 450px;
+    padding: 2.5rem;
+    background: linear-gradient(135deg,
+            hsla(210, 100%, 12%, 0.6) 0%,
+            hsla(220, 95%, 15%, 0.4) 50%,
+            hsla(200, 90%, 18%, 0.5) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid hsla(200, 90%, 50%, 0.2);
+    border-radius: 20px;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 2px 8px rgba(0, 150, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.line-chart-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+            transparent,
+            hsl(200, 90%, 50%) 20%,
+            hsl(180, 85%, 45%) 50%,
+            hsl(200, 90%, 50%) 80%,
+            transparent);
+    opacity: 0.6;
+}
+
+.line-chart-wrapper::after {
+    content: '';
+    position: absolute;
+    bottom: -50%;
+    right: -20%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle,
+            hsla(200, 90%, 50%, 0.15) 0%,
+            transparent 70%);
+    filter: blur(40px);
+    pointer-events: none;
+    animation: pulse 8s ease-in-out infinite;
+}
+
+.line-chart-wrapper:hover {
+    border-color: hsla(200, 90%, 50%, 0.4);
+    box-shadow:
+        0 12px 48px rgba(0, 0, 0, 0.5),
+        0 4px 16px rgba(0, 150, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(1.1);
+    }
+}
+
+@media (max-width: 1024px) {
+    .line-chart-wrapper {
+        height: 380px;
+        padding: 2rem;
+    }
 }
 
 @media (max-width: 768px) {
     .line-chart-wrapper {
-        height: 300px;
+        height: 320px;
+        padding: 1.5rem;
+        border-radius: 16px;
+    }
+
+    .line-chart-wrapper::after {
+        width: 200px;
+        height: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .line-chart-wrapper {
+        height: 280px;
         padding: 1rem;
     }
 }

@@ -49,8 +49,13 @@ export const usePageTracking = () => {
 
         lastTrackedTime = now;
 
-        const realtimePath = getFirestorePath("analytics-realtime/today");
-        await AnalyticsService.incrementPageView($db as Firestore, realtimePath, pageKey);
+        try {
+            const today = new Date().toISOString().split("T")[0]!;
+            const collectionPath = getFirestorePath("daily-stats");
+            await AnalyticsService.incrementPageView($db as Firestore, collectionPath, today, pageKey as PageKey);
+        } catch (error) {
+            console.error("Failed to track page view:", error);
+        }
     };
 
     onMounted(() => {

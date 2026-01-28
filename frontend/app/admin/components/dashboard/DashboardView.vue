@@ -14,7 +14,7 @@
             <div class="stats-grid">
                 <StatsCard label="Tổng lượt xem (7 ngày)" :value="weeklyStats.totalViews" icon="mdi:eye" subtitle="Theo khoảng thời gian đã chọn" />
                 <StatsCard label="Trang phổ biến nhất" :value="getPageLabel(weeklyStats.topPage.key)" icon="mdi:chart-line" :subtitle="`${weeklyStats.topPage.views.toLocaleString('vi-VN')} lượt xem`" />
-                <StatsCard label="Lượt xem hôm nay" :value="realtimeCounter" icon="mdi:clock-outline" subtitle="Cập nhật real-time" />
+                <StatsCard label="Lượt xem hôm nay" :value="todayCounter" icon="mdi:clock-outline" subtitle="Cập nhật thời gian thực" />
             </div>
 
             <div class="filters-row">
@@ -46,7 +46,7 @@ const {
     chartLabels,
     chartData,
     weeklyStats,
-    realtimeCounter,
+    todayCounter,
     updateDateRange,
     updatePageFilter
 } = useDashboardAnalytics()
