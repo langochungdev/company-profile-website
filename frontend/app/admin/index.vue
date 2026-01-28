@@ -131,7 +131,7 @@ const headerTabs = computed<TabItem[]>(() => {
     if (activePage.value === 'dashboard') {
         return [];
     }
-    if (activePage.value === 'home') {
+    if (activePage.value === 'home' || activePage.value === 'about-us' || activePage.value === 'contact') {
         return [];
     }
     if (isCollectionPage.value) {

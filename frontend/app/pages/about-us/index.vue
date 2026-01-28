@@ -10,6 +10,7 @@
 import { computed, onMounted } from 'vue'
 import AboutContent from './(components)/AboutContent.vue'
 import { usePageData } from '@/admin/composables/usePageData'
+import { useAboutSeo } from '@/composables/useAboutSeo'
 
 interface AboutPageData {
     content?: {
@@ -23,6 +24,8 @@ interface AboutPageData {
 }
 
 const { data: pageData, loadData } = usePageData<AboutPageData>('pages/about-us')
+
+useAboutSeo(pageData)
 
 const contentData = computed(() => pageData.value?.content || null)
 

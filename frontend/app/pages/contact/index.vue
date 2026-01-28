@@ -10,6 +10,7 @@
 import { computed, onMounted } from 'vue'
 import ContactForm from './(components)/ContactForm.vue'
 import { usePageData } from '@/admin/composables/usePageData'
+import { useContactSeo } from '@/composables/useContactSeo'
 
 interface ContactPageData {
     content?: {
@@ -21,6 +22,8 @@ interface ContactPageData {
 }
 
 const { data: pageData, loadData } = usePageData<ContactPageData>('pages/contact')
+
+useContactSeo(pageData)
 
 const contentData = computed(() => pageData.value?.content || null)
 
