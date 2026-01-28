@@ -63,7 +63,7 @@
                         <span data-field="mapAddress">{{ displayMapAddress }}</span>
                     </div>
                     <div class="map-container">
-                        <button class="map-edit-btn" data-field="mapEmbedUrl" data-field-type="text" title="Chỉnh sửa URL bản đồ">
+                        <button v-if="editMode" class="map-edit-btn" data-field="mapEmbedUrl" data-field-type="text" title="Chỉnh sửa URL bản đồ">
                             <Icon name="mdi:map-marker-plus" />
                             <span>Đổi vị trí</span>
                         </button>
@@ -121,6 +121,7 @@ interface FooterData {
 
 const props = defineProps<{
     data?: FooterData | null
+    editMode?: boolean
 }>()
 
 const defaultQuickLinks: QuickLink[] = [
@@ -168,7 +169,19 @@ const displaySocials = computed(() => {
 })
 
 const displayMapAddress = computed(() => props.data?.mapAddress || '123 Đường ABC, Phường XYZ, Quận 1, TP. Hồ Chí Minh')
-const displayMapEmbedUrl = computed(() => props.data?.mapEmbedUrl || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.4241674197956!2d106.69765841533417!3d10.778789792319392!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f38f9ed887b%3A0x14aded5703768989!2zUXXhuq1uIDEsIFRow6BuaCBwaOG7kSBI4buTIENow60gTWluaCwgVmnhu4d0IE5hbQ!5e0!3m2!1svi!2s!4v1704796800000')
+
+const displayMapEmbedUrl = computed(() => {
+    const raw = props.data?.mapEmbedUrl
+    if (!raw) return 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.4241674197956!2d106.69765841533417!3d10.778789792319392!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f38f9ed887b%3A0x14aded5703768989!2zUXXhuq1uIDEsIFRow6BuaCBwaOG7kSBI4buTIENow60gTWluaCwgVmnhu4d0IE5hbQ!5e0!3m2!1svi!2s!4v1704796800000'
+
+    if (raw.includes('<iframe')) {
+        const match = raw.match(/src=["']([^"']+)["']/)
+        return match ? match[1] : raw
+    }
+
+    return raw
+})
+
 const displayCopyright = computed(() => props.data?.copyright || '© 2024 SHT Security. All rights reserved.')
 </script>
 

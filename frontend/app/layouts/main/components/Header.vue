@@ -7,7 +7,9 @@
                 <div class="header-content">
                     <div class="header-left">
                         <NuxtLink to="/" class="logo" aria-label="Trang chủ SHT Security">
-                            <img :src="displayLogo" alt="SHT Security Logo" class="logo-img" data-field="logoUrl" data-field-type="image" />
+                            <div class="logo-wrapper" data-field="logoUrl" data-field-type="image">
+                                <img :src="displayLogo" alt="SHT Security Logo" class="logo-img" />
+                            </div>
                         </NuxtLink>
                     </div>
 
@@ -200,6 +202,11 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     cursor: pointer;
+}
+
+.logo-wrapper {
+    display: flex;
+    align-items: center;
 }
 
 .logo-img {
