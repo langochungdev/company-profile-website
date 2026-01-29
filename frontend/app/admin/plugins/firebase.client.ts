@@ -1,4 +1,5 @@
 import { initFirebase } from "@/admin/config/firebase.config";
+import { initAuth } from "@/admin/services/auth.service";
 
 export default defineNuxtPlugin(() => {
     const config = useRuntimeConfig();
@@ -13,12 +14,17 @@ export default defineNuxtPlugin(() => {
         measurementId: config.public.firebaseMeasurementId as string,
     };
 
-    const { db, analytics } = initFirebase(firebaseConfig);
+    const { app, db, analytics, auth } = initFirebase(firebaseConfig);
+
+    if (app) {
+        initAuth(app);
+    }
 
     return {
         provide: {
             db,
             analytics,
+            auth,
         },
     };
 });

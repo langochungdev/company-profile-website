@@ -91,9 +91,15 @@ export const PLACEHOLDER_PRODUCT_DETAIL = {
     slug: "placeholder",
     category: "Camera AI",
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.",
-    image: "https://placehold.co/800x800/e2e8f0/94a3b8?text=800x800",
+    image: { url: "https://placehold.co/800x800/e2e8f0/94a3b8?text=800x800", alt: "Ảnh chính" },
+    images: [
+        { url: "https://placehold.co/800x800/e2e8f0/94a3b8?text=800x800", alt: "Ảnh chính", title: "Ảnh chính" },
+        { url: "https://placehold.co/800x600/e2e8f0/94a3b8?text=800x600", alt: "Ảnh phụ 1", title: "Ảnh phụ 1" },
+        { url: "https://placehold.co/800x600/e2e8f0/94a3b8?text=800x600", alt: "Ảnh phụ 2", title: "Ảnh phụ 2" },
+        { url: "https://placehold.co/800x600/e2e8f0/94a3b8?text=800x600", alt: "Ảnh phụ 3", title: "Ảnh phụ 3" },
+    ],
     price: 15900000,
-    tags: [{ value: "An ninh" }, { value: "Giám sát" }, { value: "AI" }, { value: "Thông minh" }],
+    tags: ["An ninh", "Giám sát", "AI", "Thông minh"],
     media: [
         { type: "image", url: "https://placehold.co/800x800/e2e8f0/94a3b8?text=800x800", caption: "Ảnh chính" },
         { type: "image", url: "https://placehold.co/800x600/e2e8f0/94a3b8?text=800x600", caption: "Ảnh phụ 1" },

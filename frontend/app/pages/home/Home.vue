@@ -29,13 +29,10 @@ import NewsSection from './(components)/NewsSection.vue'
 import CertSection from './(components)/CertSection.vue'
 import PartnerSection from './(components)/PartnerSection.vue'
 import { usePageData } from '@/admin/composables/usePageData'
-import { useHomeSeo } from '@/composables/useHomeSeo'
 
 type HomePageData = Record<string, Record<string, unknown>>
 
 const { data: pageData, loadData } = usePageData<HomePageData>('pages/home')
-
-useHomeSeo(pageData)
 
 const shouldShowLoader = ref(false)
 
@@ -46,5 +43,10 @@ onMounted(() => {
         sessionStorage.setItem('home-visited', 'true')
     }
     loadData()
+})
+
+useSeoMeta({
+    title: 'Trang Chủ',
+    description: 'SHT Security - Giải pháp an ninh thông minh hàng đầu Việt Nam. Camera AI, hệ thống mạng, báo cháy, kiểm soát ra vào.'
 })
 </script>

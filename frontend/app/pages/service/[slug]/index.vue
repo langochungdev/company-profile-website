@@ -265,9 +265,23 @@ onUnmounted(() => {
     document.body.style.overflow = ''
 })
 
+
+const { public: { siteUrl } } = useRuntimeConfig()
+
 useSeoMeta({
-    title: () => `${currentCategory.value?.name || 'Dịch vụ'} - SHT Security`,
-    description: () => `Các dự án ${currentCategory.value?.name || 'dịch vụ'} đã hoàn thành`,
+    title: () => `${currentCategory.value?.name || 'Dịch vụ'} - Dự án đã hoàn thành`,
+    description: () => `Các dự án ${currentCategory.value?.name || 'dịch vụ'} đã hoàn thành bởi SHT Security`,
+
+    ogTitle: () => `${currentCategory.value?.name || 'Dịch vụ'} - SHT Security`,
+    ogDescription: () => `Xem gallery dự án ${currentCategory.value?.name || 'dịch vụ'} đã triển khai`,
+    ogImage: () => filteredProjects.value[0]?.images[0]?.url || '',
+    ogUrl: () => `${siteUrl}/service/${currentSlug.value}`,
+    ogType: 'website',
+
+    twitterCard: 'summary_large_image',
+    twitterTitle: () => `${currentCategory.value?.name || 'Dịch vụ'} - SHT Security`,
+    twitterDescription: () => `Xem gallery dự án ${currentCategory.value?.name || 'dịch vụ'} đã triển khai`,
+    twitterImage: () => filteredProjects.value[0]?.images[0]?.url || ''
 })
 </script>
 

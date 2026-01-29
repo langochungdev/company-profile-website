@@ -39,10 +39,7 @@
                 <Icon name="mdi:open-in-new" />
                 <span v-if="!isCollapsed">Xem trang web</span>
             </NuxtLink>
-            <button class="logout-btn" :title="isCollapsed ? 'Đăng xuất' : ''">
-                <Icon name="mdi:logout" />
-                <span v-if="!isCollapsed">Đăng xuất</span>
-            </button>
+
         </div>
     </aside>
 </template>

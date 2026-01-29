@@ -10,7 +10,6 @@
 import { computed, onMounted } from 'vue'
 import ContactForm from './(components)/ContactForm.vue'
 import { usePageData } from '@/admin/composables/usePageData'
-import { useContactSeo } from '@/composables/useContactSeo'
 
 interface ContactPageData {
     content?: {
@@ -23,11 +22,15 @@ interface ContactPageData {
 
 const { data: pageData, loadData } = usePageData<ContactPageData>('pages/contact')
 
-useContactSeo(pageData)
 
 const contentData = computed(() => pageData.value?.content || null)
 
 onMounted(() => {
     loadData()
+})
+
+useSeoMeta({
+    title: 'Liên Hệ',
+    description: 'Liên hệ với SHT Security để được tư vấn giải pháp an ninh thông minh phù hợp nhất cho doanh nghiệp của bạn.'
 })
 </script>

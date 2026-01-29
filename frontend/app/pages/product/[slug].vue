@@ -103,20 +103,32 @@
 </template>
 
 <script setup>
-import { useCollectionContext } from '@/admin/composables/useCollectionContext'
-import { usePreviewContext } from '@/admin/composables/usePreviewContext'
+import { generateProductSchema, generateBreadcrumbSchema } from '@/utils/schema'
 import { PLACEHOLDER_PRODUCT_DETAIL, PLACEHOLDER_RELATED_PRODUCTS } from '@/constants/placeholders'
 
 const route = useRoute()
 const slug = route.params.slug
+const { public: { siteUrl } } = useRuntimeConfig()
 
-const product = ref(null)
-const loading = ref(true)
+const { data: fetchedProduct } = await useAsyncData(
+    `product-${slug}`,
+    async () => {
+        try {
+            return await $fetch(`/api/seo/product/${slug}`)
+        } catch (error) {
+            if (error?.statusCode === 404) {
+                return null
+            }
+            console.error('[Product] Failed to fetch:', error)
+            return null
+        }
+    }
+)
+
+const product = ref(fetchedProduct.value || PLACEHOLDER_PRODUCT_DETAIL)
+const loading = ref(false)
 const selectedMediaIndex = ref(0)
 const relatedProducts = ref([])
-
-const { items, loadItems } = useCollectionContext({ path: 'collections/products/items' })
-const { previews, loadPreviews } = usePreviewContext('collections/products/items')
 
 const allMedia = computed(() => {
     if (!product.value) return []
@@ -171,28 +183,74 @@ const getRelatedImageAlt = (item) => {
     return item.name || ''
 }
 
+const productImage = computed(() => {
+    if (product.value?.images?.[0]?.url) return product.value.images[0].url
+    if (product.value?.image?.url) return product.value.image.url
+    if (typeof product.value?.image === 'string') return product.value.image
+    return ''
+})
+
 onMounted(async () => {
     try {
-        await loadItems()
+        const { usePreviewContext } = await import('@/admin/composables/usePreviewContext')
+        const { previews, loadPreviews } = usePreviewContext('collections/products/items')
 
-        const foundProduct = items.value.find(p => p.slug === slug)
+        await loadPreviews({ limitCount: 5 })
 
-        if (foundProduct) {
-            product.value = foundProduct
-
-            await loadPreviews({ limitCount: 5 })
+        if (product.value && !product.value.isPlaceholder) {
             relatedProducts.value = previews.value
-                .filter(p => p.category === foundProduct.category && p.slug !== slug)
+                .filter(p => p.category === product.value.category && p.slug !== slug)
                 .slice(0, 4)
-        } else {
-            product.value = PLACEHOLDER_PRODUCT_DETAIL
         }
     } catch (error) {
-        console.error('Error loading product:', error)
-        product.value = PLACEHOLDER_PRODUCT_DETAIL
-    } finally {
-        loading.value = false
+        console.error('Error loading related products:', error)
     }
+})
+
+useSeoMeta({
+    title: product.value.name,
+    description: product.value.description || '',
+
+    ogTitle: product.value.name,
+    ogDescription: product.value.description || '',
+    ogImage: productImage.value,
+    ogUrl: `${siteUrl}/product/${slug}`,
+    ogType: 'product',
+
+    twitterCard: 'summary_large_image',
+    twitterTitle: product.value.name,
+    twitterDescription: product.value.description || '',
+    twitterImage: productImage.value
+})
+
+useHead({
+    script: computed(() => {
+        if (product.value?.isPlaceholder) return []
+
+        const scripts = []
+        const productSchema = generateProductSchema(product.value, siteUrl)
+        const breadcrumbSchema = generateBreadcrumbSchema([
+            { name: 'Trang Chủ', url: siteUrl },
+            { name: 'Sản Phẩm', url: `${siteUrl}/product` },
+            { name: product.value.name, url: `${siteUrl}/product/${slug}` }
+        ])
+
+        if (productSchema) {
+            scripts.push({
+                type: 'application/ld+json',
+                innerHTML: JSON.stringify(productSchema)
+            })
+        }
+
+        if (breadcrumbSchema) {
+            scripts.push({
+                type: 'application/ld+json',
+                innerHTML: JSON.stringify(breadcrumbSchema)
+            })
+        }
+
+        return scripts
+    })
 })
 </script>
 

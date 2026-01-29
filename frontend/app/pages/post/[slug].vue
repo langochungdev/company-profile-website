@@ -85,26 +85,29 @@
 </template>
 
 <script setup>
-import { usePreviewContext } from '@/admin/composables/usePreviewContext'
-import { generatePostSchema, generateBreadcrumbSchema } from '@/admin/utils/schema-generator'
+import { generateArticleSchema, generateBreadcrumbSchema } from '@/utils/schema'
 import { PLACEHOLDER_POST_DETAIL } from '@/constants/placeholders'
-
-const SITE_URL = 'https://sht.langochung.me'
 
 const route = useRoute()
 const slug = route.params.slug
+const { public: { siteUrl } } = useRuntimeConfig()
 
-const { previews, loading, loadPreviews } = usePreviewContext('collections/posts/items')
-
-const post = ref(null)
-const relatedPosts = ref([])
-
-const displayPost = computed(() => {
-    if (post.value) {
-        return post.value
+const { data: post } = await useAsyncData(
+    `post-${slug}`,
+    async () => {
+        try {
+            return await $fetch(`/api/seo/post/${slug}`)
+        } catch (error) {
+            if (error?.statusCode === 404) {
+                return null
+            }
+            console.error('[Post] Failed to fetch:', error)
+            return null
+        }
     }
-    return PLACEHOLDER_POST_DETAIL
-})
+)
+
+const displayPost = computed(() => post.value || PLACEHOLDER_POST_DETAIL)
 
 const thumbnailUrl = computed(() => {
     if (!displayPost.value.thumbnail) return PLACEHOLDER_POST_DETAIL.thumbnail
@@ -126,16 +129,25 @@ const defaultContent = `
     <p>Trong bối cảnh công nghệ phát triển nhanh chóng, việc cập nhật những xu hướng mới nhất là điều cần thiết cho mọi doanh nghiệp.</p>
 `
 
+const loading = ref(true)
+const relatedPosts = ref([])
+
 onMounted(async () => {
-    await loadPreviews({ limitCount: 50 })
+    loading.value = true
+    try {
+        const { usePreviewContext } = await import('@/admin/composables/usePreviewContext')
+        const { previews, loadPreviews } = usePreviewContext('collections/posts/items')
 
-    const publishedPosts = previews.value.filter(p => p.status === 'published')
-    post.value = publishedPosts.find(p => p.slug === slug)
+        await loadPreviews({ limitCount: 50 })
+        const publishedPosts = previews.value.filter(p => p.status === 'published')
 
-    if (post.value) {
-        relatedPosts.value = publishedPosts
-            .filter(p => p.category === post.value.category && p.id !== post.value.id)
-            .slice(0, 3)
+        if (post.value) {
+            relatedPosts.value = publishedPosts
+                .filter(p => p.category === post.value.category && p.id !== post.value.id)
+                .slice(0, 3)
+        }
+    } finally {
+        loading.value = false
     }
 })
 
@@ -164,7 +176,7 @@ const displayTags = computed(() => {
 const shareUrls = computed(() => {
     if (!post.value) return { facebook: '', twitter: '', linkedin: '' }
 
-    const url = `${SITE_URL}/post/${post.value.slug}`
+    const url = `${siteUrl}/post/${post.value.slug}`
     const title = encodeURIComponent(post.value.title)
     const description = encodeURIComponent(post.value.description || post.value.excerpt || '')
 
@@ -175,42 +187,50 @@ const shareUrls = computed(() => {
     }
 })
 
-const postSchema = computed(() => {
-    if (!post.value) return null
-    return generatePostSchema(post.value, SITE_URL)
-})
-
-
-const breadcrumbSchema = computed(() => {
-    if (!post.value) return null
-    return generateBreadcrumbSchema([
-        { name: 'Trang Chủ', url: SITE_URL },
-        { name: 'Tin Tức', url: `${SITE_URL}/post` },
-        { name: post.value.title, url: `${SITE_URL}/post/${post.value.slug}` },
-    ])
-})
-
 useSeoMeta({
-    title: () => post.value ? `${post.value.title} - SHT Security Blog` : 'Bài viết không tồn tại',
-    description: () => post.value?.description || post.value?.excerpt || '',
-    ogTitle: () => post.value?.title || '',
-    ogDescription: () => post.value?.description || post.value?.excerpt || '',
-    ogImage: () => post.value?.thumbnail || post.value?.image || '',
+    title: displayPost.value.title,
+    description: displayPost.value.description || displayPost.value.excerpt || '',
+
+    ogTitle: displayPost.value.title,
+    ogDescription: displayPost.value.description || displayPost.value.excerpt || '',
+    ogImage: thumbnailUrl.value,
+    ogUrl: `${siteUrl}/post/${slug}`,
     ogType: 'article',
+
+    twitterCard: 'summary_large_image',
+    twitterTitle: displayPost.value.title,
+    twitterDescription: displayPost.value.description || displayPost.value.excerpt || '',
+    twitterImage: thumbnailUrl.value
 })
 
 useHead({
     script: computed(() => {
-        if (!post.value) return []
+        if (displayPost.value.isPlaceholder) return []
+
         const scripts = []
-        if (postSchema.value) {
-            scripts.push({ type: 'application/ld+json', innerHTML: JSON.stringify(postSchema.value) })
+        const articleSchema = generateArticleSchema(displayPost.value, siteUrl)
+        const breadcrumbSchema = generateBreadcrumbSchema([
+            { name: 'Trang Chủ', url: siteUrl },
+            { name: 'Tin Tức', url: `${siteUrl}/post` },
+            { name: displayPost.value.title, url: `${siteUrl}/post/${slug}` }
+        ])
+
+        if (articleSchema) {
+            scripts.push({
+                type: 'application/ld+json',
+                innerHTML: JSON.stringify(articleSchema)
+            })
         }
-        if (breadcrumbSchema.value) {
-            scripts.push({ type: 'application/ld+json', innerHTML: JSON.stringify(breadcrumbSchema.value) })
+
+        if (breadcrumbSchema) {
+            scripts.push({
+                type: 'application/ld+json',
+                innerHTML: JSON.stringify(breadcrumbSchema)
+            })
         }
+
         return scripts
-    }),
+    })
 })
 </script>
 

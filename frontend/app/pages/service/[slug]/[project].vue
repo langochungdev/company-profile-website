@@ -109,11 +109,28 @@ const router = useRouter()
 const categorySlug = computed(() => route.params.slug)
 const projectSlug = computed(() => route.params.project)
 
-const project = ref(null)
-const loading = ref(true)
-const allProjects = ref([])
+const { data: fetchedProject } = await useAsyncData(
+    `service-project-${projectSlug.value}`,
+    async () => {
+        try {
+            return await $fetch(`/api/seo/service/${projectSlug.value}`)
+        } catch (error) {
+            if (error?.statusCode === 404) {
+                return null
+            }
+            console.error('[ServiceProject] Failed to fetch:', error)
+            return null
+        }
+    }
+)
 
-const loadProject = async () => {
+const project = ref(fetchedProject.value)
+const loading = ref(false)
+const relatedProjects = ref([])
+
+onMounted(async () => {
+    if (!project.value) return
+
     loading.value = true
     try {
         const { $db } = useNuxtApp()
@@ -122,43 +139,31 @@ const loadProject = async () => {
 
         const path = getFirestorePath('collections/services/items')
         const colRef = collection($db, path)
-        const q = query(colRef, where('slug', '==', projectSlug.value))
-        const snapshot = await getDocs(q)
 
-        if (!snapshot.empty) {
-            const doc = snapshot.docs[0]
-            project.value = {
-                id: doc.id,
-                ...doc.data(),
-            }
-        }
+        if (project.value.categories && project.value.categories.length > 0) {
+            const q = query(
+                colRef,
+                where('categories', 'array-contains-any', project.value.categories.slice(0, 10))
+            )
+            const snapshot = await getDocs(q)
 
-        const allSnapshot = await getDocs(colRef)
-        allProjects.value = []
-        allSnapshot.forEach((doc) => {
-            allProjects.value.push({
-                id: doc.id,
-                ...doc.data(),
+            const related = []
+            snapshot.forEach((doc) => {
+                if (doc.id !== project.value.id) {
+                    related.push({
+                        id: doc.id,
+                        ...doc.data(),
+                    })
+                }
             })
-        })
+
+            relatedProjects.value = related.slice(0, 4)
+        }
     } catch (error) {
-        console.error('[ProjectDetail] Load error:', error)
-        project.value = null
+        console.error('[ServiceProject] Load related error:', error)
     } finally {
         loading.value = false
     }
-}
-
-const relatedProjects = computed(() => {
-    if (!project.value || !project.value.categories) return []
-
-    return allProjects.value
-        .filter(p => {
-            if (p.id === project.value.id) return false
-            if (!Array.isArray(p.categories)) return false
-            return p.categories.some(cat => project.value.categories.includes(cat))
-        })
-        .slice(0, 4)
 })
 
 const lightbox = reactive({
@@ -184,10 +189,12 @@ const closeLightbox = () => {
 }
 
 const nextImage = () => {
+    if (!project.value?.images) return
     lightbox.currentIndex = (lightbox.currentIndex + 1) % project.value.images.length
 }
 
 const prevImage = () => {
+    if (!project.value?.images) return
     lightbox.currentIndex = (lightbox.currentIndex - 1 + project.value.images.length) % project.value.images.length
 }
 
@@ -203,8 +210,7 @@ const handleKeydown = (e) => {
     if (e.key === 'ArrowLeft') prevImage()
 }
 
-onMounted(async () => {
-    await loadProject()
+onMounted(() => {
     window.addEventListener('keydown', handleKeydown)
 })
 
@@ -213,9 +219,22 @@ onUnmounted(() => {
     document.body.style.overflow = ''
 })
 
+const { public: { siteUrl } } = useRuntimeConfig()
+
 useSeoMeta({
     title: () => project.value ? `${project.value.name} - SHT Security` : 'Dự án - SHT Security',
     description: () => project.value?.description || 'Chi tiết dự án',
+
+    ogTitle: () => project.value ? `${project.value.name} - SHT Security` : 'Dự án',
+    ogDescription: () => project.value?.description || 'Chi tiết dự án đã triển khai',
+    ogImage: () => project.value?.images?.[0]?.url || '',
+    ogUrl: () => `${siteUrl}/service/${categorySlug.value}/${projectSlug.value}`,
+    ogType: 'article',
+
+    twitterCard: 'summary_large_image',
+    twitterTitle: () => project.value ? `${project.value.name} - SHT Security` : 'Dự án',
+    twitterDescription: () => project.value?.description || 'Chi tiết dự án đã triển khai',
+    twitterImage: () => project.value?.images?.[0]?.url || ''
 })
 </script>
 

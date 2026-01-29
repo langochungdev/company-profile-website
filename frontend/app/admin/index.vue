@@ -1,40 +1,49 @@
 <!-- Chức năng: Admin panel chính với sidebar, header và editor area -->
 <template>
-    <div class="admin-layout">
-        <div v-if="isMobileMenuOpen" class="sidebar-overlay" @click="isMobileMenuOpen = false" />
+    <div class="admin-layout-wrapper">
+        <div v-if="authLoading" class="auth-loading">
+            <div class="spinner" />
+            <p>Đang kiểm tra xác thực...</p>
+        </div>
 
-        <AdminSidebar :pages="sidebarPages" :active-page="activePage" :is-collapsed="isSidebarCollapsed" :is-mobile-open="isMobileMenuOpen" @toggle="toggleSidebar" @switch="switchPage" />
+        <LoginPage v-else-if="!isAuthenticated" />
 
-        <main :class="['admin-main', { 'sidebar-collapsed': isSidebarCollapsed }]">
-            <AdminHeader :page-name="currentPageName" :has-changes="hasChanges" :is-saving="isSaving" :show-save-button="showHeaderSaveButton" :show-discard-button="showHeaderDiscardButton" :tabs="headerTabs" :active-tab="currentActiveTab" @save="handleGlobalSave" @discard="handleGlobalDiscard" @tab-change="handleTabChange" @toggle-menu="toggleSidebar" />
+        <div v-else class="admin-layout">
+            <div v-if="isMobileMenuOpen" class="sidebar-overlay" @click="isMobileMenuOpen = false" />
 
-            <div class="admin-content">
-                <div v-if="loading" class="loading-state">
-                    <div class="spinner" />
-                    <p>Đang tải dữ liệu...</p>
-                </div>
+            <AdminSidebar :pages="sidebarPages" :active-page="activePage" :is-collapsed="isSidebarCollapsed" :is-mobile-open="isMobileMenuOpen" @toggle="toggleSidebar" @switch="switchPage" />
 
-                <template v-else-if="!isCollectionPage">
-                    <DashboardTabs v-if="activePage === 'dashboard'" />
+            <main :class="['admin-main', { 'sidebar-collapsed': isSidebarCollapsed }]">
+                <AdminHeader :page-name="currentPageName" :has-changes="hasChanges" :is-saving="isSaving" :show-save-button="showHeaderSaveButton" :show-discard-button="showHeaderDiscardButton" :tabs="headerTabs" :active-tab="currentActiveTab" :user="currentUser" @save="handleGlobalSave" @discard="handleGlobalDiscard" @tab-change="handleTabChange" @toggle-menu="toggleSidebar" @logout="handleLogout" />
 
-                    <template v-else>
-                        <ClientOnly>
-                            <LiveEditView :key="activePage" ref="liveEditRef" :page-key="activePage" @dirty-change="liveEditDirty = $event" @saving-change="isSaving = $event" />
-                        </ClientOnly>
+                <div class="admin-content">
+                    <div v-if="loading" class="loading-state">
+                        <div class="spinner" />
+                        <p>Đang tải dữ liệu...</p>
+                    </div>
+
+                    <template v-else-if="!isCollectionPage">
+                        <DashboardTabs v-if="activePage === 'dashboard'" />
+
+                        <template v-else>
+                            <ClientOnly>
+                                <LiveEditView :key="activePage" ref="liveEditRef" :page-key="activePage" @dirty-change="liveEditDirty = $event" @saving-change="isSaving = $event" />
+                            </ClientOnly>
+                        </template>
                     </template>
-                </template>
 
-                <div v-else-if="currentConfig" class="editor-container">
-                    <div v-if="isCollectionPage" class="collection-page">
-                        <ProductPage v-if="activePage === 'product'" ref="productPageRef" />
-                        <ServicePage v-else-if="activePage === 'service'" ref="servicePageRef" />
-                        <PostPage v-else-if="activePage === 'post'" ref="postPageRef" />
+                    <div v-else-if="currentConfig" class="editor-container">
+                        <div v-if="isCollectionPage" class="collection-page">
+                            <ProductPage v-if="activePage === 'product'" ref="productPageRef" />
+                            <ServicePage v-else-if="activePage === 'service'" ref="servicePageRef" />
+                            <PostPage v-else-if="activePage === 'post'" ref="postPageRef" />
+                        </div>
                     </div>
                 </div>
-            </div>
-        </main>
+            </main>
 
-        <Toast />
+            <Toast />
+        </div>
     </div>
 </template>
 
@@ -46,11 +55,23 @@ import ServicePage from './components/collection/services/index.vue'
 import PostPage from './components/collection/posts/index.vue'
 import LiveEditView from './components/views/LiveEditView.vue'
 import DashboardTabs from './components/dashboard/DashboardTabs.vue'
+import LoginPage from './components/auth/LoginPage.vue'
 import { PAGE_CONFIGS, getAllPages, getPageConfig, isCollectionPage as checkIsCollection } from './config/page.config'
 import Toast from './components/Toast.vue'
+import { useAuth } from './composables/useAuth'
 
 const route = useRoute();
 const router = useRouter();
+
+const { user: currentUser, loading: authLoading, isAuthenticated, initAuth, signOut } = useAuth()
+
+onMounted(() => {
+    initAuth()
+})
+
+const handleLogout = async () => {
+    await signOut()
+}
 
 const sidebarPages = computed(() => {
     return getAllPages().map((page) => ({
@@ -67,11 +88,9 @@ const getInitialPage = (): string => {
     return "dashboard";
 };
 
-
-
 const activePage = ref(getInitialPage());
-const activeTab = ref<"items">("items"); // Only items tab remains for collections
-const activeContentTab = ref<"live">("live"); // Only live tab remains for pages
+const activeTab = ref<"items">("items");
+const activeContentTab = ref<"live">("live");
 const isSidebarCollapsed = ref(false);
 const isMobileMenuOpen = ref(false);
 const liveEditDirty = ref(false);
