@@ -141,7 +141,7 @@ const checkHasUsers = async () => {
         const response = await $fetch<{ hasUsers: boolean }>('/api/admin/check-has-users')
         isRegisterMode.value = !response.hasUsers
     } catch (err) {
-        console.error('[LoginPage] Check users error:', err)
+
         isRegisterMode.value = false
     } finally {
         checkingUsers.value = false
@@ -171,7 +171,7 @@ const handleRegister = async () => {
         credentials.value.usernameOrEmail = registerForm.value.email
         credentials.value.password = registerForm.value.password
     } catch (err: any) {
-        console.error('[LoginPage] Register error:', err)
+
         localError.value = err.data?.message || err.message || 'Không thể tạo tài khoản'
     } finally {
         localLoading.value = false

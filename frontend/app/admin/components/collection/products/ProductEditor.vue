@@ -257,7 +257,7 @@ const validateSlug = async (slug: string) => {
             slugError.value = '';
         }
     } catch (e) {
-        console.error('Slug check failed', e);
+
     } finally {
         isCheckingSlug.value = false;
     }
@@ -339,7 +339,7 @@ const handleSave = async () => {
 
         clearAll();
     } catch (error) {
-        console.error("Upload failed:", error);
+
         alert("Không thể upload ảnh. Vui lòng thử lại.");
     } finally {
         isUploading.value = false;

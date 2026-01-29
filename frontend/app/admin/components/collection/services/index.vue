@@ -42,9 +42,9 @@ const isTagManagerOpen = ref(false)
 const loadData = async () => {
     try {
         await collectionContext.loadItems()
-        console.log('[Services] Loaded items:', collectionContext.items.value)
+
     } catch (error) {
-        console.error('[Services] Load error:', error)
+
     }
 }
 
@@ -61,7 +61,7 @@ const openEditModal = async (item: Record<string, unknown>) => {
         editingItem.value = fullItem ? { ...fullItem } : { ...item }
         isEditorOpen.value = true
     } catch (error) {
-        console.error('[ServicePage] Load item error:', error)
+
         editingItem.value = { ...item }
         isEditorOpen.value = true
     }
@@ -91,7 +91,7 @@ const handleSave = async (data: any) => {
         await collectionContext.loadItems()
     } catch (error: any) {
         toast.error(error.message || 'Có lỗi xảy ra!')
-        console.error('[ServicePage] Save error:', error)
+
     }
 }
 const extractCloudinaryUrls = (html: string): string[] => {
@@ -125,7 +125,7 @@ const handleDelete = async (item: Record<string, unknown>) => {
         await collectionContext.loadItems()
     } catch (error: any) {
         toast.error(error.message || 'Có lỗi xảy ra khi xóa!')
-        console.error('[ServicePage] Delete error:', error)
+
     }
 }
 

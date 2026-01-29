@@ -371,7 +371,7 @@ const handleFile = async (file: File) => {
         metadata.value.width = dimensions.width;
         metadata.value.height = dimensions.height;
     } catch (e) {
-        console.error("[ImageUploader] Failed to extract dimensions:", e);
+
     }
 
     metadataExpanded.value = true;

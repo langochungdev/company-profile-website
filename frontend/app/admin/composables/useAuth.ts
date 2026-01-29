@@ -45,8 +45,6 @@ export function useAuth() {
                     adminUser = await UserService.getByEmail(db, firebaseUser.email);
 
                     if (adminUser) {
-                        console.log("[useAuth] Migrating user from tempUid to real UID:", adminUser.uid, "→", firebaseUser.uid);
-
                         await UserService.delete(db, adminUser.uid);
 
                         const migratedUser = await UserService.create(
@@ -94,7 +92,6 @@ export function useAuth() {
                 state.value.isAuthenticated = true;
                 state.value.isSuperAdmin = adminUser.role === "superadmin";
             } catch (err: any) {
-                console.error("[useAuth] Error:", err);
                 state.value.error = err.message || "Lỗi xác thực";
                 state.value.user = null;
                 state.value.isAuthenticated = false;
@@ -112,7 +109,6 @@ export function useAuth() {
         try {
             await AuthService.signInWithGoogle();
         } catch (err: any) {
-            console.error("[useAuth] Sign in error:", err);
             state.value.error = err.message || "Đăng nhập thất bại";
             state.value.loading = false;
         }
@@ -137,7 +133,6 @@ export function useAuth() {
 
             await AuthService.signInWithEmailPassword(email, password);
         } catch (err: any) {
-            console.error("[useAuth] Password sign in error:", err);
             if (err.code === "auth/wrong-password" || err.code === "auth/user-not-found") {
                 state.value.error = "Email hoặc password không đúng";
             } else if (err.code === "auth/invalid-credential") {
@@ -155,9 +150,7 @@ export function useAuth() {
             state.value.user = null;
             state.value.isAuthenticated = false;
             state.value.isSuperAdmin = false;
-        } catch (err: any) {
-            console.error("[useAuth] Sign out error:", err);
-        }
+        } catch (err: any) {}
     };
 
     const cleanup = () => {

@@ -127,10 +127,10 @@ const fetchUsage = async () => {
     error.value = null
 
     if (DEV_MODE.value) {
-        console.warn('[StorageView] DEV MODE: Using mock data')
+
         setTimeout(() => {
             const mockData = getMockData()
-            console.log('[StorageView] Mock data:', mockData)
+
             usage.value = mockData
             loading.value = false
         }, 500)
@@ -139,21 +139,14 @@ const fetchUsage = async () => {
 
     try {
         const data = await $fetch<CloudinaryUsageResponse>('/api/cloudinary-usage')
-        console.log('[StorageView] Received data:', data)
-        console.log('[StorageView] Storage percent:', data.storage.usedPercent)
-        console.log('[StorageView] Bandwidth percent:', data.bandwidth.usedPercent)
+
         usage.value = data
     } catch (err: any) {
-        console.error('[StorageView] Fetch error:', err)
-        console.error('[StorageView] Error details:', {
-            status: err?.statusCode,
-            message: err?.data?.message || err?.message,
-            data: err?.data
-        })
+
 
         error.value = err?.data?.message || 'Không thể tải dữ liệu usage'
 
-        console.warn('[StorageView] API failed. To test UI, open console and run: window.toggleStorageMockData()')
+
     } finally {
         loading.value = false
     }
@@ -161,13 +154,13 @@ const fetchUsage = async () => {
 
 const storageWidthStyle = computed(() => {
     const width = `${usage.value.storage.usedPercent}%`
-    console.log('[StorageView] Storage width style:', width)
+
     return { width }
 })
 
 const bandwidthWidthStyle = computed(() => {
     const width = `${usage.value.bandwidth.usedPercent}%`
-    console.log('[StorageView] Bandwidth width style:', width)
+
     return { width }
 })
 
@@ -190,10 +183,10 @@ onMounted(() => {
     if (typeof window !== 'undefined') {
         (window as any).toggleStorageMockData = () => {
             DEV_MODE.value = !DEV_MODE.value
-            console.log(`[StorageView] Mock data ${DEV_MODE.value ? 'ENABLED' : 'DISABLED'}`)
+
             fetchUsage()
         }
-        console.log('[StorageView] Debug helper available: window.toggleStorageMockData()')
+
     }
 })
 

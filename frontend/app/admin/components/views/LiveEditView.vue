@@ -190,7 +190,7 @@ const sectionComponents = computed(() => {
                 const loader = pageComponentModules[componentKey];
 
                 if (!loader) {
-                    console.warn(`Component not found: ${componentKey}`);
+
                     return [key, null];
                 }
 

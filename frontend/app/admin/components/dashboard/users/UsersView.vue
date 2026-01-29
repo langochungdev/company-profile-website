@@ -115,7 +115,7 @@ const handleSubmit = async (data: { email: string; username: string; password?: 
 
         closeModal()
     } catch (err: any) {
-        console.error('[UsersView] Submit error:', err)
+
         formError.value = err.data?.message || err.message || 'Không thể thực hiện'
     } finally {
         formLoading.value = false
@@ -173,7 +173,7 @@ const handleSetPassword = async (data: { password: string; username?: string }) 
         await loadUsers()
         closePasswordModal()
     } catch (err: any) {
-        console.error('[UsersView] Set password error:', err)
+
         passwordError.value = err.data?.message || err.message || 'Không thể thiết lập password'
     } finally {
         passwordLoading.value = false
@@ -200,7 +200,7 @@ const handleImpersonate = async (targetUser: AdminUser) => {
 
         window.location.reload()
     } catch (err: any) {
-        console.error('[UsersView] Impersonate error:', err)
+
         alert(err.data?.message || 'Không thể impersonate user')
     }
 }
@@ -241,7 +241,7 @@ const handleChangePassword = async (data: { oldPassword: string; newPassword: st
         alert('Đổi mật khẩu thành công!')
         closeChangePasswordModal()
     } catch (err: any) {
-        console.error('[UsersView] Change password error:', err)
+
         changePasswordError.value = err.data?.message || err.message || 'Không thể đổi mật khẩu'
     } finally {
         changePasswordLoading.value = false

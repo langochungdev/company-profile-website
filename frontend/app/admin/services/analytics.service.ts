@@ -11,7 +11,6 @@ export class AnalyticsService {
             const snapshot = await getDocs(q);
             return snapshot.docs.map((doc) => doc.data() as DailyStats);
         } catch (error) {
-            console.error("Error getting daily stats:", error);
             return [];
         }
     }
@@ -27,7 +26,6 @@ export class AnalyticsService {
 
             return snapshot.data() as DailyStats;
         } catch (error) {
-            console.error("Error getting today stats:", error);
             return null;
         }
     }
@@ -48,8 +46,6 @@ export class AnalyticsService {
                 },
                 { merge: true },
             );
-        } catch (error) {
-            console.error("Error incrementing page view:", error);
-        }
+        } catch (error) {}
     }
 }

@@ -43,7 +43,6 @@ export function useRichTextImages() {
 
                 URL.revokeObjectURL(pendingImg.previewUrl);
             } catch (error) {
-                console.error("Failed to upload editor image:", error);
                 throw error;
             }
         }

@@ -42,7 +42,6 @@ const deepClone = (value: unknown): unknown => {
 
         return raw;
     } catch (error) {
-        console.warn("[useTempFormState] Clone failed, using fallback:", error);
         return value;
     }
 };

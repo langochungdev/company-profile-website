@@ -118,7 +118,7 @@ const handleAdd = async () => {
         newItemName.value = ''
         emit('updated')
     } catch (error) {
-        console.error('[PostConfigManager] Add error:', error)
+
         alert('Có lỗi xảy ra khi thêm!')
     }
 }
@@ -143,7 +143,7 @@ const saveEdit = async () => {
         cancelEdit()
         emit('updated')
     } catch (error) {
-        console.error('[PostConfigManager] Update error:', error)
+
         alert('Có lỗi xảy ra khi cập nhật!')
     }
 }
@@ -160,7 +160,7 @@ const handleDelete = async (item: ConfigItem) => {
         await deleteCategory(item.id)
         emit('updated')
     } catch (error) {
-        console.error('[PostConfigManager] Delete error:', error)
+
         alert('Có lỗi xảy ra khi xóa!')
     }
 }

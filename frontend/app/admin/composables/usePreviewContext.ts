@@ -96,7 +96,6 @@ export function usePreviewContext(collectionPath: string): PreviewContextResult 
             lastVisibleDoc = result.lastDoc;
         } catch (e) {
             error.value = e as Error;
-            console.error("[usePreviewContext] loadPreviews error:", e);
         } finally {
             loading.value = false;
         }
@@ -139,9 +138,7 @@ export function usePreviewContext(collectionPath: string): PreviewContextResult 
 
             const result = await PreviewService.getAll<PreviewItem>(db, previewsPath, queryOptions);
             allPreviews.value = result.items;
-        } catch (e) {
-            console.error("[usePreviewContext] loadAll error:", e);
-        }
+        } catch (e) {}
     };
 
     return {

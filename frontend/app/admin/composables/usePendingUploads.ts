@@ -96,7 +96,6 @@ export function usePendingUploads() {
                 current++;
                 onProgress?.(current, total);
             } catch (e) {
-                console.error(`[usePendingUploads] Failed to upload ${pending.fieldPath}:`, e);
                 throw e;
             }
         });

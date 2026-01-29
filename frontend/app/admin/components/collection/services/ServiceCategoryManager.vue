@@ -119,7 +119,7 @@ const handleAdd = async () => {
         newItemName.value = "";
         emit("updated");
     } catch (error) {
-        console.error("Add error:", error);
+
         alert("Có lỗi xảy ra khi thêm!");
     }
 };
@@ -144,7 +144,7 @@ const saveEdit = async () => {
         cancelEdit();
         emit("updated");
     } catch (error) {
-        console.error("Update error:", error);
+
         alert("Có lỗi xảy ra khi cập nhật!");
     }
 };
@@ -161,7 +161,7 @@ const handleDelete = async (item: ConfigItem) => {
         await deleteCategory(item.id);
         emit("updated");
     } catch (error) {
-        console.error("Delete error:", error);
+
         alert("Có lỗi xảy ra khi xóa!");
     }
 };

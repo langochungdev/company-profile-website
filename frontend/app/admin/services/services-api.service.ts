@@ -10,9 +10,7 @@ export const ServicesApiService = {
                     collection: "SERVICE",
                 },
             });
-        } catch (error) {
-            console.error("[ServicesApiService] Sync create error:", error);
-        }
+        } catch (error) {}
     },
 
     async syncUpdate(objectID: string, data: Record<string, unknown>) {
@@ -26,9 +24,7 @@ export const ServicesApiService = {
                     collection: "SERVICE",
                 },
             });
-        } catch (error) {
-            console.error("[ServicesApiService] Sync update error:", error);
-        }
+        } catch (error) {}
     },
 
     async syncDelete(objectID: string) {
@@ -41,8 +37,6 @@ export const ServicesApiService = {
                     collection: "SERVICE",
                 },
             });
-        } catch (error) {
-            console.error("[ServicesApiService] Sync delete error:", error);
-        }
+        } catch (error) {}
     },
 };

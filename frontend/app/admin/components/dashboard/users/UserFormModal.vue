@@ -147,7 +147,7 @@ const checkUsernameAvailability = async () => {
         }
         usernameChecked.value = true
     } catch (err: any) {
-        console.error('[UserFormModal] Check username error:', err)
+
         usernameError.value = 'Không thể kiểm tra username'
     } finally {
         checkingUsername.value = false

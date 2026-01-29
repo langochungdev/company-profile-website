@@ -157,10 +157,7 @@ const fetchAnalytics = async () => {
     loading.value = true
     error.value = null
 
-    console.log('[SearchReport] Fetching analytics with dates:', {
-        startDate: startDate.value,
-        endDate: endDate.value
-    })
+
 
     try {
         const data = await $fetch<AlgoliaAnalyticsResponse>('/api/algolia-analytics', {
@@ -171,19 +168,12 @@ const fetchAnalytics = async () => {
             }
         })
 
-        console.log('[SearchReport] ✅ Received data:', data)
-        console.log('[SearchReport] Stats:', {
-            totalSearches: data.totalSearches,
-            totalClicks: data.totalClicks,
-            ctr: data.clickThroughRate,
-            noResults: data.noResultsRate,
-            dailyStatsCount: data.dailyStats?.length || 0
-        })
+
 
         analytics.value = data
-        console.log('[SearchReport] ✅ Analytics state updated:', analytics.value)
+
     } catch (err: any) {
-        console.error('[SearchReport] ❌ Fetch error:', err)
+
         error.value = err?.data?.message || 'Không thể tải dữ liệu analytics'
     } finally {
         loading.value = false

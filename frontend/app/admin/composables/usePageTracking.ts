@@ -53,9 +53,7 @@ export const usePageTracking = () => {
             const today = new Date().toISOString().split("T")[0]!;
             const collectionPath = getFirestorePath("daily-stats");
             await AnalyticsService.incrementPageView($db as Firestore, collectionPath, today, pageKey as PageKey);
-        } catch (error) {
-            console.error("Failed to track page view:", error);
-        }
+        } catch (error) {}
     };
 
     onMounted(() => {

@@ -111,7 +111,6 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
 
             originalData.value = JSON.parse(JSON.stringify(editedData.value));
         } catch (error) {
-            console.error("[useLiveEdit] Load data failed:", error);
         } finally {
             isLoading.value = false;
         }
@@ -202,10 +201,8 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
     };
 
     const openEditor = (sectionId: string, fieldPath: string) => {
-        console.log("[useLiveEdit] openEditor called:", { sectionId, fieldPath });
         const section = config.value?.sections[sectionId];
         if (!section) {
-            console.warn("[useLiveEdit] Section not found:", sectionId);
             return;
         }
 
@@ -214,7 +211,6 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
         if (!firstPart) return;
 
         let fieldConfig: FieldConfig | undefined = section.fields[firstPart];
-        console.log("[useLiveEdit] Initial fieldConfig:", { firstPart, fieldConfig });
 
         for (let i = 1; i < parts.length && fieldConfig; i++) {
             const part = parts[i];
@@ -232,12 +228,10 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
         }
 
         if (!fieldConfig) {
-            console.warn("[useLiveEdit] FieldConfig not found after traversal");
             return;
         }
 
         const currentValue = getFieldValue(sectionId, fieldPath);
-        console.log("[useLiveEdit] Opening editor with:", { fieldConfig, currentValue });
 
         editTarget.value = {
             sectionId,
@@ -246,7 +240,6 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
             currentValue,
         };
         isPopupOpen.value = true;
-        console.log("[useLiveEdit] isPopupOpen set to true");
     };
 
     const closeEditor = () => {
@@ -298,7 +291,6 @@ export const useLiveEdit = (pageKeyRef: MaybeRef<string>) => {
 
             clearAllTempState();
         } catch (error) {
-            console.error("[useLiveEdit] Save failed:", error);
             throw error;
         } finally {
             isSaving.value = false;

@@ -71,7 +71,7 @@ const openEditModal = async (item: Record<string, unknown>) => {
         editingItem.value = fullItem ? { ...fullItem } : { ...item }
         isEditorOpen.value = true
     } catch (error) {
-        console.error('[ProductPage] Load item error:', error)
+
         editingItem.value = { ...item }
         isEditorOpen.value = true
     } finally {
@@ -109,7 +109,7 @@ const handleSave = async (data: any) => {
         await previewContext.loadPreviews()
     } catch (error: any) {
         toast.error(error.message || 'Có lỗi xảy ra!')
-        console.error('[ProductPage] Save error:', error)
+
     } finally {
         loading.value = false
     }
@@ -154,7 +154,7 @@ const handleDelete = async (item: Record<string, unknown>) => {
         await previewContext.loadPreviews()
     } catch (error: any) {
         toast.error(error.message || 'Có lỗi xảy ra khi xóa!')
-        console.error('[ProductPage] Delete error:', error)
+
     } finally {
         loading.value = false
     }

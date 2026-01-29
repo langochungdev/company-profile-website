@@ -208,7 +208,7 @@ const handleSave = async () => {
         emit('save', saveData)
         clearAll()
     } catch (error) {
-        console.error('[ServiceEditor] Save error:', error)
+
         alert('Có lỗi xảy ra khi lưu dự án!')
     } finally {
         isUploading.value = false

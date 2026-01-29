@@ -139,7 +139,6 @@ export function useCollectionContext(config: CollectionConfig): CollectionConten
             lastVisibleDoc = result.lastDoc;
         } catch (e) {
             error.value = e as Error;
-            console.error("[useCollectionContext] loadItems error:", e);
         } finally {
             loading.value = false;
         }
@@ -193,7 +192,7 @@ export function useCollectionContext(config: CollectionConfig): CollectionConten
             return docId;
         } catch (e) {
             error.value = e as Error;
-            console.error("[useCollectionContext] addItem error:", e);
+
             throw e;
         } finally {
             loading.value = false;
@@ -235,7 +234,7 @@ export function useCollectionContext(config: CollectionConfig): CollectionConten
             }
         } catch (e) {
             error.value = e as Error;
-            console.error("[useCollectionContext] updateItem error:", e);
+
             throw e;
         } finally {
             loading.value = false;
@@ -259,7 +258,7 @@ export function useCollectionContext(config: CollectionConfig): CollectionConten
             totalItems.value = items.value.length;
         } catch (e) {
             error.value = e as Error;
-            console.error("[useCollectionContext] deleteItem error:", e);
+
             throw e;
         } finally {
             loading.value = false;
@@ -278,7 +277,6 @@ export function useCollectionContext(config: CollectionConfig): CollectionConten
             const item = await CollectionService.getById<CollectionItem>(db, collectionPath, id);
             return item;
         } catch (e) {
-            console.error("[useCollectionContext] getItem error:", e);
             return null;
         }
     };

@@ -62,11 +62,9 @@ export const useDashboardAnalytics = () => {
                 currentDate.setDate(currentDate.getDate() + 1);
             }
 
-            console.log("📊 Final dailyStats:", filledStats);
             dailyStats.value = filledStats;
         } catch (e) {
             error.value = e as Error;
-            console.error("Failed to load daily stats:", e);
         } finally {
             loading.value = false;
         }

@@ -272,7 +272,7 @@ const handleSearch = () => {
             const { hits } = await ProductsApiService.search(searchQuery.value)
             searchResults.value = hits
         } catch (error) {
-            console.error('Search error:', error)
+
             searchResults.value = []
         } finally {
             isSearching.value = false

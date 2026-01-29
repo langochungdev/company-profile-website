@@ -53,7 +53,6 @@ export function useCollectionConfig(collectionPath: string): UseCollectionConfig
             config.value = await ConfigService.getConfig(db, path);
         } catch (e) {
             error.value = e as Error;
-            console.error("[useCollectionConfig] loadConfig error:", e);
         } finally {
             loading.value = false;
         }

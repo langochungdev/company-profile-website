@@ -66,7 +66,6 @@ export function useSettingsContext(configPath: string): SettingsContextResult {
             }
         } catch (e) {
             error.value = e as Error;
-            console.error("[useSettingsContext] loadSettings error:", e);
         } finally {
             loading.value = false;
         }
@@ -90,7 +89,7 @@ export function useSettingsContext(configPath: string): SettingsContextResult {
             // await $fetch("/api/seo/invalidate", { method: "POST", body: { pageKey } }).catch(() => {});
         } catch (e) {
             error.value = e as Error;
-            console.error("[useSettingsContext] saveSettings error:", e);
+
             throw e;
         } finally {
             loading.value = false;

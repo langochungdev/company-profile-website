@@ -27,7 +27,6 @@ export function useUserManagement() {
         try {
             users.value = await UserService.getAll(db);
         } catch (err: any) {
-            console.error("[useUserManagement] Load error:", err);
             error.value = err.message || "Không thể tải danh sách users";
         } finally {
             loading.value = false;
@@ -71,7 +70,6 @@ export function useUserManagement() {
 
             return true;
         } catch (err: any) {
-            console.error("[useUserManagement] Add error:", err);
             error.value = err.message || "Không thể thêm user";
             return false;
         } finally {
@@ -98,7 +96,6 @@ export function useUserManagement() {
 
             return true;
         } catch (err: any) {
-            console.error("[useUserManagement] Update error:", err);
             error.value = err.message || "Không thể cập nhật user";
             return false;
         } finally {
@@ -126,7 +123,6 @@ export function useUserManagement() {
             users.value = users.value.filter((u) => u.uid !== uid);
             return true;
         } catch (err: any) {
-            console.error("[useUserManagement] Delete error:", err);
             error.value = err.message || "Không thể xóa user";
             return false;
         } finally {

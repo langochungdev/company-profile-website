@@ -37,7 +37,6 @@ export function usePageData<T extends Record<string, unknown>>(pagePath: string)
             }
         } catch (e) {
             error.value = e as Error;
-            console.error("Failed to load page data:", e);
         } finally {
             loading.value = false;
         }
