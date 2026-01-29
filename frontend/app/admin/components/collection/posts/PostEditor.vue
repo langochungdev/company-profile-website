@@ -291,7 +291,7 @@ const validateSlug = async (slug: string) => {
             slugError.value = ''
         }
     } catch (e) {
-        console.error('[PostEditor] Slug check failed', e)
+
     } finally {
         isCheckingSlug.value = false
     }
@@ -385,7 +385,7 @@ const handleSave = async () => {
 
         clearAll()
     } catch (error) {
-        console.error('[PostEditor] Upload failed:', error)
+
         alert('Không thể upload ảnh. Vui lòng thử lại.')
     } finally {
         isUploading.value = false

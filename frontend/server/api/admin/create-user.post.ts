@@ -67,8 +67,6 @@ export default defineEventHandler(async (event) => {
 
         await db.collection(usersPath).doc(userRecord.uid).set(userData);
 
-        console.log(`[Create User API] Created user: ${email} (${username})`);
-
         return {
             success: true,
             user: {
@@ -77,8 +75,6 @@ export default defineEventHandler(async (event) => {
             },
         };
     } catch (error: any) {
-        console.error("[Create User API] Error:", error);
-
         if (error.statusCode) throw error;
 
         if (error.code === "auth/email-already-exists") {

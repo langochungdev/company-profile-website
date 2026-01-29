@@ -42,7 +42,6 @@ export default defineEventHandler(async (event) => {
             total: nbHits,
         };
     } catch (error: any) {
-        console.error("[API] Search error:", error);
         throw createError({
             statusCode: 500,
             message: "Có lỗi xảy ra khi tìm kiếm",

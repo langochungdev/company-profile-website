@@ -34,7 +34,6 @@ export default defineEventHandler(async (event) => {
             try {
                 serviceAccount = JSON.parse(serviceAccount);
             } catch (e) {
-                console.error("[SEO API] Failed to parse service account:", e);
                 throw createError({ statusCode: 500, message: "Invalid Firebase configuration" });
             }
         }
@@ -49,12 +48,9 @@ export default defineEventHandler(async (event) => {
         const configPath = collectionMap[type];
         const collectionPath = getFirestorePath(configPath, config);
 
-        console.log(`[SEO API] Querying: ${collectionPath} with slug: ${slug}`);
-
         const snapshot = await db.collection(collectionPath).where("slug", "==", slug).limit(1).get();
 
         if (snapshot.empty) {
-            console.log(`[SEO API] No document found for slug: ${slug}`);
             throw createError({
                 statusCode: 404,
                 message: `${type} with slug "${slug}" not found`,
@@ -62,7 +58,7 @@ export default defineEventHandler(async (event) => {
         }
 
         const doc = snapshot.docs[0];
-        console.log(`[SEO API] Found document: ${doc.id}`);
+
         return {
             id: doc.id,
             ...doc.data(),
@@ -70,7 +66,6 @@ export default defineEventHandler(async (event) => {
     } catch (error: any) {
         if (error.statusCode) throw error;
 
-        console.error("[SEO API] Error:", error);
         throw createError({
             statusCode: 500,
             message: "Failed to fetch SEO data",

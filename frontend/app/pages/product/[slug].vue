@@ -119,7 +119,7 @@ const { data: fetchedProduct } = await useAsyncData(
             if (error?.statusCode === 404) {
                 return null
             }
-            console.error('[Product] Failed to fetch:', error)
+
             return null
         }
     }
@@ -203,7 +203,7 @@ onMounted(async () => {
                 .slice(0, 4)
         }
     } catch (error) {
-        console.error('Error loading related products:', error)
+
     }
 })
 

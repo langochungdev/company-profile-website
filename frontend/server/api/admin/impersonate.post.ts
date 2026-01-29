@@ -49,8 +49,6 @@ export default defineEventHandler(async (event) => {
             impersonatedAt: Date.now(),
         });
 
-        console.log(`[Impersonate API] Created token for user: ${targetUid}`);
-
         return {
             success: true,
             token: customToken,
@@ -62,8 +60,6 @@ export default defineEventHandler(async (event) => {
             },
         };
     } catch (error: any) {
-        console.error("[Impersonate API] Error:", error);
-
         if (error.statusCode) throw error;
 
         throw createError({

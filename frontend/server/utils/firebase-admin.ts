@@ -24,7 +24,6 @@ function parseServiceAccount(config: any): any {
         try {
             serviceAccount = JSON.parse(cleaned);
         } catch (e) {
-            console.error("[Firebase Admin] Failed to parse service account JSON:", e);
             throw new Error("Invalid Firebase configuration - failed to parse JSON");
         }
     }

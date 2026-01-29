@@ -70,15 +70,11 @@ export default defineEventHandler(async (event) => {
 
         await db.collection(usersPath).doc(userRecord.uid).set(userData);
 
-        console.log(`[Register First Admin API] Created super admin: ${email}`);
-
         return {
             success: true,
             message: "Tạo Super Admin thành công! Hãy đăng nhập.",
         };
     } catch (error: any) {
-        console.error("[Register First Admin API] Error:", error);
-
         if (error.statusCode) throw error;
 
         if (error.code === "auth/email-already-exists") {

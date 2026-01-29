@@ -24,11 +24,6 @@ export default defineEventHandler(async (event): Promise<AlgoliaAnalyticsRespons
     const isProd = config.public.envIsProd;
 
     if (!appId || !adminKey) {
-        console.error("[Algolia Analytics] Missing credentials");
-        throw createError({
-            statusCode: 500,
-            message: "Algolia credentials not configured",
-        });
     }
 
     const startDate = query.startDate as string;
@@ -51,12 +46,6 @@ export default defineEventHandler(async (event): Promise<AlgoliaAnalyticsRespons
         indexes = ["prod_PRODUCT", "prod_SERVICE", "dev_PRODUCT", "dev_SERVICE"];
     }
 
-    console.log("[Algolia Analytics] Fetching data:", {
-        indexes,
-        startDate,
-        endDate,
-    });
-
     try {
         let totalSearches = 0;
         let totalClicks = 0;
@@ -77,31 +66,15 @@ export default defineEventHandler(async (event): Promise<AlgoliaAnalyticsRespons
 
             const [searchData, ctrData, noResultData] = await Promise.all([
                 $fetch<any>(searchUrl, { headers }).catch((err) => {
-                    console.error(`[Algolia] Search count error for ${index}:`, err?.data || err?.message);
                     return { count: 0, dates: [] };
                 }),
                 $fetch<any>(ctrUrl, { headers }).catch((err) => {
-                    console.error(`[Algolia] CTR error for ${index}:`, err?.data || err?.message);
                     return { rate: null, clickCount: 0, trackedSearchCount: 0 };
                 }),
                 $fetch<any>(noResultUrl, { headers }).catch((err) => {
-                    console.error(`[Algolia] NoResult error for ${index}:`, err?.data || err?.message);
                     return { rate: 0, count: 0, noResultCount: 0 };
                 }),
             ]);
-
-            console.log(`[Algolia Analytics] ${index} RAW response:`, {
-                searchData,
-                ctrData,
-                noResultData,
-            });
-
-            console.log(`[Algolia Analytics] ${index} data:`, {
-                searches: searchData?.count || 0,
-                clicks: ctrData?.clickCount || 0,
-                ctr: ctrData?.rate,
-                noResultRate: noResultData?.rate,
-            });
 
             const searchCount = searchData?.count || 0;
             const clickCount = ctrData?.clickCount || 0;
@@ -138,11 +111,9 @@ export default defineEventHandler(async (event): Promise<AlgoliaAnalyticsRespons
 
             const [topSearchData, noResultData] = await Promise.all([
                 $fetch<any>(topSearchUrl, { headers }).catch((err) => {
-                    console.error(`[Algolia] Top searches error for ${index}:`, err?.data || err?.message);
                     return { searches: [] };
                 }),
                 $fetch<any>(noResultUrl, { headers }).catch((err) => {
-                    console.error(`[Algolia] No result searches error for ${index}:`, err?.data || err?.message);
                     return { searches: [] };
                 }),
             ]);
@@ -183,22 +154,8 @@ export default defineEventHandler(async (event): Promise<AlgoliaAnalyticsRespons
             lastUpdated: new Date().toISOString(),
         };
 
-        console.log("[Algolia Analytics] Result:", {
-            totalSearches: result.totalSearches,
-            totalClicks: result.totalClicks,
-            ctr: result.clickThroughRate,
-            noResultsRate: result.noResultsRate,
-            dailyStatsCount: result.dailyStats.length,
-        });
-
         return result;
     } catch (error: any) {
-        console.error("[Algolia Analytics] API Error:", {
-            status: error?.status || error?.statusCode,
-            message: error?.message,
-            data: error?.data,
-        });
-
         throw createError({
             statusCode: error?.status || error?.statusCode || 500,
             message: error?.data?.message || error?.message || "Failed to fetch Algolia analytics",

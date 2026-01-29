@@ -101,7 +101,7 @@ const { data: post } = await useAsyncData(
             if (error?.statusCode === 404) {
                 return null
             }
-            console.error('[Post] Failed to fetch:', error)
+
             return null
         }
     }

@@ -13,7 +13,6 @@ export default defineEventHandler(async () => {
             hasUsers: !snapshot.empty,
         };
     } catch (error: any) {
-        console.error("[Check Has Users API] Error:", error);
         throw createError({
             statusCode: 500,
             message: error.message || "Không thể kiểm tra",

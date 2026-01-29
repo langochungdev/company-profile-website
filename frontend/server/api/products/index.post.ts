@@ -37,7 +37,6 @@ export default defineEventHandler(async (event) => {
             });
         }
 
-        console.error("[API] Create product error:", error);
         throw createError({
             statusCode: 500,
             message: "Có lỗi xảy ra khi tạo sản phẩm",

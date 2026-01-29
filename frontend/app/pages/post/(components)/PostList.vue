@@ -102,19 +102,19 @@ const loadCategories = async () => {
 
         const { getFirestorePath } = await import('@/admin/utils/firestore')
         const configPath = getFirestorePath('collections/posts/config/settings')
-        console.log('[PostList] Loading categories from:', configPath)
+
 
         const configData = await PageService.get(db, configPath)
-        console.log('[PostList] Config data:', configData)
+
 
         if (configData?.categories && Array.isArray(configData.categories)) {
             categories.value = configData.categories.map((cat: any) => cat.name || cat)
-            console.log('[PostList] Categories loaded:', categories.value)
+
         } else {
-            console.warn('[PostList] No categories found in config')
+
         }
     } catch (error) {
-        console.error('[PostList] Failed to load categories:', error)
+
     }
 }
 

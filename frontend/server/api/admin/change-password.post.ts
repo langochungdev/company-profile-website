@@ -45,15 +45,11 @@ export default defineEventHandler(async (event) => {
         const auth = getAdminAuth();
         await auth.updateUser(signInResponse.localId, { password: newPassword });
 
-        console.log(`[Change Password API] Password changed for user: ${email}`);
-
         return {
             success: true,
             message: "Đổi mật khẩu thành công",
         };
     } catch (error: any) {
-        console.error("[Change Password API] Error:", error);
-
         if (error.statusCode) throw error;
 
         if (error.data?.error?.message === "INVALID_PASSWORD" || error.data?.error?.message === "INVALID_LOGIN_CREDENTIALS") {

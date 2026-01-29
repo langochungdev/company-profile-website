@@ -30,7 +30,6 @@ export default defineEventHandler(async (event) => {
 
         return { available: false };
     } catch (error: any) {
-        console.error("[Check Username API] Error:", error);
         throw createError({
             statusCode: 500,
             message: error.message || "Failed to check username",

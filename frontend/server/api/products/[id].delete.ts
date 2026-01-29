@@ -33,7 +33,6 @@ export default defineEventHandler(async (event) => {
     } catch (error: any) {
         if (error.statusCode) throw error;
 
-        console.error("[API] Delete product error:", error);
         throw createError({
             statusCode: 500,
             message: "Có lỗi xảy ra khi xóa sản phẩm",

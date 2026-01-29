@@ -118,7 +118,7 @@ const { data: fetchedProject } = await useAsyncData(
             if (error?.statusCode === 404) {
                 return null
             }
-            console.error('[ServiceProject] Failed to fetch:', error)
+
             return null
         }
     }
@@ -160,7 +160,7 @@ onMounted(async () => {
             relatedProjects.value = related.slice(0, 4)
         }
     } catch (error) {
-        console.error('[ServiceProject] Load related error:', error)
+
     } finally {
         loading.value = false
     }

@@ -75,7 +75,7 @@ const openEditModal = async (item: Record<string, unknown>) => {
         editingItem.value = fullItem ? { ...fullItem } : { ...item }
         isEditorOpen.value = true
     } catch (error) {
-        console.error('[PostsPage] Load item error:', error)
+
         editingItem.value = { ...item }
         isEditorOpen.value = true
     } finally {
@@ -108,7 +108,7 @@ const handleSave = async (data: any) => {
         await previewContext.loadPreviews()
     } catch (error: any) {
         toast.error(error.message || 'Có lỗi xảy ra!')
-        console.error('[PostsPage] Save error:', error)
+
     } finally {
         loading.value = false
     }
@@ -130,15 +130,15 @@ const handleDelete = async (item: Record<string, unknown>) => {
         const fullItem = await collectionContext.getItem(item.id as string)
         const itemToDelete = fullItem || item
 
-        console.log('[PostsPage] Deleting item:', itemToDelete)
+
 
         if (itemToDelete.thumbnail && typeof itemToDelete.thumbnail === 'object' && (itemToDelete.thumbnail as any)?.url) {
-            console.log('[PostsPage] Adding thumbnail to delete queue:', (itemToDelete.thumbnail as any).url)
+
             addToDeleteQueue((itemToDelete.thumbnail as any).url)
         }
         if (itemToDelete.content && typeof itemToDelete.content === 'string') {
             const contentUrls = extractCloudinaryUrls(itemToDelete.content)
-            console.log('[PostsPage] Adding content images to delete queue:', contentUrls)
+
             contentUrls.forEach(url => addToDeleteQueue(url))
         }
 
@@ -150,7 +150,7 @@ const handleDelete = async (item: Record<string, unknown>) => {
         await previewContext.loadPreviews()
     } catch (error: any) {
         toast.error(error.message || 'Có lỗi xảy ra khi xóa!')
-        console.error('[PostsPage] Delete error:', error)
+
     } finally {
         loading.value = false
     }

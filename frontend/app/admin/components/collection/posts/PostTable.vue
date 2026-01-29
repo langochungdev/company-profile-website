@@ -353,7 +353,7 @@ const handleSearch = () => {
             const { hits } = await PostsApiService.search(searchQuery.value)
             searchResults.value = hits
         } catch (error) {
-            console.error('[PostTable] Search error:', error)
+
             searchResults.value = []
         } finally {
             isSearching.value = false

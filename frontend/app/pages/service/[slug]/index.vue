@@ -126,7 +126,7 @@ const loadProjects = async () => {
 
         allProjects.value = items.length > 0 ? items : PLACEHOLDER_SERVICE_PROJECTS
     } catch (error) {
-        console.error('[Service] Load error:', error)
+
         allProjects.value = PLACEHOLDER_SERVICE_PROJECTS
     } finally {
         loading.value = false

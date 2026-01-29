@@ -27,7 +27,6 @@ export default defineEventHandler(async (event) => {
             objectID,
         };
     } catch (error: any) {
-        console.error("[API] Algolia sync error:", error);
         throw createError({
             statusCode: 500,
             message: error.message || "Có lỗi xảy ra khi đồng bộ Algolia",

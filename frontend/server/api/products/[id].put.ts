@@ -62,7 +62,6 @@ export default defineEventHandler(async (event) => {
 
         if (error.statusCode) throw error;
 
-        console.error("[API] Update product error:", error);
         throw createError({
             statusCode: 500,
             message: "Có lỗi xảy ra khi cập nhật sản phẩm",

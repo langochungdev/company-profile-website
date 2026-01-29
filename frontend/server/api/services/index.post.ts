@@ -13,10 +13,8 @@ const ServiceSchema = z.object({
 export default defineEventHandler(async (event) => {
     try {
         const body = await readBody(event);
-        console.log("[API Services] Received body:", JSON.stringify(body, null, 2));
 
         const validatedData = ServiceSchema.parse(body);
-        console.log("[API Services] Validated data:", validatedData);
 
         const db = getFirestore();
         const servicesRef = db.collection("services");
@@ -26,10 +24,7 @@ export default defineEventHandler(async (event) => {
             updatedAt: new Date().toISOString(),
         });
 
-        console.log("[API Services] Created doc:", docRef.id);
-
         await saveToAlgolia(docRef.id, validatedData, "SERVICE");
-        console.log("[API Services] Synced to Algolia");
 
         return {
             success: true,
@@ -37,9 +32,6 @@ export default defineEventHandler(async (event) => {
             data: validatedData,
         };
     } catch (error: any) {
-        console.error("[API] Create service error:", error);
-        console.error("[API] Error stack:", error.stack);
-
         if (error.name === "ZodError") {
             throw createError({
                 statusCode: 400,
